@@ -1,92 +1,164 @@
 import React, {useEffect, setState, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select } from "antd";
-import {getQuotes, getAddress, getRegion} from '../../api/addresses';
-import { useRouteMatch } from "react-router-dom";
+import {getQuotes, getAddress, getUser, } from '../../api/addresses';
+import { useHistory, useRouteMatch, Route, Switch } from "react-router-dom";
+import {getAllInfo} from "../../api/quoteEditAPI";
+const { Item } = Form;
+const { confirm } = Modal;
+const { Option } = Select;
+const {format } = require('date-fns-tz')
 
 export default function AddressInfo() {
  
+  let history = useHistory();
   let match = useRouteMatch('/addressinfo/:address').params.address;
   const [addressInfo, setaddressinfo] = useState([]);
-  const [regionName, setRegionName] = useState([]);
   const [quoteList, setQuoteList] = useState([]);
+  const [userData, setUserData] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  const [tableData, setTableData] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const currentDate = new Date();
-let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
-    useEffect(() => {
-        const func = async () => {
-          var result = await getAddress(match);
-          var addressInfo = result.data.map((item) =>({
-            id: item.AddressID,
-            address: item.Address,
-            city: item.City,
-            postal: item.PostalCode,
-            region: item.Region
-          }));
-          setaddressinfo(addressInfo[0]);
-        };
-        func();
-        getQuoteList();
-        getRegionName();
-      }, [addressInfo.length]);
+  const [formView] = Form.useForm();
+  const [formData, setFormData] = useState([]);
+  const [testData, setTestData] = useState([]);
 
-    const getRegionName = async () => {
-      var result = await getRegion(addressInfo.region);
-      var name = result.data.map((item) =>({
-        name: item.Region
-      }))
-      setRegionName(name[0]);
+    useEffect(async() => {
+        const func = async () => {
+          let result2 = await getAllInfo(match);
+          console.log(result2);
+          setTestData(result2.data);
+    };
+        func();
+        
+        if(testData !== []){
+          setTableData(createTable());
+          setLoaded(true);
+        }
+        
+      }, [tableData.length]);
+
+    const checkDate = (date) => {
+      console.log('date', date);
+      let returnDate = "";
+      if(date === "December 31st, 1969"){
+      }
+      else{
+        returnDate = date;
     }
-    const getQuoteList = async () => {
-        var result = await getQuotes(match);
-        var quotes = result.data.map((item) =>({
+    return returnDate;
+    }
+    const createTable = () => {
+      let tableList = testData.map((item) => (
+        {
           id: item.QuoteID,
-          user: item.UserID,
-          info: item.QuoteInfo,
-          date: item.creationDate,
-          startdate: item.startDate,
-          enddate: item.endDate
-        }));
-        setQuoteList(quotes);
-        console.log(quotes);
-      };
+          salesman: item.FirstName + " " + item.LastName,
+          creationDate: format(new Date(item.creationDate),"MMMM do',' yyyy"),
+          modifyDate: checkDate(format(new Date(item.modifyDate), "MMMM do',' yyyy")),
+          total: item.QuoteTotal
+      }));
+      return tableList;
+    };
+
+    const findSalesman = (id) => {
+      let salesman = "";
+      userData.forEach(element => {
+        if(element.id === id){
+          salesman = element.firstName + " " + element.lastName;
+        }
+      });
+      return salesman;
+    }
     const columns =[
-      {
-        title:"Creation Date",
-        dataIndex:"date",
-        key:"date"
-      },
+      
       {
         title:"Salesman",
-        dataIndex:"user",
+        dataIndex:"FirstName",
         key:"user"
       },
       {
-        title:"Info",
-        dataIndex:"info",
-        key:"info"
+        title:"Quote Total",
+        dataIndex:"QuoteTotal",
+        key:"total"
       },
       {
-        title:"Show Quote Info",
+        title:"Show/Edit Quote Info",
         key:"OpenQuote",
-
+        render: (data) => 
+          (
+            <div>
+              <Button
+         
+          href={`/quoteinfo/${data.id}`}>
+          Edit Quote  
+          </Button>
+            <Button
+            onClick={() => {setShowForm(true);
+                            setFormData(data);
+                            }}>
+            View Quote</Button>
+            </div>)
+      },
+      {
+        title:"Creation Date",
+        dataIndex:"creationDate",
+        key:"date"
+      },
+      {
+        title:"Last Modified",
+        dataIndex:"modifyDate",
+        key:"modDate"
       }   
 
     ]
+    if(loaded){
+
       return(
         <div>
+          <Card title="Customer Information"></Card>
         <Card title="Address Information">
-            
+           {addressInfo.address}
+           <br />
+           {addressInfo.city}
+           <br />
+          {addressInfo.postal}
         </Card>
-        <h2>Quotes</h2>
+
+        <h2>Active Quotes</h2>
         <Table
         style={{ width: "80%", margin: "0 auto" }}
         rowKey="id"
-        bordered
-        dataSource={quoteList}
+        dataSource={testData}
         columns={columns}
         tableLayout="auto"
         pagination={{ pageSize: 10 }}>
-
           </Table>
+
+
+        <Modal
+        visible={showForm}
+        title="View Quote"
+        onOk={() => {console.log("submit")}}
+        onCancel={() => {setShowForm(false)}}>
+          <Form 
+          form={formView}
+          labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
+            <Item name="test">
+
+            </Item>
+          </Form>
+        </Modal>
           </div>
       )
+    }
+
+    else{
+      return(
+        <div>
+          Loading...
+        </div>
+        
+      );
+      
+    }
     }

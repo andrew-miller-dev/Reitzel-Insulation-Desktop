@@ -1,67 +1,115 @@
-import React, {useState, useEffect} from "react";
-import { useRouteMatch, useHistory } from "react-router-dom";
+import { getAddressID, getCustomerID, getQuoteDetails, getUserID, getProductList, getQuoteID, updateQuote, updateDetail, updateProduct, deleteProduct, deleteDetail } from "../../api/quoteEditAPI";
+import {addNewDetails, addNewProductLine} from '../../api/quotes';
+import React, {useState, useEffect} from 'react';
 import Button from "../../component/quotes/Button";
 import {useInput} from '../../hooks/input-hook';
-import { useParams } from "react-router";
-import {useSelector, useDispatch} from "react-redux";
-import CustomSelect from "../../component/quotes/CustomSelect";
-import qData from './quoteData.js';
-import {getCustomerAddresses, getCustomers} from '../../api/customer';
-import {getUser} from '../../util/storage';
+import {Row, Col, Card, Checkbox} from 'antd';
+import { useRouteMatch } from "react-router-dom";
 
-import axios from "axios";
-import { AutoComplete, Card, Row, Col, Checkbox, Modal } from "antd";
-import { isDOMComponentElement } from "react-dom/test-utils";
-
-const {confirm} = Modal;
-
-function QuoteOne(props) {
+function QuoteEdit (props) {
+    let quoteID = useRouteMatch('/quoteinfo/:qid').params.qid;
     const [isLoading, setLoading] = useState(true);
 
-    let { qid } = useParams();
-
-    let { path, url } = useRouteMatch();
-    let history = useHistory();
-
     const {value, bind, reset} = useInput('');
-    
-    const data = useSelector( state => state.quoteOneReducer.quote_one);
-    
-    let  quotes = qData.quote_data;
-    let selectedQuote  = (parseInt(qid)) ? quotes.find((d) => { return parseInt(d.id) == parseInt(qid) }): {};
-    
-    
-    if(Object.keys(selectedQuote).length == 0){
-        history.push(`/quotes`);
-    }
-    const [user, setUser] = useState([]);
-    const [quoteData, setQuoteData] = useState({});
-    const [customers, setCustomers] = useState([]);
-    const [addresses, setAddresses] = useState([]);
-    
-    useEffect(async () => {
-        let result = await getCustomers();
-            let cust = result.data.map((c) => (
-                    {
-                    value : c.CustFirstName + " " + c.CustLastName + " " + c.CustomerID,
-                    id : c.CustomerID,
-                    name : c.CustFirstName + " " + c.CustLastName,
-                    first_name : c.CustFirstName,
-                    last_name : c.CustLastName,
-                    phone : c.Phone,
-                    email : c.Email,
-                    address : c.BillingAddress,
-                    city : c.CustCity,
-                    postal_code : c.CustPostalCode,
-                    region : c.CustRegion,
-                }
-            ));
-            setCustomers(cust);
-            setLoading(false);
-            setUser(getUser());    
-        },[selectedQuote]);
+    const [quoteData, setQuoteData] = useState([]);
+    const [quoteDetail, setQuoteDetail] = useState([]);
+    const [customerData, setCustomerData] = useState([]);
+    const [addressData, setAddressData] = useState([]);
+    const [userData, setUserData] = useState([]);
+    const [productList, setProductList] = useState([]);
+    const [detailKey, setDetailKey] = useState(0);
+    const [prodKey, setProdKey] = useState(0);
 
-    const dispatch = useDispatch();
+    useEffect(async () => {
+        try {
+            let quote = await getQuoteID(quoteID);
+            let quoteInfo = quote.data[0];
+            setQuoteData(quoteInfo);
+            let customerInfo = await getCustomerID(quoteInfo.CustomerID);
+            setCustomerData(customerInfo.data[0]);
+            console.log(customerInfo.data[0]);
+            let addressInfo = await getAddressID(quoteInfo.AddressID);
+            setAddressData(addressInfo.data[0]);
+            let detailList = await getQuoteDetails(quoteInfo.QuoteID);
+            setQuoteDetail(detailList.data);
+            console.log(detailList.data);
+            let products = await getProductList(quoteInfo.QuoteID);
+            setProductList(products.data);
+            console.log(products.data);
+            let user = await getUserID(quoteInfo.UserID);
+            setUserData(user.data[0]);
+            console.log(user.data[0]);
+            createDetails(detailList.data, products.data);
+            setText(customerInfo.data[0], addressInfo.data[0], quoteInfo, user.data[0]);            
+
+        } catch (error) {
+            console.log(error);
+        }
+        setLoading(false);
+        setcounter(counter + 1);
+        console.log(quotedetails);
+        },[]);
+ 
+
+    const createDetails = (detlist, prodlist) => {
+        let temp = quotedetails;
+        detlist.map((detail) => {
+           let detailObj = {
+                    id: detail.subtotalID,
+                    key:detailKey,
+                    details:detail.subtotalNotes,
+                    total:detail.subtotalAmount,
+                    productArr:[]
+                
+            }
+            setDetailKey(detailKey + 1);
+            prodlist.map((prod) => {
+                if(prod.subtotalID === detail.subtotalID){
+                    let prodObj = {
+                        id:prod.QuoteLineID,
+                        key:prodKey,
+                        product:prod.Product,
+                        notes:prod.Notes,
+                        price:prod.Subtotal
+                    }
+                    if(detailObj.productArr.length === 0){
+                        detailObj.productArr[0] =prodObj;
+                    }
+                    else{
+                        detailObj.productArr[detailObj.productArr.length] = prodObj;
+                    }
+                    setProdKey(prodKey + 1);
+                }
+            })
+            if(temp.length === 0){
+                temp[0] = detailObj;
+            }
+            else{
+                temp[temp.length] = detailObj;
+            }
+            setquotedetails(temp);
+        });        
+    }
+    const setText = (customerInfo, addressInfo, quoteInfo, userInfo) => {
+        assignCustID(customerInfo.CustomerID);
+        assignFirstName(customerInfo.CustFirstName);
+        assignLastName(customerInfo.CustLastName);
+        assignPhoneNumber(customerInfo.Phone);
+        assignEmail(customerInfo.Email);
+        assignBillingAddress(customerInfo.BillingAddress);
+        assignCity(customerInfo.CustCity);
+        assignPostCode(customerInfo.CustPostalCode);
+        assignSiteAddress(addressInfo.Address);
+        assignSiteCity(addressInfo.City);
+        assignSiteCode(addressInfo.PostalCode);
+        assignSiteProv(addressInfo.Province);
+        assignCustomerNotes(quoteInfo.notesCustomers);
+        assignInstallerNotes(quoteInfo.notesInstallers);
+        assignUserFirstName(userInfo.FirstName);
+        assignUserLastName(userInfo.LastName);
+
+    setcounter(counter + 1);
+    }
 
     const {value: custID, bind: bindCustID, reset: resetCustID, assignValue: assignCustID} = useInput();
     const {value: firstName, bind: bindFirstName, reset: resetFirstName,assignValue: assignFirstName} = useInput();
@@ -80,108 +128,57 @@ function QuoteOne(props) {
     
     const {value: customerNotes, bind: bindCustomerNotes, reset: resetCustomerNotes, assignValue: assignCustomerNotes} = useInput();
     const {value: installerNotes, bind: bindInstallerNotes, reset: resetInstallerNotes, assignValue: assignInstallerNotes} = useInput();
-    const {value: salesman, bind: bindSalesman, reset: resetSalesman, assignValue: assignSalesman} = useInput();
+
+    const {value: userFirstName, bind: bindUserFirstName, reset: resetUserFirstName, assignValue: assignUserFirstName} = useInput();
+    const {value: userLastName, bind: bindUserLastName, reset: resetUserLastName, assignValue: assignUserLastName} = useInput();
 
     const [tax, setTax] = useState(true);
-        const [counter, setcounter] = useState(1);
-        const [detailKey, setDetailKey] = useState(1);
-        const [prodKey, setProdKey] = useState(1);
-        const [quotedetails, setquotedetails] = useState([{
-                    key:0,
-                    details:selectedQuote.details,
-                    total:0.00,
-                    productArr:[{
-                        prodKey:0,
-                        product:"",
-                        notes:"",
-                        price:0.00
-                    }]
-                }]);
-
+    const [counter, setcounter] = useState(1);
+    const [quotedetails, setquotedetails] = useState([]);
     
-    
-    async function onCustomerSelect(e, option) {
-        if ((e == null || e == "" || e == undefined)) {
-            
-        } else {
-            assignCustID(option.id)
-            assignFirstName(option.first_name)
-            assignLastName(option.last_name)
-            assignPhoneNumber(option.phone)
-            assignEmail(option.email)
-            assignBillingAddress(option.address)
-            assignCity(option.city)
-            assignPostCode(option.postal_code)
-            let result = await getCustomerAddresses(option.id);
-            let addressList = result.data.map((item) => (
-                {
-                    value : item.Address,
-                    id:item.AddressID,
-                    address:item.Address,
-                    postal:item.PostalCode,
-                    city:item.City,
-                    prov:item.Province,
-                    region:item.Region
-
-                }
-            ));
-            setAddresses(addressList);
-        }
-    }
-
-    async function onAddressSelect(e, option){
-        if ((e == null || e == "" || e == undefined)) {
-            
-        } else {
-            assignAddressID(option.id)
-            assignSiteAddress(option.address)
-            assignSiteCity(option.city)
-            assignSiteProv(option.prov)
-            assignSiteCode(option.postal)
-        }
-    }
-    const [formSubmit, setFormSubmit] = useState(false)
-    
-    const handleSubmit = (evt) => {
-
-        var payload = 
+    const handleSubmit = async (evt) => {
+        evt.preventDefault();
+        var quoteInfo = 
         {
-            userInfo:user,
-            id:custID,
-            addressID: addressID,
-            first_name: firstName,
-            last_name: lastName,
-            billing_address: billingAddress,
-            city: city,
-            post_code: postCode,
-            phone_number: phoneNumber,
-            email: email,
-            site_address: siteAddress,
-            site_city: siteCity,
-            site_prov:siteProv,
-            site_postal:siteCode,
+            id:quoteID,
             customer_notes: customerNotes,
             installer_notes: installerNotes,
-            details: quotedetails,
+            
             total: getQuoteTotal(quotedetails)
         }
+        console.log('details',quotedetails);
+        await updateQuote(quoteInfo);
+        quotedetails.map(async (details) => {
+            if(details.id !== null){
+                await updateDetail(details).then(() => {
+                details.productArr.map(async (prod) => {
+                    if(prod.id !== null){
+                        console.log("prod found");
+                        let prodEdit = await updateProduct(prod);
+                    } 
+                    else{
+                        console.log("prod not found");
+                        let newProd = await addNewProductLine(prod, quoteID, details.id);
+                    }
+                });
+            });
+                
 
-        dispatch({
-            type: "quote_one",
-            payload: payload
+            }
+            else{
+                await addNewDetails(details, quoteID).then(() => {
+                     details.productArr.map(async (prod) => {
+                    if(prod.id !== null){
+                        let prodEdit = await updateProduct(prod);
+                    } 
+                    else{
+                        let newProd = await addNewProductLine(prod, quoteID, details.id);
+                    }
+                });
+                });
+               
+            }
         })
-
-        props.onSetQuoteFormDataChange(payload);
-        reset();
-        evt.preventDefault();
-
-    }
-
-    
-
-    const handleSubmitEvent = (values) => {
-        console.log((values))
-        values.preventDefault();
     }
 
     const changeTax = () => {
@@ -198,6 +195,7 @@ function QuoteOne(props) {
         var temp = quotedetails;
         if(temp[temp.length] == 0){
             temp[0] = {
+                id:null,
                 key:detailKey,
                 details:"",
                 total:0.00,
@@ -206,6 +204,7 @@ function QuoteOne(props) {
         }
         else{
             temp[temp.length] = {
+                id:null,
                 key:detailKey,
                 details:"",
                 total:0.00,
@@ -214,6 +213,7 @@ function QuoteOne(props) {
         }
         setDetailKey(detailKey + 1);
         setquotedetails(temp);
+        console.log(quotedetails);
     }
     const handleAddProduct = (details,e) => {
         e.preventDefault();
@@ -222,6 +222,7 @@ function QuoteOne(props) {
         var index = temp.indexOf(details);
         if(temp[index].productArr.length == 0){
             temp[index].productArr[0] = {
+                id:null,
                 prodKey:prodKey,
                 product:"",
                 notes:"",
@@ -230,6 +231,7 @@ function QuoteOne(props) {
         }
         else{
             temp[index].productArr[temp[index].productArr.length] = {
+                id:null,
                 prodKey:prodKey,
                 product:"",
                 notes:"",
@@ -239,8 +241,10 @@ function QuoteOne(props) {
         setProdKey(prodKey + 1);
         setquotedetails(temp);
     }
-    const handleRemoveRow = (details, prod ,e) => {
+    const handleRemoveRow = async(details, prod ,e) => {
         e.preventDefault();
+        console.log(prod.id);
+        await deleteProduct(prod.id);
         setcounter(counter - 1);
         var temp = quotedetails;
         var index = temp.indexOf(details);
@@ -248,8 +252,14 @@ function QuoteOne(props) {
         temp[index].productArr.splice(prodIndex,1);
         setquotedetails(temp);
     }
-    const handleRemoveDetail = (details,e) => {
+    const handleRemoveDetail = async(details,e) => {
         e.preventDefault();
+        console.log(details.id);
+        details.productArr.forEach(async element => {
+            console.log(element.id);
+            await deleteProduct(element.id);
+        });
+        await deleteDetail(details.id);
         setcounter(counter -1);
         var temp = quotedetails;
         var index = temp.indexOf(details);
@@ -275,7 +285,6 @@ function QuoteOne(props) {
         prod.price = rounded;
         setcounter(counter + 1);
     }
-
     const renderProducts = (details) => {
         let rows = [];
             if(details.productArr.length !== 0){
@@ -309,7 +318,6 @@ function QuoteOne(props) {
                                         handleProductPrice(prod, e);
                                      }}
                                      className="ant-input"
-                                     defaultValue='0.00'
                                      />
                             </td>
                              <td style={{textAlign:"right"}}>
@@ -342,7 +350,7 @@ function QuoteOne(props) {
     }
     const renderRows = () => {
         let rows = [];
-        if(quotedetails !== []){
+        if(quotedetails.length > 0){
             
             quotedetails.map((detail) => {
             rows.push(
@@ -400,80 +408,34 @@ function QuoteOne(props) {
     return (
         <form onSubmit={handleSubmit}>
             <div className="Quote" style={{width:"80%"}}>
-                <h2> {quoteData.name}</h2>
                 <div>
-                    Select Customer:
-                    <AutoComplete 
-                    onSelect={(e, option) => {onCustomerSelect(e, option)}}
-                    style={{ width: 200 }}
-                    options={customers}
-                    placeholder="Enter a customer"
-                    filterOption={(inputValue, option) =>
-                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                      }>    
-                    </AutoComplete>
-                    <br/>
-                    Select Site Address:
-                    <AutoComplete
-                    onSelect={(e, option) => {onAddressSelect(e, option)}}
-                    style={{ width: 200 }}
-                    options={addresses}
-                    placeholder="Choose an address"
-                    filterOption={(inputValue, option) =>
-                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    notFoundContent="Choose a customer first or no addresses found"
-                    ></AutoComplete>
-                    <br/>
                     <Row gutter={16}>
                         <Col span={10}>
                             <Card title="Customer and Billing" bordered={false}>
                             Customer:<br />
-                    <input type="text" className="ant-input ant-col-8" name="first_name"
-                            placeholder="First Name" {...bindFirstName} />
-                    <input type="text" className="ant-input ant-col-8" name="last_name"
-                            placeholder="Last Name" {...bindLastName} />
-                    <br/>
+                    <p>{firstName} {lastName}</p>
                     Address:
-                    <input type="text" className="ant-input" name="billing_address"
-                            placeholder="Billing Address" {...bindBillingAddress} />
-                    <br/>
+                    <p>{billingAddress}</p>
                     City:
-                    <input type="text" className="ant-input" name="city"
-                            placeholder="contractor city" {...bindCity} />
-
-                    <br/>
+                    <p>{city}</p>
                     Postal Code:
-                    <input type="text" className="ant-input" name="postal_code"
-                            placeholder="contractor postal code" {...bindPostCode} />
-                    <br/>
+                    <p>{postCode}</p>
                     Phone:
-                    <input type="text" className="ant-input" name="phone_number"
-                            placeholder="contractor phone number" {...bindPhoneNumber} />
-
-                    <br/>
+                    <p>{phoneNumber}</p>
                     Email:
-                    <input type="text" className="ant-input" name="email"
-                            placeholder="contractor email" {...bindEmail} />
+                    <p>{email}</p>
                             </Card>
                         </Col>
                          <Col span={10}>
                             <Card title="Site Address" bordered={false}>
                     Address:
-                    <input type="text" className="ant-input" name="site_address"
-                            placeholder="Site Address" {...bindSiteAddress} />
-                    <br/>
+                    <p>{siteAddress}</p>
                     City:
-                    <input type="text" className="ant-input" name="site_city"
-                            placeholder="Site City" {...bindSiteCity} />
-                    <br/>
+                    <p>{siteCity}</p>
                     Province:
-                    <input type="text" className="ant-input" name="site_prov"
-                            placeholder="Site Province" {...bindSiteProv} />
-                            < br/>
+                    <p>{siteProv}</p>
                     Postal Code:
-                    <input type="text" className="ant-input" name="site_code"
-                            placeholder="Site Postal Code" {...bindSiteCode} />
+                    <p>{siteCode}</p>
                             </Card>
                         </Col>
                      </Row>
@@ -515,7 +477,7 @@ function QuoteOne(props) {
                     rows="3" 
                     className="ant-input"
                     name="customer_notes"
-                    defaultValue={selectedQuote.customer_notes}
+                    defaultValue={quoteData.customer_notes}
                     onChange={(e) => {
                         assignCustomerNotes(e.target.value);
                     }  }
@@ -531,7 +493,7 @@ function QuoteOne(props) {
                     rows="3" 
                     className="ant-input"
                     name="installer_notes"
-                    defaultValue={selectedQuote.installer_notes}
+                    defaultValue={quoteData.installer_notes}
                     onChange={(e) => {
                         assignInstallerNotes(e.target.value);
                     }}
@@ -539,16 +501,16 @@ function QuoteOne(props) {
                     >
                     </textarea>
                     <br/>
-                    Estimator: {user.FirstName + " " + user.LastName} 
-
+                    <p>Estimator: {userFirstName + " " + userLastName}</p>< br/>
                     <br/>
                     <br/>
                     <br/>
-                    <Button size="md" variant="primary" type="submit" className="ant-btn ant-btn-primary">Submit</Button>
+                    
+                    <Button size="md" variant="primary" type="submit" className="ant-btn ant-btn-primary">Update Quote</Button>
                 </div>
             </div>
         </form>
     );
 }
 
-export default QuoteOne;
+export default QuoteEdit;

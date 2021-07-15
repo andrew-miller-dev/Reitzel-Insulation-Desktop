@@ -3,13 +3,14 @@ import { useHistory } from "react-router-dom";
 import Button from "../../component/quotes/Button";
 import { useInput } from "../../hooks/input-hook";
 import { useSelector, useDispatch } from "react-redux";
-import CustomSelect from "../../component/quotes/CustomSelect";
-import { useParams } from "react-router";
+import { Redirect, useParams } from "react-router";
 import qData from "./quoteData.js";
 import Headerforquoto from "../headforquote";
 import Footerforquoto from "../footer";
-import { sendQuote } from "../../api/quotes";
-import { message } from "antd";
+import { message, Card } from "antd";
+import {sendQuote, addNewQuote, addNewDetails, addNewProductLine, getLatestQuote, getLatestDetail} from '../../api/quotes';
+import QuoteEmail from "../../Components/Email_Templates/quote_template";
+import {renderEmail} from 'react-html-email';
 
 
 function printQuote() {
@@ -22,10 +23,36 @@ function printQuote() {
   pri.print();
 }
 
-function emailQuote(customer){
-  var content = document.getElementById("printContents");
-  var email = sendQuote(customer, content.innerHTML);
-  message.success("Email sent");
+async function emailQuote (customer){
+  console.log(customer);
+  try {
+    let result = await addNewQuote(customer)
+    let latestQuote = await getLatestQuote()
+    let quoteID = latestQuote.data[0].QuoteID;
+    customer.details.map(async (detail) => {
+      let result = await addNewDetails(detail, quoteID);
+      let latestDetail = await getLatestDetail()
+      let detailID = latestDetail.data[0].subtotalID;
+      detail.productArr.map(async (prod) => {
+        let result = await addNewProductLine(prod, quoteID, detailID);
+      })
+    })
+    message.success("Quote added");
+  } catch (error) {
+    message.error("Something dun fucked up");
+    console.log(error);
+  }
+  try {
+    sendQuote(customer.email, renderEmail(<QuoteEmail info={customer}/>))
+  } catch (error) {
+    console.log(error);
+    message.error("Whoops");
+  }
+
+  
+  //var content = document.getElementById("printContents");
+  //var email = sendQuote(customer.email, content.innerHTML);
+  //message.success("Email sent");
 }
 
 function QuotePrint(props) {
@@ -52,7 +79,6 @@ function QuotePrint(props) {
 
   const [quoteFormData, setQuoteFormData] = useState(props.quoteFormData);
 
-  console.log(quoteFormData);
   return (
     <div>
       <div
@@ -61,8 +87,8 @@ function QuotePrint(props) {
         style={{ width: "80%", margin: "auto" }}
       >
         <Headerforquoto />
-        <p>
-          <strong>Attention TO:</strong> {quoteFormData.first_name}{" "}
+        <Card>
+          <strong>Attention:</strong> {quoteFormData.first_name}{" "}
           {quoteFormData.last_name}
           <br /> Address: {quoteFormData.billing_address}
           <br /> City: {quoteFormData.city}
@@ -70,76 +96,70 @@ function QuotePrint(props) {
           <br /> Phone: {quoteFormData.phone_number}
           <br /> Email: {quoteFormData.email}
           <br />
-        </p>
-        <p>{quoteFormData.details}</p>
-        <p>
-          {quoteFormData.products.length > 0 && (
+        </Card>
+        <Card>
+          <strong>Site Address</strong>
+          <br /> Site Address: {quoteFormData.site_address}
+          <br /> Site City: {quoteFormData.site_city}
+          <br /> Site Province: {quoteFormData.site_prov}
+          <br /> Site Postal Code: {quoteFormData.site_postal}
+        </Card>
+        <div>
+          {quoteFormData.details.length > 0 && (
             <table width="100%" border="1" cellPadding="10px">
               <thead>
                 <tr>
-                  <td>Product Info</td>
-                  <td width="10%">Subtotal ($)</td>
+                  <td colSpan="3">Quote Details</td>
                 </tr>
               </thead>
               <tbody>
-                {quoteFormData.products.map((product) => {
-                  if (product["isProduct"])
+                {quoteFormData.details.map((item) => {
+
                     return (
-                      <tr>
-                        <td>
-                          {product["name"]} <br></br>
-                          {product["option"]}
-                          <br></br>
+                      <tr key={item.key} >
+                      <tr >
+                        <td colSpan="3" style={{width:'100%', minWidth:"875px"}}>
+                          {item.details}
                         </td>
-                        <td style={{ textAlign: "right" }}>
-                          {product["price"]}
+                        
+                      </tr>
+                      {item.productArr.map((prod) => {
+                        return (
+                            <tr key={prod.prodKey}>
+                              <td width="40%">
+                                {prod.product}
+                              </td>
+                              <td width="40%">
+                                {prod.notes}
+                              </td>
+                                <td width="20%">
+                                  {prod.price}
+                                </td>
+                              </tr>
+                          );
+                          })}
+                      <tr>
+                        <td colSpan="3" style={{textAlign:"right"}}>
+                          Subtotal:${item.total}
                         </td>
                       </tr>
-                    );
-                  else
-                    return (
-                      <tr>
-                        <td colSpan="2">{product["detail"]}</td>
                       </tr>
                     );
                 })}
               </tbody>
-              <tfoot>
-                <tr style={{ borderTop: "2px solid black" }}>
-                  <td style={{ textAlign: "right" }}>Subtotal ($)</td>
-                  <td style={{ textAlign: "right" }}>
-                    {quoteFormData.subtotal}{" "}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ textAlign: "right" }}>Tax %</td>
-                  <td style={{ textAlign: "right" }}>
-                    {quoteFormData.taxper}{" "}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ textAlign: "right" }}>Tax $</td>
-                  <td style={{ textAlign: "right" }}>{quoteFormData.tax}</td>
-                </tr>
-                <tr>
-                  <td style={{ textAlign: "right" }}>Total ($)</td>
-                  <td style={{ textAlign: "right" }}>{quoteFormData.total}</td>
-                </tr>
-              </tfoot>
             </table>
           )}
-        </p>
+        </div>
         <p>Notes to customer: {quoteFormData.customer_notes}</p>
         <p>Notes to installers: {quoteFormData.installer_notes}</p>
-        <p>Estimator: {quoteFormData.salesman}</p>
+        <p>Estimator: {quoteFormData.userInfo.FirstName + " " + quoteFormData.userInfo.LastName}</p>
         <p>
-          WSIB# {quoteFormData.wsib} &nbsp; Account: {quoteFormData.account}{" "}
-          &nbsp; Firm # {quoteFormData.firm}
+        WSIB# Account #1941844 /  Firm # 245166V
         </p>
               <Footerforquoto />
       </div>
       <button onClick={printQuote}> Print this Quote</button>
-      <button onClick={() => emailQuote(quoteFormData.email)}> Send as Email</button> 
+      <button onClick={() => emailQuote(quoteFormData)}>Submit and send as Email</button> 
       <iframe
         id="ifmcontentstoprint"
         style={{ height: "0px", width: "0px", position: "absolute" }}

@@ -12,17 +12,22 @@ axios.interceptors.response.use(null, (err) => {
   } else if (err.response && err.response.status === 404) {
     message.warn("Forbidden");
   } else if (err.response && err.response.status === 401) {
-    message.warn("Access Denied...");
+    message.warn("Access Denied");
   } else if (expectedError) {
-    message.warn("Try another name please..");
+    message.warn("Try another name please");
   }
   return Promise.reject(err);
 });
 //set the request goes with headers[token] automatically
 
-axios.defaults.headers.post["user_id"] = getUser();
-axios.defaults.headers.put["user_id"] = getUser();
-axios.defaults.headers.delete["user_id"] = getUser();
+axios.defaults.headers.post = {
+  "user_id" : null,
+  "Access-Control-Allow-Origin": "*",
+  'Access-Control-Allow-Methods' : 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
+};
+//axios.defaults.headers.post["user_id"] = getUser();
+//axios.defaults.headers.put["user_id"] = getUser();
+//axios.defaults.headers.delete["user_id"] = getUser();
 
 export default function ajax(url, body = {}, method = "GET") {
   //

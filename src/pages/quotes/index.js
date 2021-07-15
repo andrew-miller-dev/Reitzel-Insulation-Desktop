@@ -3,6 +3,8 @@ import { Route, Switch,  Link,  useParams,  useRouteMatch, useHistory } from "re
 import FormOne from "./FormOne";
 import QuoteOne from "./QuoteOne";
 import QuotePrint from "./QuotePrint";
+import QuoteList from "./quoteList";
+import {Space, Button} from "antd";
 
 export default function Quotes() {
 
@@ -40,7 +42,7 @@ export default function Quotes() {
   return (
     <div style={{padding: "10px", margin: "10px"}}>
       <div>
-        <h2> Quote Form  <Link className="btn btn-sm float-right" style={{float: "right"}} to="/quotes"><button> New Quote  </button></Link></h2>
+        <h2> Quotes<Space style={{float:"right"}}><Link to="/quotes/quoteList" ><Button>View All Quotes</Button></Link>  <Link to="/quotes"><Button> New Quote  </Button></Link></Space></h2>
       </div> 
       <hr/>
       <Switch>
@@ -55,6 +57,9 @@ export default function Quotes() {
         </Route>
         <Route path="/quotes/:qid/print" >
           <QuotePrint key={quoteData} quoteFormData={quoteFormData}  quoteData={quoteData} onEditQuoteFormData={onEditQuoteFormData} />
+        </Route>
+        <Route path="/quotes/quoteList">
+          <QuoteList/>
         </Route>
       </Switch>
       

@@ -1,13 +1,13 @@
 import ajax from "./base";
 
-const baseURL = "";
+const baseURL = "https://reitzel-server.herokuapp.com";
 
 
 export async function getAddress(id) {
     var tableName = "Address";
     var condition = `AddressID = '${id}'`
     const address = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       { tableName, condition},
       "post"
     );
@@ -21,7 +21,7 @@ export async function getAddress(id) {
     var tableName = "quotes";
     var condition = `AddressID = '${id}'`
     const quotelist = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       { tableName, condition},
       "post"
     );
@@ -36,7 +36,7 @@ export async function getAddress(id) {
     var tableName = "customers";
     var condition = `CustomerID = '${id}'`
     const customer = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       {tableName, condition},
       "post"
     );
@@ -45,14 +45,13 @@ export async function getAddress(id) {
 
     }
   
-  export async function getRegion(id){
-    var tableName = "region";
-    var condition = `RegionID = '${id}'`
-    const region = await ajax(
-      "/fetchValues",
-      {tableName, condition},
+  export async function getUser(){
+    var tableName = "users";
+    const user = await ajax(
+      `${baseURL}/fetchValues`,
+      {tableName},
       "post"
     );
-    if(region !== []) return region;
+    if(user !== []) return user;
     else return 0;
   }

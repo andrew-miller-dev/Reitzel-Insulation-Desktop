@@ -1,11 +1,10 @@
-import axios from "axios";
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+
 let  qData = {
     quote_data: [
         {
             id: "1",
             name: "Batting Template",
-            details: "We will supply and install Products!",
+            details: "We will supply and install “product name” ",
             customer_notes: "",
             account: "1941844",
             firm: "245166V",
@@ -75,36 +74,6 @@ let  qData = {
             wsib:""
         }
     ],
-    customer_data: [
-        {
-            id: "1",
-            name:"Simran",
-            first_name: "Sim",
-            last_name: "Ran",
-
-        },
-        {
-            id: "2",
-            name:"Dhiraj",
-            first_name: "Dhi",
-            last_name: "raj",
-
-        },
-        {
-            id: "3",
-            name:"lieang",
-            first_name: "lie",
-            last_name: "ang",
-
-        }
-    ],
-    getGustomers: async () => {
-        return new Promise((resolved, reject) => {
-            axios.post("http://localhost:5001/fetchValues",{ tableName: "customers"})
-            .then((resp) => { resolved(resp) })
-            .catch((err) => { reject([]) })
-        });
-    },
 };
 
 export default qData;

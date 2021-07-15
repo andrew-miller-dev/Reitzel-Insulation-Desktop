@@ -1,9 +1,10 @@
 import React, { useState, useEffect, Link } from "react";
 import { Card, Table, Button, Modal, Form, Input, message, Select } from "antd";
-import { getCustomers, getAddresses } from "../../api/customer";
+import { getCustomers, getAddresses, customerLookup } from "../../api/customer";
 import "./index.css";
 import { withRouter } from "react-router";
 
+const {Search} = Input;
 function Customers(props) {
   const [customers, setcustomers] = useState([]);
   const [addressList, setaddresses] = useState([]);
@@ -47,17 +48,35 @@ function Customers(props) {
       var result = await getCustomers();
       var tables = result.data.map((item) => ({
         id: item.CustomerID,
-        firstName: item.FirstName,
-        lastName: item.LastName,
+        firstName: item.CustFirstName,
+        lastName: item.CustLastName,
         billing: item.BillingAddress,
       }));
       setcustomers(tables);
     };
     func();
-  }, [customers.length]);
+  }, []);
 
+  const findCustomers = async (value) => {
+    let result = await customerLookup(value);
+    var tables = result.data.map((item) => ({
+      id: item.CustomerID,
+      firstName: item.CustFirstName,
+      lastName: item.CustLastName,
+      billing: item.BillingAddress,
+    }));
+    setcustomers(tables);
+  }
   return (
-    <Table
+    <div>
+      <Search
+      style={{width:"40%"}}
+      className="searchbar"
+      size = "medium"
+      enterButton="Find Customer"
+      onChange={(e) => {findCustomers(e.target.value)}} />
+
+      <Table
       style={{ width: "80%", margin: "0 auto" }}
       rowKey="id"
       bordered
@@ -66,6 +85,8 @@ function Customers(props) {
       tableLayout="auto"
       pagination={{ pageSize: 10 }}
     ></Table>
+    </div>
+    
   );
 }
 export default withRouter(Customers);

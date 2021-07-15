@@ -1,13 +1,17 @@
+import { getOverlappingDaysInIntervals } from "date-fns";
 import ajax from "./base";
+const currentDate = new Date();
+let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+const baseURL = "https://reitzel-server.herokuapp.com";
 
-const baseURL = "";
+
 
 
 export async function getCustomers() {
     console.log("here");
     var tableName = "Customers";
     const customerlist = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       { tableName},
       "post"
     );
@@ -21,7 +25,7 @@ export async function getCustomers() {
     console.log("here");
     var tableName = "Addresses";
     const addresslist = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       { tableName},
       "post"
     );
@@ -36,7 +40,7 @@ export async function getCustomers() {
     var tableName = "customers";
     var condition = `CustomerID = '${id}'`
     const customer = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       {tableName, condition},
       "post"
     );
@@ -48,7 +52,7 @@ export async function getCustomers() {
     var tableName = "address";
     var condition = `CustomerID = '${id}'`
     const addressList = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       {tableName, condition},
       "post"
     );
@@ -59,7 +63,7 @@ export async function getCustomers() {
     var tableName = "region";
     var condition = `RegionID = '${id}'`
     const region = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       {tableName, condition},
       "post"
     );
@@ -69,7 +73,7 @@ export async function getCustomers() {
   export async function getRegionAPI(){
     var tableName = "region";
     const region = await ajax(
-      "/fetchValues",
+      `${baseURL}/fetchValues`,
       {tableName},
       "post"
     );
@@ -82,7 +86,7 @@ export async function getCustomers() {
     var columnsAndValues = `FirstName='${firstName}',LastName='${lastName}',Phone='${phone}',Email='${email}', BillingAddress='${billing}',City='${city}',PostalCode='${postal}',Region='${region}'`;
   var condition = `CustomerID=${id}`;
   const result = await ajax(
-    "/updateValues",
+    `${baseURL}/updateValues`,
     { tableName, columnsAndValues, condition },
     "post"
   );
@@ -97,7 +101,7 @@ export async function deleteCustomer(id) {
   var tableName = "customers";
   var columns = "*";
   var condition = `CustomerID='${id}'`;
-  const result = await ajax("/deleteValues", { tableName, columns, condition }, "post");
+  const result = await ajax(`${baseURL}/deleteValues`, { tableName, columns, condition }, "post");
   console.log("result", result);
   if (result !== []) return result;
   else {
@@ -109,10 +113,45 @@ export async function addAddress(id, value){
   var tableName = "address";
   var values = `${null},'${id}','${value.BillingAddress}','${value.PostalCode}','${value.City}','${value.Prov}','${value.Region}'`;
 
-  var address = await ajax("/insertValues", { tableName, values }, "post");
+  var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("address", address);
   if (address !== []) return address;
   else {
     return 0;
   }
+}
+
+export async function customerLookup(value){
+  var tableName = "customers";
+  var condition = `CustFirstName LIKE '%${value}%' OR CustLastName LIKE '%${value}%' OR BillingAddress LIKE '%${value}%'`;
+  const customers = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post"
+  );
+  if(customers !== []) return customers;
+  else return 0;
+}
+
+export async function addNotes(value, user, id){
+  var tableName = "customernotes";
+  var values = `${null},'${value}','${date}','${user}','${id}'`;
+  const notes = await ajax(
+    `${baseURL}/insertValues`,
+    {tableName, values},
+    "post"
+  );
+  if(notes !== []) return notes;
+  else return 0;
+}
+
+export async function getNotes(id){
+  var tableName = "customernotes";
+  var condition = `CustomerID = '${id}'`;
+  const notes = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post");
+    if(notes !== []) return notes;
+    else return 0;
 }

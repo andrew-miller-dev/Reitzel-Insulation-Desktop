@@ -30,33 +30,6 @@ const dataSource = new CustomStore({
       endDate : timeFormat(item.endDate)
     }));
     return formatData
-  },
-  update: async (key, values) => {
-    let formatData = {
-      EstimateID : values.EstimateID,
-      CustomerID : values.CustomerID,
-      AddressID : values.AddressID,
-      UserID : values.UserID,
-      CreationDate : values.CreationDate,
-      EstimateInfo : values.EstimateInfo,
-      RegionID : values.RegionID,
-      startDate : timeDeformat(values.startDate),
-      endDate : timeDeformat(values.endDate)
-  }
-    const check = await updateEstimate(key, formatData);
-    console.log(check);
-    return check;
-  },
-  remove: async(key) => {
-    console.log(`removed ${key}`);
-    const data = await deleteEstimate(key);
-    return data
-  },
-  insert: async (key, values) =>{
-    console.log("attempted insert");
-  },
-  onUpdating: (key, values) => {
-    confirm({title:"Send email update to customer?", onOk() {sendEmailUpdate(values)}, cancelText:"No"})
   }
 });
 const sendEmailUpdate = async (values) => {
@@ -80,20 +53,13 @@ const timeDeformat = (date) => {
 }
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
-const views = ['day','week', 'workWeek','month'];
+const views = ['day','workWeek','month'];
 const groups = ['UserID'];
 
 const renderResourceCell = (model) => {
   return (
       <b>{model.data.FirstName}</b>
   );
-}
-
-const onAppointmentDeleting = (e) => {
-  console.log(e);
-  var cancel = true;
-  e.cancel = cancel;
-  var r = confirm({title:"Do you want to delete this appointment?", onOk(){dataSource.remove(e.appointmentData.EstimateID) }, onCancel(){cancel = true}});
 }
 
 class SalesCalendar extends React.Component {
@@ -181,8 +147,10 @@ class SalesCalendar extends React.Component {
         endDayHour={21}
         appointmentComponent={SalesTemplate}
         //appointmentTooltipComponent={SalesTooltip}
-        onAppointmentDeleting={onAppointmentDeleting}
-        onAppointmentFormOpening={this.onAppointmentForm}
+        onAppointmentAdding={(e) => {e.cancel = true}}
+        onAppointmentDeleting={(e) => {e.cancel = true}}
+        onAppointmentFormOpening={(e) => {e.cancel = true}}
+        onAppointmentUpdating={(e) => {e.cancel = true}}
         >
         <Resource
           dataSource={this.state.userList}

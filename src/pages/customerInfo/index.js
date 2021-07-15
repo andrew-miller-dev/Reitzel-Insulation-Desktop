@@ -1,16 +1,19 @@
 import React, {useEffect, setState, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import {getRegion, updateCustomer, getRegionAPI, getCustomer, getCustomerAddresses, deleteCustomer, addAddress} from '../../api/customer';
+import {getRegion, updateCustomer, getRegionAPI, getCustomer, getCustomerAddresses, deleteCustomer, addAddress, addNotes, getNotes} from '../../api/customer';
 import { Redirect, useRouteMatch, useHistory } from "react-router-dom";
 import { withRouter } from "react-router";
-import { PropertiesPanel } from 'devextreme-react/diagram';
- const { Item } = Form;
+import {getUser} from '../../util/storage';
+const { Item } = Form;
 const { confirm } = Modal;
 const { Option } = Select;
+const {TextArea, Search} = Input;
+const { zonedTimeToUtc, utcToZonedTime, format } = require('date-fns-tz')
 
 export function CustomerInfo() {
 
+  let history = useHistory();
   let match = useRouteMatch('/customerinfo/:customer').params.customer;
   const [showForm, setShowForm] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
@@ -19,36 +22,44 @@ export function CustomerInfo() {
   const [regions, setRegions] = useState([]);
   const [customerInfo, setcustomerinfo] = useState([]);
   const [addressList, setAddressList] = useState([]);
+  const [user, setUser] = useState("");
+  const [notes, setNotes] = useState([]);
 
   const options = regions.map((item) => (
     <Option key={item.id}>{item.name}</Option>
   ));
     useEffect(() => {
         const func = async () => {
-          var result = await getCustomer(match);
-          var customerInfo = result.data.map((item) =>({
+          var result = await getCustomer(match).then((info) => {
+            var customerInfo = info.data.map((item) =>({
             id: item.CustomerID,
-            firstName: item.FirstName,
-            lastName: item.LastName,
+            firstName: item.CustFirstName,
+            lastName: item.CustLastName,
             email: item.Email,
             phone: item.Phone,
             billing: item.BillingAddress,
-            city: item.City,
-            postal: item.PostalCode,
-            region: item.Region
+            city: item.CustCity,
+            postal: item.CustPostalCode,
+            region: item.CustRegion
           }));
           setcustomerinfo(customerInfo[0]);
-          
+          });
+          let userInfo = getUser();
+          let initial = userInfo.FirstName.charAt(0) + userInfo.LastName.charAt(0);
+          setUser(initial);
+          var notes = await getNotes(match).then((notes) => {
+            setNotes(notes.data);
+          })
         };
         func();
         getAddressList();
-          getRegions();
+        getRegions();
         
       }, []);
 
     const getAddressList = async () => {
-        var result = await getCustomerAddresses(match);
-        var addresses = result.data.map((item) =>({
+        var result = await getCustomerAddresses(match).then((list) => {
+          var addresses = list.data.map((item) =>({
           id: item.AddressID,
           address: item.Address,
           postalcode: item.PostalCode,
@@ -57,9 +68,9 @@ export function CustomerInfo() {
           region: item.Region
         }));
         setAddressList(addresses);
-        console.log(addresses);
+        })
       };
-      const getRegions = async() =>{
+      const getRegions = async() => {
         var result = await getRegionAPI();
         var regionList = result.data.map((item) =>({
           id:item.RegionID,
@@ -77,7 +88,7 @@ export function CustomerInfo() {
           onClick={() => {
               setShowForm(true);
               form1.setFieldsValue({
-                firstName: customerInfo.firstName,
+              firstName: customerInfo.firstName,
               lastName: customerInfo.lastName,
               email: customerInfo.email,
               phone: customerInfo.phone,
@@ -160,52 +171,63 @@ export function CustomerInfo() {
         setShowAddress(false);
 
       }
+      const getNoteTable = () => {
+        let rows = [];
+        notes.map((item) => {
+          rows.push(
+            <tr>
+              <td>
+                {item.custNotes}
+              </td>
+              <td>
+                {format(new Date(item.dateAdded), "MMMM do',' yyyy")}
+              </td>
+              <td>
+                {item.UserInitial}
+              </td>
+            </tr>
+         
+            
+          );
+        });
+        return rows;
+      }
     const columns =[
       {
         title:"Address",
         dataIndex:"address",
-        key:""
+        key:"address"
       },
       {
         title:"Postal Code",
         dataIndex:"postalcode",
-        key:""
+        key:"postal"
       },
       {
         title:"City",
         dataIndex:"city",
-        key:""
+        key:"city"
       },
       {
         title:"Province",
         dataIndex:"prov",
-        key:""
+        key:"prov"
       },
       {
         title:"Region",
         dataIndex:"region",
-        key:""
-      },
-      {
-        title:"Show Address Info",
-        key:"OpenAddress",
-      render: (data) => ( 
-      <div className="operate-button">
-          <Button
-          type="link"
-          href={`/addressinfo/${data.id}`}
-            >
-           Show Address Details
-          </Button>
-         </div>)
-      }   
+        key:"region"
+      }
+      
     ]
       return(
         <div>
           <Card
           title = {title}
           >
-        <Card title="Customer Information">
+            <div>
+              <div style={{float:"left", width:"30%"}}>
+              <Card title="Customer Information">
             <p>First Name: {customerInfo.firstName}</p>
             <p>Last Name: {customerInfo.lastName}</p>
             <p>Email: {customerInfo.email}</p>
@@ -217,6 +239,61 @@ export function CustomerInfo() {
             <p>City: {customerInfo.city}</p>
             <p>Postal Code: {customerInfo.postal}</p>
         </Card>
+            </div>
+            <div style={{float:"right", width:"50%"}}>
+              <h1>Customer Notes</h1>
+              <Item>
+                <table style={{display:'block', height:"350px", overflowY:"scroll", width:"100%"}}
+              >
+                <thead>
+                  <tr>
+                    <td style={{position:"sticky", top:"0", width:"60%", backgroundColor:"white"}}>
+                      <strong>Notes</strong>
+                    </td>
+                    
+                    <td style={{position:"sticky", top:"0", width:"30%", backgroundColor:"white"}}>
+                      <strong>Date Added</strong>
+                    </td>
+                    <td style={{position:"sticky", top:"0", width:"10%", backgroundColor:"white"}}>
+                      <strong>User Initial</strong>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getNoteTable()}
+                </tbody>
+              </table>
+              </Item>
+              
+              <Item>
+                <TextArea
+                name="notes"
+                allowClear={true}
+                autoSize={{minRows: 2, maxRows: 3}}
+                ></TextArea>
+              </Item>
+              <Item>
+                <Button
+                onClick={async() => {
+                  let value = document.getElementsByName("notes");
+                  console.log(value[0].value);
+                  let result = await addNotes(value[0].value, user, match);
+                  if(result.status === 200){
+                    message.success("added new note");
+                  }
+                  else{
+                    message.error("Something went wrong. Please try again.")
+                  }
+                  document.getElementsByName("notes")[0].value = "";
+                }}>
+                Submit
+                </Button>
+              </Item>
+              
+            </div>
+            </div>
+            
+        
             
         <Table
         style={{ width: "80%", margin: "0 auto" }}

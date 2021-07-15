@@ -12,7 +12,7 @@ export default function Footerforquote() {
     <div className="footerforqueto">
       <div className="beware">
         PLEASE BE AWARE THAT POLYURETHANE SPRAY FOAM INSULATION REQUIRES A
-        THERMAL BARRIER I.E. DRYWALL, OR FIREPROOFING. ¼ INCH TOLERENCE DURING
+        THERMAL BARRIER I.E. DRYWALL, OR FIREPROOFING. ¼ INCH TOLERANCE DURING
         APPLICATION IS REQUIRED.{" "}
       </div>
       <div className="payment">

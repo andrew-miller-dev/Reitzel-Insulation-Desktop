@@ -31,7 +31,7 @@ export default function Login(props) {
             rules={[
               {
                 required: true,
-                message: "Cannot be Emptry!",
+                message: "Cannot be Empty",
               },
             ]}
           >

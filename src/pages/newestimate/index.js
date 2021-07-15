@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, DatePicker, Input, Button, Select, message, Card } from "antd";
+import { Form, DatePicker, Input, Button, Select, message, Card, Modal } from "antd";
 import {
   addOrder,
   addEstimate,
@@ -7,9 +7,13 @@ import {
   addAddress,
   getLatestAddress,
 } from "../../api/neworder";
-import { getRegionAPI, getUsers } from "../../api/calendar";
+import SalesSnapshot from '../../Components/HomeTemplate/SalesCalendar/SalesSnapshot'
+import { getRegionAPI, getUsers, sendConfirm } from "../../api/calendar";
 import "./index.css";
 import TextArea from "antd/lib/input/TextArea";
+import Confirmation from "../../Components/Email_Templates/confirmation"
+import {renderEmail} from 'react-html-email';
+import { useStore } from "react-redux";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
@@ -20,6 +24,7 @@ export default function NewEstimate(props) {
   const [salesmen, setSalesmen] = useState([]);
   const [regions, setRegions] = useState([]);
   const [form] = Form.useForm();
+  const [showCalendar, setShowCalendar] = useState(false);
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 14 },
@@ -90,8 +95,6 @@ export default function NewEstimate(props) {
       ),
       estimateInfo: values.EstimateInfo,
     };
-    console.log("estimate", estimate);
-    console.log("site", siteAddress);
     var result = await addOrder(customer);
 
     if (result.status == 200) {
@@ -115,6 +118,7 @@ export default function NewEstimate(props) {
       getAddressID.data[0].AddressID,
       estimate
     );
+    sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />))
     props.history.push("/home");
   };
 
@@ -264,7 +268,9 @@ export default function NewEstimate(props) {
                 format="YYYY-MM-DD HH:mm"
                 className="datepicker"
               />
+              <Button type="primary" onClick={() => {setShowCalendar(true)}}>Show Calendar</Button>
             </Item>
+            
             <Item
               name="JobType"
               label="Type of Job"
@@ -314,62 +320,15 @@ export default function NewEstimate(props) {
             </Item>
           </Form>
         </Card>
+        <Modal
+        visible={showCalendar}
+        onCancel={() => {setShowCalendar(false)}}
+        width="90%"
+        >
+        <SalesSnapshot />
+      </Modal>
       </div>
+      
     );
   }
 }
-
-
-
-/*
-<Input placeholder="Billing Address" />
-            </Item>
-            <Item
-              label="City"
-              name="City"
-              rules={[
-                {
-                  required: true,
-                  message: "Cannot be Empty",
-                },
-              ]}
-            >
-              <Input placeholder="City" />
-            </Item>
-            <Item
-              label="Province"
-              name="Prov"
-              rules={[
-                {
-                  required: true,
-                  message: "Cannot be Empty",
-                },
-              ]}
-            >
-              <Input placeholder="Province" />
-            </Item>
-            <Item
-              label="Postal Code"
-              name="PostalCode"
-              rules={[
-                {
-                  required: true,
-                  message: "Cannot be Empty",
-                },
-              ]}
-            >
-              <Input placeholder="Postal Code" />
-            </Item>
-            <Item
-              name="Region"
-              label="Region"
-              rules={[
-                {
-                  required: true,
-                  message: "Cannot be Empty",
-                },
-              ]}
-            >
-              <Select>{options}</Select>
-            </Item>
-            */

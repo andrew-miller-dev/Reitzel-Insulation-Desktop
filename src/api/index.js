@@ -1,6 +1,6 @@
 import ajax from "./base";
 
-const baseURL = "";
+const baseURL = "https://reitzel-server.herokuapp.com";
 
 //get the information from weather api
 export const reqWeather = async (city) => {
@@ -13,12 +13,11 @@ export const reqWeather = async (city) => {
 };
 
 export async function getLogin(loginId, loginPwd) {
-  console.log("here");
   var tableName = "users";
   var columns = "*";
   var condition = `Email='${loginId}'and Password='${loginPwd}'`;
   const user = await ajax(
-    "/fetchValues",
+    `${baseURL}/fetchValues`,
     { tableName, columns, condition },
     "post"
   );
@@ -34,7 +33,7 @@ export async function addUser(user) {
   var tableName = "users";
   var values = `null,'${user.loginId}','${user.loginId}','${user.email}','${user.loginPwd}','${user.role}',"null"`;
 
-  var users = await ajax("/insertValues", { tableName, values }, "post");
+  var users = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("user", users);
   if (users !== []) return users;
   else {
@@ -47,7 +46,7 @@ export async function updateUser(id, loginId, loginPwd, email, role) {
   var columsAndvalues = `FirstName='${loginId}',Password='${loginPwd}',Email='${email}',SecurityLevel='${role}'`;
   var condition = `UserID='${id}'`;
   const result = await ajax(
-    "/updateValues",
+    `${baseURL}/updateValues`,
     { tableName, columsAndvalues, condition },
     "post"
   );
@@ -62,7 +61,7 @@ export async function deleteUser(id) {
   var tableName = "users";
   var columns = "*";
   var condition = `UserID='${id}'`;
-  const result = await ajax("/deleteValues", { tableName, columns }, "post");
+  const result = await ajax(`${baseURL}/deleteValues`, { tableName, columns }, "post");
   console.log("result", result);
   if (result !== []) return result;
   else {
@@ -76,7 +75,7 @@ export async function getUsers() {
   var columns = "*";
   var condition = ``;
   const user = await ajax(
-    "/fetchValues",
+    `${baseURL}/fetchValues`,
     { tableName, columns, condition },
     "post"
   );
