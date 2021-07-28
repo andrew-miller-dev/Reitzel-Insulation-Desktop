@@ -31,7 +31,7 @@ export async function getLogin(loginId, loginPwd) {
 //add user
 export async function addUser(user) {
   var tableName = "users";
-  var values = `null,'${user.loginId}','${user.loginId}','${user.email}','${user.loginPwd}','${user.role}',"null"`;
+  var values = `${null},'${user.loginFirstName}','${user.loginLastName}','${user.email}','${user.loginPwd}','${user.role}','${null}'`;
 
   var users = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("user", users);
@@ -41,13 +41,13 @@ export async function addUser(user) {
   }
 }
 //update user
-export async function updateUser(id, loginId, loginPwd, email, role) {
+export async function updateUser(id, loginFirstName, loginLastName, loginPwd, email, role) {
   var tableName = "users";
-  var columsAndvalues = `FirstName='${loginId}',Password='${loginPwd}',Email='${email}',SecurityLevel='${role}'`;
+  var columnsAndValues = `FirstName='${loginFirstName}',LastName='${loginLastName}',Password='${loginPwd}',Email='${email}',SecurityLevel='${role}'`;
   var condition = `UserID='${id}'`;
   const result = await ajax(
     `${baseURL}/updateValues`,
-    { tableName, columsAndvalues, condition },
+    { tableName, columnsAndValues, condition },
     "post"
   );
   console.log("result", result);
@@ -59,9 +59,8 @@ export async function updateUser(id, loginId, loginPwd, email, role) {
 //delete user
 export async function deleteUser(id) {
   var tableName = "users";
-  var columns = "*";
   var condition = `UserID='${id}'`;
-  const result = await ajax(`${baseURL}/deleteValues`, { tableName, columns }, "post");
+  const result = await ajax(`${baseURL}/deleteValues`, { tableName, condition }, "post");
   console.log("result", result);
   if (result !== []) return result;
   else {

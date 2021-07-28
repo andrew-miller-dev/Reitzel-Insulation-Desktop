@@ -1,16 +1,17 @@
-import { getAddressID, getCustomerID, getQuoteDetails, getUserID, getProductList, getQuoteID, updateQuote, updateDetail, updateProduct, deleteProduct, deleteDetail } from "../../api/quoteEditAPI";
+import { getAddressID, getCustomerID, getQuoteDetails, getUserID, getProductList, getQuoteID, updateQuote, updateDetail, updateProduct, deleteProduct, deleteDetail, getAllInfoID } from "../../api/quoteEditAPI";
 import {addNewDetails, addNewProductLine} from '../../api/quotes';
 import React, {useState, useEffect} from 'react';
 import Button from "../../component/quotes/Button";
 import {useInput} from '../../hooks/input-hook';
-import {Row, Col, Card, Checkbox} from 'antd';
-import { useRouteMatch } from "react-router-dom";
+import {Row, Col, Card, Checkbox, message} from 'antd';
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 function QuoteEdit (props) {
     let quoteID = useRouteMatch('/quoteinfo/:qid').params.qid;
+    let history = useHistory();
     const [isLoading, setLoading] = useState(true);
 
-    const {value, bind, reset} = useInput('');
+    const [allData, setAllData] = useState([]);
     const [quoteData, setQuoteData] = useState([]);
     const [quoteDetail, setQuoteDetail] = useState([]);
     const [customerData, setCustomerData] = useState([]);
@@ -22,25 +23,16 @@ function QuoteEdit (props) {
 
     useEffect(async () => {
         try {
-            let quote = await getQuoteID(quoteID);
-            let quoteInfo = quote.data[0];
-            setQuoteData(quoteInfo);
-            let customerInfo = await getCustomerID(quoteInfo.CustomerID);
-            setCustomerData(customerInfo.data[0]);
-            console.log(customerInfo.data[0]);
-            let addressInfo = await getAddressID(quoteInfo.AddressID);
-            setAddressData(addressInfo.data[0]);
-            let detailList = await getQuoteDetails(quoteInfo.QuoteID);
+            let allInfo = await getAllInfoID(quoteID);
+            console.log(allInfo.data[0]);
+            setAllData(allInfo.data[0]);
+            
+            let detailList = await getQuoteDetails(quoteID);
             setQuoteDetail(detailList.data);
-            console.log(detailList.data);
-            let products = await getProductList(quoteInfo.QuoteID);
+            let products = await getProductList(quoteID);
             setProductList(products.data);
-            console.log(products.data);
-            let user = await getUserID(quoteInfo.UserID);
-            setUserData(user.data[0]);
-            console.log(user.data[0]);
             createDetails(detailList.data, products.data);
-            setText(customerInfo.data[0], addressInfo.data[0], quoteInfo, user.data[0]);            
+            setText(allInfo.data[0]);          
 
         } catch (error) {
             console.log(error);
@@ -55,16 +47,16 @@ function QuoteEdit (props) {
         let temp = quotedetails;
         detlist.map((detail) => {
            let detailObj = {
-                    id: detail.subtotalID,
+                    id: detail.SubtotalID,
                     key:detailKey,
-                    details:detail.subtotalNotes,
+                    details:detail.subtotalLines,
                     total:detail.subtotalAmount,
                     productArr:[]
                 
             }
             setDetailKey(detailKey + 1);
             prodlist.map((prod) => {
-                if(prod.subtotalID === detail.subtotalID){
+                if(prod.subtotalID === detail.SubtotalID){
                     let prodObj = {
                         id:prod.QuoteLineID,
                         key:prodKey,
@@ -90,23 +82,23 @@ function QuoteEdit (props) {
             setquotedetails(temp);
         });        
     }
-    const setText = (customerInfo, addressInfo, quoteInfo, userInfo) => {
-        assignCustID(customerInfo.CustomerID);
-        assignFirstName(customerInfo.CustFirstName);
-        assignLastName(customerInfo.CustLastName);
-        assignPhoneNumber(customerInfo.Phone);
-        assignEmail(customerInfo.Email);
-        assignBillingAddress(customerInfo.BillingAddress);
-        assignCity(customerInfo.CustCity);
-        assignPostCode(customerInfo.CustPostalCode);
-        assignSiteAddress(addressInfo.Address);
-        assignSiteCity(addressInfo.City);
-        assignSiteCode(addressInfo.PostalCode);
-        assignSiteProv(addressInfo.Province);
-        assignCustomerNotes(quoteInfo.notesCustomers);
-        assignInstallerNotes(quoteInfo.notesInstallers);
-        assignUserFirstName(userInfo.FirstName);
-        assignUserLastName(userInfo.LastName);
+    const setText = (allInfo) => {
+        assignCustID(allInfo.CustomerID);
+        assignFirstName(allInfo.CustFirstName);
+        assignLastName(allInfo.CustLastName);
+        assignPhoneNumber(allInfo.Phone);
+        assignEmail(allInfo.Email);
+        assignBillingAddress(allInfo.BillingAddress);
+        assignCity(allInfo.CustCity);
+        assignPostCode(allInfo.CustPostalCode);
+        assignSiteAddress(allInfo.Address);
+        assignSiteCity(allInfo.City);
+        assignSiteCode(allInfo.PostalCode);
+        assignSiteProv(allInfo.Province);
+        assignCustomerNotes(allInfo.notesCustomers);
+        assignInstallerNotes(allInfo.notesInstallers);
+        assignUserFirstName(allInfo.FirstName);
+        assignUserLastName(allInfo.LastName);
 
     setcounter(counter + 1);
     }
@@ -146,24 +138,25 @@ function QuoteEdit (props) {
             
             total: getQuoteTotal(quotedetails)
         }
-        console.log('details',quotedetails);
+        try{
+
+        
         await updateQuote(quoteInfo);
         quotedetails.map(async (details) => {
             if(details.id !== null){
                 await updateDetail(details).then(() => {
                 details.productArr.map(async (prod) => {
                     if(prod.id !== null){
-                        console.log("prod found");
+                        
                         let prodEdit = await updateProduct(prod);
                     } 
                     else{
-                        console.log("prod not found");
+                        
                         let newProd = await addNewProductLine(prod, quoteID, details.id);
                     }
                 });
             });
                 
-
             }
             else{
                 await addNewDetails(details, quoteID).then(() => {
@@ -178,7 +171,16 @@ function QuoteEdit (props) {
                 });
                
             }
-        })
+        });
+        message.success("Quote successfully updated");
+    }
+    catch(e){
+        message.error("Something went wrong. Try again in a bit")
+    }
+    finally{
+        history.push('/quotes/quoteList');
+    }
+        
     }
 
     const changeTax = () => {

@@ -61,3 +61,59 @@ export const manuList = [
     ],
   },
 ];
+
+export const salesMenu = [
+  {
+    key: "/home",
+    icon: <HomeOutlined />,
+    path: "/home",
+    content: "Home",
+    isPublic: true,
+  },
+  {
+    key: "/quotes",
+    icon: <DollarCircleOutlined />,
+    path: "/quotes",
+    content: "Quotes",
+  },
+  {
+    key: "/customers",
+    icon: <TeamOutlined />,
+    path: "/customers",
+    content: "Customers",
+  }
+];
+
+export const officeMenu = [
+  {
+    key: "/home",
+    icon: <HomeOutlined />,
+    path: "/home",
+    content: "Home",
+    isPublic: true,
+  },
+  {
+    key: "/quotes",
+    icon: <DollarCircleOutlined />,
+    path: "/quotes",
+    content: "Quotes",
+  },
+  {
+    key: "/orders",
+    icon: <SnippetsOutlined />,
+    path: "/orders",
+    content: "Orders",
+  },
+  {
+    key: "/invoices",
+    icon: <ShoppingCartOutlined />,
+    path: "/invoices",
+    content: "Invoices",
+  },
+  {
+    key: "/customers",
+    icon: <TeamOutlined />,
+    path: "/customers",
+    content: "Customers",
+  }
+];

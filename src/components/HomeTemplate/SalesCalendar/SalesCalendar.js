@@ -26,8 +26,8 @@ const dataSource = new CustomStore({
       CreationDate : item.CreationDate,
       text : item.EstimateInfo,
       RegionID : item.RegionID,
-      startDate : timeFormat(item.startDate),
-      endDate : timeFormat(item.endDate)
+      startDate : item.startDate,
+      endDate : item.endDate
     }));
     return formatData
   },
@@ -40,8 +40,8 @@ const dataSource = new CustomStore({
       CreationDate : values.CreationDate,
       EstimateInfo : values.EstimateInfo,
       RegionID : values.RegionID,
-      startDate : timeDeformat(values.startDate),
-      endDate : timeDeformat(values.endDate)
+      startDate : values.startDate,
+      endDate : values.endDate
   }
     const check = await updateEstimate(key, formatData);
     console.log(check);
@@ -67,17 +67,6 @@ const sendEmailUpdate = async (values) => {
   sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>));
 }
 
-const timeFormat = (date) => {
-   let newdate = zonedTimeToUtc(new Date(date), 'America/Edmonton');
-   var formatteddate = format(newdate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-   return formatteddate;
-}
-
-const timeDeformat = (date) => {
-  let newdate = utcToZonedTime(new Date(date), 'America/Edmonton');
-  var formatteddate = format(newdate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-   return formatteddate;
-}
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 const views = ['day','week', 'workWeek','month'];

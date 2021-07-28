@@ -59,7 +59,7 @@ export async function getCustomers() {
 
   export async function addNewQuote(value){
     var tableName = "quotes";
-    var values = `'${null}','${value.addressID}','${value.id}','${value.userInfo.UserID}','${value.total}','${value.customer_notes}','${value.installer_notes}','${date}'`;
+    var values = `'${null}','${value.addressID}','${value.id}','${value.userInfo.UserID}','${value.total}','${value.customer_notes}','${value.installer_notes}','${date}',${null},${null}`;
     var quote = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
     console.log("quote", quote);
     if (quote !== []) return quote;

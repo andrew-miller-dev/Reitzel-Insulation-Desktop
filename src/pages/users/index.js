@@ -16,10 +16,6 @@ export default function Users() {
   const [addShow, setAddShow] = useState(false);
   //control the status of updating form modal
   const [updateShow, setupdateShow] = useState(false);
-  //control the status of the deleting form modal
-  const [deleteShow, setdeleteShow] = useState(false);
-
-  const [onSelected, setonSelected] = useState();
   const [, setForce] = useState();
 
   const [users, setusers] = useState([]);
@@ -45,9 +41,11 @@ export default function Users() {
   //for table coloums
   const columns = [
     {
-      title: "LoginId",
-      dataIndex: "loginId",
+      title: "Name",
       key: "loginId",
+      render:(data) => (
+        <p>{data.loginFirstName} {data.loginLastName}</p>
+      )
     },
     {
       title: "Email",
@@ -69,9 +67,12 @@ export default function Users() {
             type="primary"
             onClick={() => {
               setselectedData(data);
+              console.log(data);
               setupdateShow(true);
               form1.setFieldsValue({
-                loginId: data.loginId,
+                key:data.id,
+                loginFirstName: data.loginFirstName,
+                loginLastName: data.loginLastName,
                 loginPwd: data.loginPwd,
                 loginPwdConfirm: data.loginPwdConfirm,
                 email: data.email,
@@ -85,7 +86,7 @@ export default function Users() {
             type="primary"
             onClick={() => {
               setselectedData(data);
-              showDeleteConfirm(data.key);
+              showDeleteConfirm(data.id);
             }}
           >
             Delete
@@ -99,10 +100,10 @@ export default function Users() {
     const validResult = await form.validateFields();
     if (validResult.errorFields && validResult.errorFields.length > 0) return;
     const value = form.getFieldsValue();
-    const { loginId, loginPwd, email, role } = value;
-    const result = await addUser({ loginId, loginPwd, email, role });
+    const { loginFirstName, loginLastName, loginPwd, email, role } = value;
+    const result = await addUser({loginFirstName, loginLastName, loginPwd, email, role});
     if (result.data && result.data.affectedRows > 0) {
-      message.success("Success!");
+      message.success("Added new user");
       setAddShow(false);
       setForce();
     }
@@ -113,15 +114,15 @@ export default function Users() {
     const validResult = await form1.validateFields();
     if (validResult.errorFields && validResult.errorFields.length > 0) return;
     const value = form1.getFieldsValue();
-    const { loginId, loginPwd, email, role } = value;
-    const id = selectedData.key;
+    const { loginFirstName, loginLastName, loginPwd, email, role } = value;
+    const id = selectedData.id;
     console.log("id", id);
     //update data in the backend
-    const result = await updateUser(id, loginId, loginPwd, email, role);
+    const result = await updateUser(id, loginFirstName, loginLastName, loginPwd, email, role);
     setupdateShow(false);
     console.log(result);
-    if (result.data.status === 1) {
-      message.success("success!");
+    if (result.status === 200) {
+      message.success("Updated user");
     }
   };
 
@@ -139,9 +140,10 @@ export default function Users() {
       okType: "danger",
       cancelText: "No",
       onOk() {
-        return new Promise((resolve, reject) => {
-          const result = deleteUser(id);
-          if (result === 1) message.success("success!");
+        return new Promise(async(resolve, reject) => {
+          const result = await deleteUser(id);
+          console.log(result);
+          if (result.status === 200) message.success("Successfully deleted user");
           resolve();
         });
       },
@@ -155,8 +157,9 @@ export default function Users() {
     const func = async () => {
       var result = await getUsers();
       var tables = result.data.map((item) => ({
-        id: item.UserId,
-        loginId: item.FirstName,
+        id: item.UserID,
+        loginFirstName: item.FirstName,
+        loginLastName: item.LastName,
         loginPwd: item.Password,
         email: item.Email,
         role: item.SecurityLevel,
@@ -175,7 +178,7 @@ export default function Users() {
           dataSource={users}
           columns={columns}
           tableLayout="auto"
-          pagination={{ pageSize: 3 }}
+          pagination={{ pageSize: 5 }}
         ></Table>
         <Modal
           visible={addShow}
@@ -185,8 +188,8 @@ export default function Users() {
         >
           <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
             <Item
-              label="LoginId"
-              name="loginId"
+              label="First Name"
+              name="loginFirstName"
               rules={[
                 {
                   required: true,
@@ -197,7 +200,19 @@ export default function Users() {
               <Input />
             </Item>
             <Item
-              label="loginPwd"
+              label="Last Name"
+              name="loginLastName"
+              rules={[
+                {
+                  required: true,
+                  message: "Required",
+                },
+              ]}
+            >
+              <Input />
+            </Item>
+            <Item
+              label="Password"
               name="loginPwd"
               rules={[
                 {
@@ -209,7 +224,7 @@ export default function Users() {
               <Input.Password />
             </Item>
             <Item
-              label="ConfirmPwd"
+              label="Confirm Password"
               name="loginPwdConfirm"
               rules={[
                 {
@@ -222,7 +237,7 @@ export default function Users() {
                       return Promise.resolve();
                     }
                     return Promise.reject(
-                      "the two passwords that you entered do not match"
+                      "Passwords must match"
                     );
                   },
                 }),
@@ -231,7 +246,7 @@ export default function Users() {
               <Input.Password />
             </Item>
             <Item
-              label="email"
+              label="Sign-in Email"
               name="email"
               rules={[
                 {
@@ -244,7 +259,7 @@ export default function Users() {
             </Item>
 
             <Item
-              label="role"
+              label="Role"
               name="role"
               rules={[
                 {
@@ -264,9 +279,9 @@ export default function Users() {
           onCancel={handleCancel}
         >
           <Form form={form1} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
-            <Item
-              label="LoginId"
-              name="loginId"
+          <Item
+              label="First Name"
+              name="loginFirstName"
               rules={[
                 {
                   required: true,
@@ -277,7 +292,19 @@ export default function Users() {
               <Input />
             </Item>
             <Item
-              label="loginPwd"
+              label="Last Name"
+              name="loginLastName"
+              rules={[
+                {
+                  required: true,
+                  message: "Required",
+                },
+              ]}
+            >
+              <Input />
+            </Item>
+            <Item
+              label="Password"
               name="loginPwd"
               rules={[
                 {
@@ -289,7 +316,7 @@ export default function Users() {
               <Input.Password />
             </Item>
             <Item
-              label="ConfirmPwd"
+              label="Confirm Password"
               name="loginPwdConfirm"
               rules={[
                 {
@@ -302,7 +329,7 @@ export default function Users() {
                       return Promise.resolve();
                     }
                     return Promise.reject(
-                      "the two password that you entered do not match"
+                      "Passwords must match"
                     );
                   },
                 }),
@@ -311,7 +338,7 @@ export default function Users() {
               <Input.Password />
             </Item>
             <Item
-              label="email"
+              label="Email"
               name="email"
               rules={[
                 {
@@ -324,7 +351,7 @@ export default function Users() {
             </Item>
 
             <Item
-              label="role"
+              label="Role"
               name="role"
               rules={[
                 {

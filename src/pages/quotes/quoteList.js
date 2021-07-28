@@ -19,15 +19,17 @@ const {format } = require('date-fns-tz')
 
     useEffect(async() => {
           const func = async () => {
-          getAllInfo().then((result) => {
+          await getAllInfo().then((result) => {
             setTestData(result.data);
           });
         }
-          getDetails().then((item) => {
+          await getDetails().then((item) => {
             setDetailData(item.data);
+            console.log(item.data);
           });
-          getProducts().then((item) => {
+          await getProducts().then((item) => {
             setProdData(item.data);
+            console.log(item.data);
           })
         func();
         
@@ -48,15 +50,14 @@ const {format } = require('date-fns-tz')
       }
     const getDetailsByID = (id) => {
         let array = [];
-        let arr = [];
         detailData.map((item) => {
           if(item.quoteID === id){
             array.push({
               quoteID:item.quoteID,
               id:item.subtotalID,
-              subtotalNotes:item.subtotalNotes,
+              subtotalLines:item.subtotalLines,
               total:item.subtotalAmount,
-              arr:getProductArr(item.subtotalID)
+              arr:getProductArr(item.SubtotalID)
             });
           }
         });
@@ -89,7 +90,7 @@ const {format } = require('date-fns-tz')
       let rows = [];
       formData.map((item) => {
         rows.push(<Card title="Details" bordered={true} type="inner">
-          <p>{item.subtotalNotes}</p>
+          <p>{item.subtotalLines}</p>
           <strong>Products</strong>
           <table style={{width:'100%'}}>
             <tbody>

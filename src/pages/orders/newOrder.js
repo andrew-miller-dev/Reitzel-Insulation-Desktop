@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import Button from "../../component/quotes/Button";
 import {useInput} from '../../hooks/input-hook';
-import { Card, Checkbox, Row, Col, Form, DatePicker, Modal} from 'antd';
+import { Card, Checkbox, Row, Col, Form, DatePicker, Modal, Button} from 'antd';
 import { useRouteMatch } from "react-router-dom";
 import { getAllInfoID, getDetailsID, getProductsID } from '../../api/orders';
+import { ValueAxis } from 'devextreme-react/chart';
 
 const { RangePicker } = DatePicker;
 const { Item } = Form;
@@ -19,6 +19,7 @@ function NewOrder (props) {
     const [loaded, setLoaded] = useState(false);
     const [quoteDetails, setQuoteDetails] = useState([]);
     const [showCalendar, setShowCalendar] = useState(false);
+    const [form] = Form.useForm();
 
     useEffect(async() => {
       try {
@@ -28,13 +29,9 @@ function NewOrder (props) {
           console.log(result.data[0]);
         });
         let detailsInfo = await getDetailsID(quoteID);
-        //.then((item) => {
           setDetailData(detailsInfo.data);
-        //});
         let productInfo = await getProductsID(quoteID)
-        //.then((item) => {
           setProdData(productInfo.data);
-        //})
         createDetails(detailsInfo.data, productInfo.data);
       
       }
@@ -51,20 +48,41 @@ function NewOrder (props) {
       
     }, [])
 
+    const createOrder = (values) => {
+      const workOrderInfo = {
+        allInfo:quoteData,
+        selectedDetails:findSelectedDetails(),
+        selectedDates:values.selectedDate,
+        selectedTruck:null
+      }
+      props.updateOrder(workOrderInfo);
+    }
+
+    function findSelectedDetails() {
+      let selectItem = [];
+      quoteDetails.map((item) => {
+        if(item.selected){
+          selectItem.push(item);
+        }
+      });
+      return selectItem;
+    }
     const createDetails = (detlist, prodlist) => {
       if(quoteDetails !== []){
       let temp = quoteDetails;
       detlist.map((detail) => {
          let detailObj = {
-                  id: detail.subtotalID,
-                  details:detail.subtotalNotes,
+                  id: detail.SubtotalID,
+                  details:detail.subtotalLines,
                   total:detail.subtotalAmount,
                   selected:false,
                   productArr:[]
               
           }
           prodlist.map((prod) => {
-              if(prod.subtotalID === detail.subtotalID){
+            console.log(prod);
+              if(prod.subtotalID === detail.SubtotalID){
+                console.log("found match");
                   let prodObj = {
                       id:prod.QuoteLineID,
                       product:prod.Product,
@@ -102,7 +120,7 @@ function NewOrder (props) {
             <div>
               <tr>
             <td>
-              <Checkbox onChange={() => {detail.selected = !detail.selected}}></Checkbox>
+              <Checkbox onChange={() => {detail.selected = !detail.selected; console.log(detail)}}></Checkbox>
             </td>
             <td colSpan='2' style={{fontSize:"15px"}}>
               {detail.details}
@@ -157,6 +175,8 @@ function NewOrder (props) {
         <div>
             <h2>New Order Creation</h2>
             
+
+            
             <Card title="Customer and Address Information">
                 <Row>
               <Col>
@@ -175,33 +195,46 @@ function NewOrder (props) {
                 </Card>
               </Col>
             </Row>
-                
-            
-                
             </Card>
-            <Card title="Select the details">
+            <Form form={form} onFinish={createOrder}>
+            <Card title='Select the details'>
+            <Item>
               <table>
                 <tbody>
                   {renderList()}
                 </tbody>
               </table>
-              
-            </Card>
-            <Card title="Select the date">
-              <Item>
-                <RangePicker
+            </Item>
+              </Card>
+              <Card title="Select the date">
+                <Item
+              name="selectedDate"
+            >
+              <RangePicker
                 showTime={{ format: "HH:mm" }}
                 format="YYYY-MM-DD HH:mm"
                 className="datepicker"
               />
-              <Button variant="primary" onClick={() => {setShowCalendar(true)}}>Show Calendar</Button>
-              </Item>
+              
+            </Item>
+            <Item>
+            <Button type="primary" onClick={() => {setShowCalendar(true)}}>Show Calendar</Button>
+            </Item>
+              </Card>
             
+            
+            <Card>
+              <Item>
+              <h1>Select truck</h1>
+            </Item>
             </Card>
-            <Card title="Select the truck">
-
-            </Card>
-            <Button size="lg" variant="primary">Create Work Order</Button>
+            
+            <Item>
+              <Button size="large" type="primary" htmlType="submit">Create Work Order</Button>
+            </Item>
+            
+            
+                </Form>
             <Modal
             visible={showCalendar}
             onCancel={() => {setShowCalendar(false)}}
@@ -209,6 +242,7 @@ function NewOrder (props) {
             >
 
             </Modal>
+             
         </div>
     )   
     }

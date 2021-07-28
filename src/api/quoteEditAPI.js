@@ -92,7 +92,7 @@ export async function updateQuote(values){
 
 export async function updateDetail(values){
     var tableName = 'subtotallines';
-    var columnsAndValues = `subtotalNotes = '${values.details}', subtotalAmount = '${values.total}'`;
+    var columnsAndValues = `subtotalLines = '${values.details}', subtotalAmount = '${values.total}'`;
     var condition = `subtotalID = '${values.id}'`;
     const detailUpdate = await ajax(
         `${baseURL}/updateValues`,
@@ -119,6 +119,18 @@ export async function updateProduct(values){
 
 export async function getAllInfo(){
     var sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID
+    `;
+    const info = await ajax(
+        `${baseURL}/processCustomQuery`,
+        {sql},
+        "post"
+    );
+    if(info !== []) return info;
+    else return 0; 
+}
+
+export async function getAllInfoID(id){
+    var sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID WHERE quotes.QuoteID = '${id}'
     `;
     const info = await ajax(
         `${baseURL}/processCustomQuery`,

@@ -62,7 +62,7 @@ export default function NewEstimate(props) {
   ));
 
   const onFinish = async (values) => {
-    console.log(values);
+
     var customer = {
       FirstName: values.FirstName,
       LastName: values.LastName,
@@ -173,7 +173,7 @@ export default function NewEstimate(props) {
               <Input placeholder="Phone Number" />
             </Item>
             <Item label="Email Address" name="Email">
-              <Input placeholder="Email" />
+              <Input defaultValue=" " />
             </Item>
             <Item label="Site Address" name="siteAddress"
             rules={[
@@ -226,25 +226,25 @@ export default function NewEstimate(props) {
               label="Billing Address"
               name="BillingAddress" 
             >
-            <Input placeholder="Billing Address" />
+            <Input defaultValue=" " />
             </Item>
             <Item
               label="City"
               name="City"
             >
-              <Input placeholder="City" />
+              <Input defaultValue=" " />
             </Item>
             <Item
               label="Province"
               name="Prov"
             >
-              <Input placeholder="Province" />
+              <Input defaultValue=" " />
             </Item>
             <Item
               label="Postal Code"
               name="PostalCode"
             >
-              <Input placeholder="Postal Code" />
+              <Input defaultValue=" " />
             </Item>
             <Item
               name="Region"
@@ -268,9 +268,12 @@ export default function NewEstimate(props) {
                 format="YYYY-MM-DD HH:mm"
                 className="datepicker"
               />
-              <Button type="primary" onClick={() => {setShowCalendar(true)}}>Show Calendar</Button>
+              
             </Item>
-            
+            <Item
+            label="Calendar">
+            <Button type="primary" onClick={() => {setShowCalendar(true)}}>Show Calendar</Button>
+            </Item>
             <Item
               name="JobType"
               label="Type of Job"
@@ -307,7 +310,7 @@ export default function NewEstimate(props) {
             >
               <Select>{options2}</Select>
             </Item>
-            <Item className="login_button">
+            <Item>
               <Button
                 type="primary"
                 htmlType="submit"

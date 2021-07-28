@@ -21,10 +21,10 @@ function Confirmation(props){
             </Item>
             <Item>
             Download document:<br />
-            <A href="C:\Users\amill\OneDrive\Documents\GitHub\sodv2999_team_explorers\src\assets\Customer Info Sheet _ Reitzel Insulation.pdf" download="Customer_Info_Sheet_Reitzel_Insulation">Customer Info</A>
+            <A href="\assets\Customer Info Sheet _ Reitzel Insulation.pdf" download="Customer_Info_Sheet_Reitzel_Insulation">Customer Info</A>
                 <br/>
                 Download COVID-19 protocols:<br />
-                <A href="C:\Users\amill\OneDrive\Documents\GitHub\sodv2999_team_explorers\src\assets\COVID-19.docx" download="COVID-19">COVID-19 Info</A>
+                <A href="\assets\COVID-19.docx" download="COVID-19">COVID-19 Info</A>
 
             </Item>
             <Item>

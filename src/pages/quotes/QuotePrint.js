@@ -32,21 +32,23 @@ async function emailQuote (customer){
     customer.details.map(async (detail) => {
       let result = await addNewDetails(detail, quoteID);
       let latestDetail = await getLatestDetail()
-      let detailID = latestDetail.data[0].subtotalID;
+      let detailID = latestDetail.data[0].SubtotalID;
       detail.productArr.map(async (prod) => {
         let result = await addNewProductLine(prod, quoteID, detailID);
       })
     })
     message.success("Quote added");
   } catch (error) {
-    message.error("Something dun fucked up");
+    message.error("Something went wrong - please try again");
     console.log(error);
   }
   try {
-    sendQuote(customer.email, renderEmail(<QuoteEmail info={customer}/>))
+    if(customer.email !== 'undefined'){
+      sendQuote(customer.email, renderEmail(<QuoteEmail info={customer}/>))
+    }
   } catch (error) {
     console.log(error);
-    message.error("Whoops");
+    message.error("Email failed to send");
   }
 
   

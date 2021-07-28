@@ -8,7 +8,6 @@ export async function addOrder(order) {
   var values = `${null},'${order.FirstName}','${order.LastName}','${order.Phone}','${order.Email}','${order.BillingAddress}','${order.City}','${order.PostalCode}','${order.Region}'`;
 
   var orders = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  console.log("cusotmers", orders);
   if (orders !== []) return orders;
   else {
     return 0;
