@@ -13,7 +13,6 @@ import "./index.css";
 import TextArea from "antd/lib/input/TextArea";
 import Confirmation from "../../Components/Email_Templates/confirmation"
 import {renderEmail} from 'react-html-email';
-import { useStore } from "react-redux";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
@@ -102,7 +101,6 @@ export default function NewEstimate(props) {
     } else message.warn("fail");
     var getCustomerID = await getLatestCustomer();
     var latestCustomer = getCustomerID.data[0].CustomerID;
-    console.log("customerID", getCustomerID);
     if(customer.BillingAddress !== undefined){
           var newAddress = await addAddress(latestCustomer, customer);
     }
@@ -111,8 +109,6 @@ export default function NewEstimate(props) {
     }
     var getAddressID = await getLatestAddress();
     var latestAddress = getAddressID.data[0].CustomerID;
-    console.log(latestAddress);
-    console.log("addressID", getAddressID);
     var estimateResult = await addEstimate(
       latestCustomer,
       getAddressID.data[0].AddressID,

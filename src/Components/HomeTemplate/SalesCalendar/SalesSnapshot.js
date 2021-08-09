@@ -5,13 +5,12 @@ import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
-import {getEstimates, deleteEstimate, getUsers, updateEstimate, getRegionAPI, sendUpdate, findCustomer} from '../../../api/calendar';
+import {getEstimates, getUsers, getRegionAPI, sendUpdate, findCustomer} from '../../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
 import { Modal } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
 
-const { confirm } = Modal;
 const { zonedTimeToUtc, utcToZonedTime, format } = require('date-fns-tz')
 
 const dataSource = new CustomStore({

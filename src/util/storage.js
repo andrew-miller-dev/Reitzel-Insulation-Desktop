@@ -12,3 +12,10 @@ export function setUser(value) {
 export function removeUser() {
   return store.remove(userid)
 }
+
+export function CheckUndefined(data) {
+  if(data === 'undefined'){
+    return ' ';
+  }
+  else return data;
+}

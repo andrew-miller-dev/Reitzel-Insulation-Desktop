@@ -5,11 +5,13 @@ import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
-import {getEstimates, deleteEstimate, getUsers, updateEstimate, getRegionAPI, sendUpdate, findCustomer} from '../../../api/calendar';
+import {getEstimates, deleteEstimate, getUsers, updateEstimate, getRegionAPI, sendUpdate, findCustomer, addNewCustomer, addNewAddress, getLatestCustomer, getLatestAddress, addEstimate} from '../../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
-import { Modal } from 'antd';
+import { message, Modal } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
+import 'devextreme-react/tag-box';
+import { Redirect } from "react-router-dom";
 
 const { confirm } = Modal;
 const { zonedTimeToUtc, utcToZonedTime, format } = require('date-fns-tz')
@@ -52,8 +54,27 @@ const dataSource = new CustomStore({
     const data = await deleteEstimate(key);
     return data
   },
-  insert: async (key, values) =>{
-    console.log("attempted insert");
+  insert: async (values) => {
+    console.log('values', values);
+    try{
+      const addCustomer = await addNewCustomer(values);
+      const latestCustomer = await getLatestCustomer();
+      const customerID = latestCustomer.data[0].CustomerID;
+      const addAddress = await addNewAddress(customerID, values);
+      const latestAddress = await getLatestAddress();
+      const addressID = latestAddress.data[0].AddressID;
+      const addEstimates = await addEstimate(
+        customerID,
+        addressID,
+        values);
+        message.success("New estimate added");
+      return addEstimates;
+    }
+    catch(e){
+      console.log(e);
+    }
+
+    
   },
   onUpdating: (key, values) => {
     confirm({title:"Send email update to customer?", onOk() {sendEmailUpdate(values)}, cancelText:"No"})
@@ -77,7 +98,6 @@ const renderResourceCell = (model) => {
       <b>{model.data.FirstName}</b>
   );
 }
-
 const onAppointmentDeleting = (e) => {
   console.log(e);
   var cancel = true;
@@ -101,6 +121,9 @@ class SalesCalendar extends React.Component {
     this.salesmanSource = this.salesmanSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
+    this.getRegionNames = this.getRegionNames.bind(this);
+    this.getUserName = this.getUserName.bind(this);
+    this.getRegionID  = this.getRegionID.bind(this);
   }
   async InfoIsHere() {
   let regionData = await this.regionSource();
@@ -110,9 +133,145 @@ class SalesCalendar extends React.Component {
   this.setState({info:true});
 } 
   
-  onAppointmentForm(args) {
-    args.cancel = true;
+onAppointmentForm(e) {
+  e.popup.option('showTitle', true);
+  e.popup.option('title', e.appointmentData.text ? 
+      e.appointmentData.text : 
+      'Quick appointment creation');
+  let user = e.appointmentData.UserID;
+
+  const form = e.form;
+  let newGroupItems = [];
+  newGroupItems.push({
+    label:{text: "First Name"},
+    isRequired:true,
+    editorType:'dxTextBox',
+    dataField:"firstName"
+  },
+  {
+    label:{text: "Last Name"},
+    isRequired:true,
+    editorType:'dxTextBox',
+    dataField:"lastName"
+  },
+  {
+    label:{text:'Phone'},
+    isRequired:true,
+    editorType:'dxTextBox',
+    dataField:'phone'
+  },
+  {
+    label:{text:"Email"},
+    editorType:'dxTextBox',
+    dataField:"email",
+  },
+  {
+    label:{text:"Site Address"},
+    isRequired:true,
+    editorType:'dxTextBox',
+    dataField:"siteAddress"
+  },
+  {
+    label:{text:"Site City"},
+    isRequired:true,
+    editorType:'dxTextBox',
+    dataField:"siteCity"
+  },
+  {
+    label:{text:"Site Province"},
+    isRequired:true,
+    editorType:'dxTextBox',
+    dataField:"siteProv"
+  },
+  {
+    label:{text:"Postal Code"},
+    isRequired:true,
+    editorType:'dxTextBox',
+    dataField:"sitePostal"
+  },
+  {
+    label:{text:"Region"},
+    isRequired:true,
+    editorType:'dxSelectBox',
+    editorOptions:{
+      displayExpr:"region",
+      valueExpr:"id",
+      dataSource: this.state.regionList,
+    },
+    dataField:'siteRegion'
+  },
+  {
+    label:{text:"Assigned Salesman"},
+    editorType: 'dxTextBox',
+    editorOptions:{
+      value:this.getUserName(user, this.state.userList),
+      readOnly:true
+    }
+  },
+  {
+    label:{text: "Start Date"},
+    colSpan:2,
+    editorType:'dxDateBox',
+    editorOptions:{type:'datetime', width:'100%'},
+    isRequired:true,
+    dataField:'startDate'
+  },
+  {
+    label:{text: "End Date"},
+    colSpan:2,
+    editorType:'dxDateBox',
+    editorOptions:{type:'datetime', width:'100%'},
+    isRequired:true,
+    dataField:'endDate'
+  },
+  {
+    label:{text:"Description"},
+    colSpan:2,
+    editorType:'dxTextArea',
+    isRequired:true,
+    dataField:'apptInfo'
+  },
+  {
+    label:{text:"Job Type"},
+    colSpan:2,
+    isRequired:true,
+    editorType:'dxSelectBox',
+    editorOptions:{
+      items:['loosefill','spray']
+    },
+    dataField:'jobType'
   }
+  );
+
+  form.itemOption('mainGroup','items', newGroupItems)
+}
+
+getUserName(id, array){
+  let user = '';
+  array.map((item) => {
+    if(item.id === id) {
+      user = item.FirstName + " " + item.LastName;
+    }
+  })
+  return user;
+} 
+
+getRegionNames(array) {
+  let names = [];
+  array.map((item) => {
+    names.push(item.region);
+  });
+  return names;
+}
+getRegionID(name, array){
+  let id = '';
+  array.map((item) => {
+    if(item.region === name) {
+      id = item.FirstName + " " + item.LastName;
+    }
+  })
+  return id;
+}
   onGroupByDateChanged(args) {
     this.setState({
       groupByDate: args.value
@@ -142,10 +301,9 @@ class SalesCalendar extends React.Component {
   componentDidMount(){
     this.InfoIsHere();
 }
-
  
   render() {
-    if (this.state.info == false){
+    if (this.state.info === false){
         return (
           <p>Loading information...</p>
         )
