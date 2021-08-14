@@ -7,13 +7,13 @@ import Invoices from "../../pages/invoices";
 import Customers from "../../pages/customers";
 import Users from "../../pages/users";
 import Roles from "../../pages/roles";
+import Trucks from "../../pages/trucks";
 import CustomerInfo from "../../pages/customerInfo";
 import AddressInfo from "../../pages/addressInfo";
 import NewCusomter from "../../pages/newcustomer";
 import NewEstimate from "../../pages/newestimate";
 import "./index.css";
 import QuoteTemplate from "../../Components/Email_Templates/test_quote";
-import QuoteEdit from '../../pages/quotes/quoteEdit';
 
 const id = 0;
 export default function Main() {
@@ -27,12 +27,12 @@ export default function Main() {
         <Route path="/customers" component={Customers} />
         <Route path="/users" component={Users} />
         <Route path="/roles" component={Roles} />
+        <Route path="/trucks" component={Trucks} />
         <Route path="/customerinfo/:customer" component={CustomerInfo} />
         <Route path="/addressinfo/:address" component={AddressInfo} />
         <Route path="/newcustomer" component={NewCusomter} />
         <Route path="/newestimate" component={NewEstimate} />
         <Route path="/testquote" component={QuoteTemplate} />
-        <Route path="/quoteinfo/:qid" component={QuoteEdit} />
         <Redirect to="/home"></Redirect>
       </Switch>
     </div>

@@ -4,6 +4,7 @@ import FormOne from "./FormOne";
 import QuoteOne from "./QuoteOne";
 import QuotePrint from "./QuotePrint";
 import QuoteList from "./quoteList";
+import QuoteEdit from './quoteEdit';
 import {Space, Button} from "antd";
 
 export default function Quotes() {
@@ -61,6 +62,9 @@ export default function Quotes() {
         <Route path="/quotes/quoteList">
           <QuoteList/>
         </Route>
+        <Route path="/quoteinfo/:qid">
+          <QuoteEdit />
+          </Route> 
       </Switch>
       
     </div>

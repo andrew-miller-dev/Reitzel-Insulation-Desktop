@@ -7,6 +7,7 @@ import {
   HomeOutlined,
   UserOutlined,
   KeyOutlined,
+  ToolOutlined
 } from "@ant-design/icons";
 import React from "react";
 export const manuList = [
@@ -58,7 +59,14 @@ export const manuList = [
         path: "/roles",
         content: "Roles",
       },
+      {
+        key: "/trucks",
+        icon: <ToolOutlined />,
+        path: "/trucks",
+        content: "Trucks"
+      }
     ],
+
   },
 ];
 

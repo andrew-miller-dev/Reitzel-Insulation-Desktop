@@ -1,4 +1,3 @@
-import { getDate } from "date-fns";
 import ajax from "./base";
 
 const baseURL = "https://reitzel-server.herokuapp.com";
