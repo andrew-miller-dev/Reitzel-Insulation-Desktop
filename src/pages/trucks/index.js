@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Button, Switch, Card, Table, Form, Modal, Input, message} from 'antd';
-import { getTrucks, addTruck, changeAvailable } from '../../api/trucks';
+import { getTrucks, addTruck, changeAvailable, deleteTruckID } from '../../api/trucks';
 const {Item} = Form;
 
 export default function Trucks(props) {
@@ -54,8 +54,8 @@ export default function Trucks(props) {
               <div>
                 <Button 
                 type="primary" danger
-                onClick={() => {deleteTruck(data)}}
-                >X</Button>
+                onClick={() => {deleteTruck(data).then(() => {setCount(count + 1)})}}
+                >Delete</Button>
                 </div>
 
                 
@@ -78,7 +78,7 @@ export default function Trucks(props) {
             setTruckList(table);
         } 
         getData();
-    }, [truckList.length]);
+    }, [truckList.length, count]);
 
     const finishSubmit = async () => {
         const validResult = await form.validateFields();
@@ -90,6 +90,7 @@ export default function Trucks(props) {
       message.success("Added new truck");
       setAddShow(false);
     } 
+    setCount(count + 1);
     }
 
     const changeAvail = async(data) => {
@@ -108,7 +109,13 @@ export default function Trucks(props) {
     const deleteTruck = async(data) => {
       Modal.confirm({
         title:"Are you sure you want to delete this truck?",
-        onOk:{},
+        onOk() { return new Promise(async(resolve, reject) => {
+          await deleteTruckID(data).then((item) => {
+            resolve();
+            setCount(count + 1);
+          });
+        })
+          },
         cancelText:'No',
         okText:'Yes'
       });

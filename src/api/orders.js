@@ -36,3 +36,17 @@ export async function getProductsID(id){
     if(prods !== []) return prods;
     else return 0;
 }
+
+export async function getAvailableTrucks() {
+    var tableName = "trucks";
+    var condition = `Available = '1'`
+    const trucklist = await ajax(
+      `${baseURL}/fetchValues`,
+      {tableName, condition},
+      "post"
+    );
+    if (trucklist !== []) return trucklist;
+    else {
+      return 0;
+    }
+}

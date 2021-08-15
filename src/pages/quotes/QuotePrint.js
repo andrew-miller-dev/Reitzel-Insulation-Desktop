@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import Button from "../../component/quotes/Button";
-import { useInput } from "../../hooks/input-hook";
-import { useSelector, useDispatch } from "react-redux";
-import { Redirect, useParams } from "react-router";
+import { useParams } from "react-router";
 import qData from "./quoteData.js";
 import Headerforquoto from "../headforquote";
 import Footerforquoto from "../footer";
@@ -26,15 +23,15 @@ function printQuote() {
 async function emailQuote (customer){
   console.log(customer);
   try {
-    let result = await addNewQuote(customer)
+     await addNewQuote(customer)
     let latestQuote = await getLatestQuote()
     let quoteID = latestQuote.data[0].QuoteID;
     customer.details.map(async (detail) => {
-      let result = await addNewDetails(detail, quoteID);
+       await addNewDetails(detail, quoteID);
       let latestDetail = await getLatestDetail()
       let detailID = latestDetail.data[0].SubtotalID;
       detail.productArr.map(async (prod) => {
-        let result = await addNewProductLine(prod, quoteID, detailID);
+       await addNewProductLine(prod, quoteID, detailID);
       })
     })
     message.success("Quote added");
@@ -65,11 +62,11 @@ function QuotePrint(props) {
   let quotes = qData.quote_data;
   let selectedQuote = parseInt(qid)
     ? quotes.find((d) => {
-        return parseInt(d.id) == parseInt(qid);
+        return parseInt(d.id) === parseInt(qid);
       })
     : {};
 
-  if (Object.keys(selectedQuote).length == 0) {
+  if (Object.keys(selectedQuote).length === 0) {
     history.push(`/quotes`);
   }
 

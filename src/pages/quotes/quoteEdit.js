@@ -7,7 +7,7 @@ import {Row, Col, Card, Checkbox, message} from 'antd';
 import { useHistory, useRouteMatch } from "react-router-dom";
 
 function QuoteEdit (props) {
-    let quoteID = useRouteMatch('/quoteinfo/:qid').params.qid;
+    let quoteID = useRouteMatch('/quotes/:qid/edit').params.qid;
     let history = useHistory();
     const [isLoading, setLoading] = useState(true);
 
@@ -21,8 +21,8 @@ function QuoteEdit (props) {
     const [detailKey, setDetailKey] = useState(0);
     const [prodKey, setProdKey] = useState(0);
 
-    useEffect(async () => {
-        try {
+    useEffect( () => {
+        let func = async() => {
             let allInfo = await getAllInfoID(quoteID);
             console.log(allInfo.data[0]);
             setAllData(allInfo.data[0]);
@@ -32,7 +32,10 @@ function QuoteEdit (props) {
             let products = await getProductList(quoteID);
             setProductList(products.data);
             createDetails(detailList.data, products.data);
-            setText(allInfo.data[0]);          
+            setText(allInfo.data[0]);
+        }
+        try {
+            func();
 
         } catch (error) {
             console.log(error);

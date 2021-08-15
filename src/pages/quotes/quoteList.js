@@ -1,5 +1,5 @@
-import React, {useEffect, setState, useState} from 'react';
-import { Card, Table, Button, Modal, Form, Input, message, Select} from "antd";
+import React, {useEffect, useState} from 'react';
+import { Card, Table, Button, Modal, Input} from "antd";
 import { useHistory } from "react-router-dom";
 import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quoteEditAPI";
 import { getUser } from '../../util/storage';
@@ -11,18 +11,17 @@ const {format } = require('date-fns-tz')
   let user = getUser();
   const [loaded, setLoaded] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const currentDate = new Date();
   const [formData, setFormData] = useState([]);
   const [testData, setTestData] = useState([]);
   const [detailData, setDetailData] = useState([]);
   const [prodData, setProdData] = useState([]);
 
-    useEffect(async() => {
+    useEffect(() => {
           const func = async () => {
           await getAllInfo().then((result) => {
             setTestData(result.data);
           });
-        }
+        
           await getDetails().then((item) => {
             setDetailData(item.data);
             console.log(item.data);
@@ -31,13 +30,14 @@ const {format } = require('date-fns-tz')
             setProdData(item.data);
             console.log(item.data);
           })
+        }
         func();
         
         if(testData !== []){
           setLoaded(true);
         }
         
-      }, []);
+      },[]);
 
       const getUserQuotes = (list) => {
         let newList = [];
@@ -222,7 +222,7 @@ const {format } = require('date-fns-tz')
         visible={showForm}
         title="View Quote"
         onCancel={() => {setShowForm(false)}}
-        onOk={() => {history.push(`/quoteinfo/${formData[0].quoteID}`)}}
+        onOk={() => {history.push(`/quotes/${formData[0].quoteID}/edit`)}}
         okText="Edit Quote"
         >
          <div>

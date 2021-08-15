@@ -40,6 +40,14 @@ export async function changeAvailable(data) {
   else return 0;
 }
 
-export async function deleteTruck(data){
-  
+export async function deleteTruckID(data) {
+  var tableName ='trucks';
+  var condition = `TruckID = '${data.id}'`;
+  const deleted = await ajax(
+    `${baseURL}/deleteValues`,
+    {tableName, condition},
+    "post"
+  );
+  if(deleted !==[]) return deleted;
+  else return 0;
 }

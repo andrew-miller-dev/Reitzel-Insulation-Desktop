@@ -4,23 +4,16 @@ import Button from "../../component/quotes/Button";
 import {useInput} from '../../hooks/input-hook';
 import { useParams } from "react-router";
 import {useSelector, useDispatch} from "react-redux";
-import CustomSelect from "../../component/quotes/CustomSelect";
 import qData from './quoteData.js';
 import {getCustomerAddresses, getCustomers} from '../../api/customer';
 import {getUser} from '../../util/storage';
-
-import axios from "axios";
-import { AutoComplete, Card, Row, Col, Checkbox, Modal } from "antd";
-import { isDOMComponentElement } from "react-dom/test-utils";
-
-const {confirm} = Modal;
+import { AutoComplete, Card, Row, Col, Checkbox } from "antd";
 
 function QuoteOne(props) {
     const [isLoading, setLoading] = useState(true);
 
     let { qid } = useParams();
 
-    let { path, url } = useRouteMatch();
     let history = useHistory();
 
     const {value, bind, reset} = useInput('');
@@ -63,24 +56,23 @@ function QuoteOne(props) {
 
     const dispatch = useDispatch();
 
-    const {value: custID, bind: bindCustID, reset: resetCustID, assignValue: assignCustID} = useInput();
-    const {value: firstName, bind: bindFirstName, reset: resetFirstName,assignValue: assignFirstName} = useInput();
-    const {value: lastName, bind: bindLastName, reset: resetLastName,assignValue: assignLastName} = useInput();
-    const {value: billingAddress, bind: bindBillingAddress, reset: resetBillingAddress, assignValue: assignBillingAddress} = useInput();
-    const {value: city, bind: bindCity, reset: resetCity, assignValue: assignCity} = useInput();
-    const {value: postCode, bind: bindPostCode, reset: resetPostCode,assignValue: assignPostCode} = useInput();
-    const {value: phoneNumber, bind: bindPhoneNumber, reset: resetPhoneNumber, assignValue: assignPhoneNumber} = useInput();
-    const {value: email, bind: bindEmail, reset: resetEmail, assignValue: assignEmail} = useInput();
+    const {value: custID, assignValue: assignCustID} = useInput();
+    const {value: firstName, bind: bindFirstName, assignValue: assignFirstName} = useInput();
+    const {value: lastName, bind: bindLastName, assignValue: assignLastName} = useInput();
+    const {value: billingAddress, bind: bindBillingAddress, assignValue: assignBillingAddress} = useInput();
+    const {value: city, bind: bindCity, assignValue: assignCity} = useInput();
+    const {value: postCode, bind: bindPostCode, assignValue: assignPostCode} = useInput();
+    const {value: phoneNumber, bind: bindPhoneNumber, assignValue: assignPhoneNumber} = useInput();
+    const {value: email, bind: bindEmail, assignValue: assignEmail} = useInput();
 
-    const {value: addressID, bind: bindAddressID, reset: resetAddressID, assignValue: assignAddressID} = useInput();
-    const {value: siteAddress, bind: bindSiteAddress, reset: resetSiteAddress, assignValue: assignSiteAddress} = useInput();
-    const {value: siteCity, bind: bindSiteCity, reset: resetSiteCity, assignValue: assignSiteCity} = useInput();
-    const {value: siteCode, bind: bindSiteCode, reset: resetSiteCode,assignValue: assignSiteCode} = useInput();
-    const {value: siteProv, bind: bindSiteProv, reset: resetSiteProv, assignValue: assignSiteProv} = useInput();
+    const {value: addressID, assignValue: assignAddressID} = useInput();
+    const {value: siteAddress, bind: bindSiteAddress, assignValue: assignSiteAddress} = useInput();
+    const {value: siteCity, bind: bindSiteCity, assignValue: assignSiteCity} = useInput();
+    const {value: siteCode, bind: bindSiteCode, assignValue: assignSiteCode} = useInput();
+    const {value: siteProv, bind: bindSiteProv, assignValue: assignSiteProv} = useInput();
     
-    const {value: customerNotes, bind: bindCustomerNotes, reset: resetCustomerNotes, assignValue: assignCustomerNotes} = useInput();
-    const {value: installerNotes, bind: bindInstallerNotes, reset: resetInstallerNotes, assignValue: assignInstallerNotes} = useInput();
-    const {value: salesman, bind: bindSalesman, reset: resetSalesman, assignValue: assignSalesman} = useInput();
+    const {value: customerNotes, bind: bindCustomerNotes,assignValue: assignCustomerNotes} = useInput();
+    const {value: installerNotes, bind: bindInstallerNotes, assignValue: assignInstallerNotes} = useInput();
 
     const [tax, setTax] = useState(true);
         const [counter, setcounter] = useState(1);
@@ -140,7 +132,6 @@ function QuoteOne(props) {
             assignSiteCode(option.postal)
         }
     }
-    const [formSubmit, setFormSubmit] = useState(false)
     
     const handleSubmit = (evt) => {
 

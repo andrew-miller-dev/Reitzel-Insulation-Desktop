@@ -54,7 +54,7 @@ export default function Quotes() {
           <QuoteOne key={quoteData} quoteData={quoteData} onSetQuoteFormDataChange={onSetQuoteFormDataChange} />
         </Route>
         <Route path="/quotes/:qid/edit" >
-          <QuoteOne key={quoteData} quoteData={quoteData} quoteFormData={quoteFormData} onSetQuoteFormDataChange={onSetQuoteFormDataChange} />
+          <QuoteEdit />
         </Route>
         <Route path="/quotes/:qid/print" >
           <QuotePrint key={quoteData} quoteFormData={quoteFormData}  quoteData={quoteData} onEditQuoteFormData={onEditQuoteFormData} />
@@ -62,9 +62,6 @@ export default function Quotes() {
         <Route path="/quotes/quoteList">
           <QuoteList/>
         </Route>
-        <Route path="/quoteinfo/:qid">
-          <QuoteEdit />
-          </Route> 
       </Switch>
       
     </div>

@@ -13,7 +13,6 @@ const { zonedTimeToUtc, utcToZonedTime, format } = require('date-fns-tz')
 
 export function CustomerInfo() {
 
-  let history = useHistory();
   let match = useRouteMatch('/customerinfo/:customer').params.customer;
   const [showForm, setShowForm] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
@@ -24,13 +23,14 @@ export function CustomerInfo() {
   const [addressList, setAddressList] = useState([]);
   const [user, setUser] = useState("");
   const [notes, setNotes] = useState([]);
+  const [count, setCount] = useState(0);
 
   const options = regions.map((item) => (
     <Option key={item.id}>{item.name}</Option>
   ));
     useEffect(() => {
         const func = async () => {
-          var result = await getCustomer(match).then((info) => {
+           await getCustomer(match).then((info) => {
             var customerInfo = info.data.map((item) =>({
             id: item.CustomerID,
             firstName: item.CustFirstName,
@@ -47,15 +47,17 @@ export function CustomerInfo() {
           let userInfo = getUser();
           let initial = userInfo.FirstName.charAt(0) + userInfo.LastName.charAt(0);
           setUser(initial);
-          var notes = await getNotes(match).then((notes) => {
+           await getNotes(match).then((notes) => {
             setNotes(notes.data);
           })
         };
         func();
         getAddressList();
         getRegions();
+        document.getElementsByName("notes")[0].value = "";
+
         
-      }, []);
+      }, [count]);
 
     const getAddressList = async () => {
         var result = await getCustomerAddresses(match).then((list) => {
@@ -267,24 +269,47 @@ export function CustomerInfo() {
               
               <Item>
                 <TextArea
+                defaultValue=""
                 name="notes"
                 allowClear={true}
                 autoSize={{minRows: 2, maxRows: 3}}
+                onPressEnter={
+                  async() => {
+                    let box = document.getElementsByName("notes")[0];
+                    await addNotes(box.value, user, match)
+                    .then((item) => {
+                      setCount(count + 1);
+                      if(item.status === 200){
+                      message.success("added new note");
+                      box.value = " ";
+                    }
+                    else{
+                      message.error("Something went wrong. Please try again.");
+                      box.value = " ";
+                    }        });
+                  }
+                }
                 ></TextArea>
               </Item>
               <Item>
                 <Button
                 onClick={async() => {
-                  let value = document.getElementsByName("notes");
-                  console.log(value[0].value);
-                  let result = await addNotes(value[0].value, user, match);
-                  if(result.status === 200){
+                  let box = document.getElementsByName("notes")[0];
+                  await addNotes(box.value, user, match)
+                  .then((item) => {
+                    setCount(count + 1);
+                    if(item.status === 200){
                     message.success("added new note");
+                    box.value = " ";
                   }
                   else{
-                    message.error("Something went wrong. Please try again.")
-                  }
-                  document.getElementsByName("notes")[0].value = "";
+                    message.error("Something went wrong. Please try again.");
+                    box.value = " ";
+                  }        });
+                  
+                  
+                  
+                  
                 }}>
                 Submit
                 </Button>

@@ -1,13 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {useInput} from '../../hooks/input-hook';
-import { Card, Checkbox, Row, Col, Form, DatePicker, Modal, Button} from 'antd';
+import { Card, Checkbox, Row, Col, Form, DatePicker, Modal, Button, Select} from 'antd';
 import { useRouteMatch } from "react-router-dom";
-import { getAllInfoID, getDetailsID, getProductsID } from '../../api/orders';
-import { ValueAxis } from 'devextreme-react/chart';
+import { getAllInfoID, getDetailsID, getProductsID, getAvailableTrucks } from '../../api/orders';
 
 const { RangePicker } = DatePicker;
 const { Item } = Form;
-
+const {Option} = Select;
 
 function NewOrder (props) {
     
@@ -20,6 +19,7 @@ function NewOrder (props) {
     const [quoteDetails, setQuoteDetails] = useState([]);
     const [showCalendar, setShowCalendar] = useState(false);
     const [form] = Form.useForm();
+    const [trucks, setTrucks] = useState([]);
 
     useEffect(async() => {
       try {
@@ -33,6 +33,10 @@ function NewOrder (props) {
         let productInfo = await getProductsID(quoteID)
           setProdData(productInfo.data);
         createDetails(detailsInfo.data, productInfo.data);
+        await getAvailableTrucks().then((result) => {
+          setTrucks(result.data);
+        })
+        
       
       }
       
@@ -47,6 +51,10 @@ function NewOrder (props) {
       }
       
     }, [])
+
+    const options = trucks.map((item, index) => (
+      <Option key = {index + 1}>{item.TruckNumber + " " + item.TruckInfo} </Option> 
+    ))
 
     const createOrder = (values) => {
       const workOrderInfo = {
@@ -82,7 +90,6 @@ function NewOrder (props) {
           prodlist.map((prod) => {
             console.log(prod);
               if(prod.subtotalID === detail.SubtotalID){
-                console.log("found match");
                   let prodObj = {
                       id:prod.QuoteLineID,
                       product:prod.Product,
@@ -120,7 +127,7 @@ function NewOrder (props) {
             <div>
               <tr>
             <td>
-              <Checkbox onChange={() => {detail.selected = !detail.selected; console.log(detail)}}></Checkbox>
+              <Checkbox onChange={() => {detail.selected = !detail.selected;}}></Checkbox>
             </td>
             <td colSpan='2' style={{fontSize:"15px"}}>
               {detail.details}
@@ -226,6 +233,9 @@ function NewOrder (props) {
             <Card>
               <Item>
               <h1>Select truck</h1>
+            </Item>
+            <Item>
+              <Select>{options}</Select>
             </Item>
             </Card>
             
