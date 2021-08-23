@@ -142,8 +142,6 @@ function QuoteEdit (props) {
             total: getQuoteTotal(quotedetails)
         }
         try{
-
-        
         await updateQuote(quoteInfo);
         quotedetails.map(async (details) => {
             if(details.id !== null){

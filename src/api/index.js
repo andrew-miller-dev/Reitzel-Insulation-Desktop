@@ -31,8 +31,7 @@ export async function getLogin(loginId, loginPwd) {
 //add user
 export async function addUser(user) {
   var tableName = "users";
-  var values = `${null},'${user.loginFirstName}','${user.loginLastName}','${user.email}','${user.loginPwd}','${user.role}','${null}'`;
-
+  var values = `${null},'${user.loginFirstName}','${user.loginLastName}','${user.email}','${user.loginPwd}','${user.role}'`;
   var users = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("user", users);
   if (users !== []) return users;
@@ -86,21 +85,65 @@ export async function getUsers() {
 }
 
 //adding a new role
-export function addRole(rolename) {
-  const obj = {
-    rolename,
-    authTime: "",
-    authAuthor: "",
-    menus: [""],
-    createAt: "",
-  };
-  datas.role.push(obj);
-  return 1;
+export async function addRole(value) {
+  var tableName = 'roles';
+  var values = `${null},'${value}','[]'`
+  const role = await ajax(
+    `${baseURL}/insertValues`,
+    {tableName, values},
+    "post"
+  );
+  if(role !== []) return role;
+  else return 0;
 }
 
 //getting the role lists
-export function getRoles() {
-  return datas.role;
+export async function getRoles() {
+  var tableName = 'roles';
+  const roleList = await ajax (
+    `${baseURL}/fetchValues`,
+    {tableName},
+    "post"
+  );
+  if(roleList !== []) return roleList;
+  else return 0;
+}
+
+export async function updateRole(value, id) {
+  var tableName = 'roles';
+  var columnsAndValues = `RoleMenu = '${value}'`
+  var condition = `RoleID='${id.RoleID}'`;
+  const update = await ajax(
+    `${baseURL}/updateValues`,
+    {tableName, columnsAndValues,condition},
+    "post"
+  );
+  if (update !== []) return update;
+  else return 0;
+}
+
+export async function deleteRole(id) {
+  var tableName = 'roles';
+  var condition = `RoleID = '${id}'`;
+  const deleteRole = await ajax(
+    `${baseURL}/deleteValues`,
+    {tableName, condition},
+    "post"
+  );
+  if(deleteRole !== []) return deleteRole;
+  else return 0; 
+}
+
+export async function getMenuData(data) {
+  var tableName = 'roles';
+  var condition = `RoleName = '${data.SecurityLevel}'`
+  const menuList = await ajax (
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post"
+  );
+  if(menuList !== []) return menuList;
+  else return 0;
 }
 
 export const datas = {

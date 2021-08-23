@@ -11,10 +11,7 @@ import { message, Modal } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
-import { Redirect } from "react-router-dom";
-
 const { confirm } = Modal;
-const { zonedTimeToUtc, utcToZonedTime, format } = require('date-fns-tz')
 
 const dataSource = new CustomStore({
   key: "EstimateID",

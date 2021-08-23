@@ -2,23 +2,22 @@ import React, { useState, useEffect } from "react";
 import { reqWeather } from "../../api/index";
 import LinkButton from "../../pages/linkbutton";
 import { Modal } from "antd";
-import { removeUser } from "../../util/storage";
+import { removeMenu, removeUser } from "../../util/storage";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import "./index.css";
 import { withRouter } from "react-router-dom";
+const {format} = require('date-fns-tz');
 
 function Head(props) {
   const [date, setCurrendate] = useState();
-  const [city, setCity] = useState("Calgary");
+  const city = "Toronto";
   const [icon, setIcon] = useState(`http://openweathermap.org/img/w/10d.png`);
   const [main, setMain] = useState();
   const timer = setInterval(() => {
     if (timer) clearInterval(timer);
     const date = new Date(Date.now());
-    const dateFormat = `${date.getFullYear()}/${
-      date.getMonth() + 1
-    }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    setCurrendate(dateFormat);
+    const dateFormatted = format(date,"MMMM do',' yyyy h':'mm':'ss");
+    setCurrendate(dateFormatted);
   }, 1000);
   const getCancel = () => {
     Modal.confirm({
@@ -26,6 +25,7 @@ function Head(props) {
       content: "Do you want to logout?",
       onOk: () => {
         removeUser();
+        removeMenu();
         props.history.push("/login");
       },
     });

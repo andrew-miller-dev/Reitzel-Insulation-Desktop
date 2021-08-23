@@ -1,7 +1,8 @@
 import store from 'store'
 
 //set the name of localstorage
-const userid = 'user_id'
+const userid = 'user_id';
+const menu = 'menu';
 
 export function getUser() {
   return store.get(userid)
@@ -13,9 +14,12 @@ export function removeUser() {
   return store.remove(userid)
 }
 
-export function CheckUndefined(data) {
-  if(data === 'undefined'){
-    return ' ';
-  }
-  else return data;
+export function getMenu() {
+  return store.get(menu);
+}
+export function setMenu(value) {
+  return store.set(menu, value)
+}
+export function removeMenu() {
+  return store.remove(menu)
 }

@@ -17,8 +17,9 @@ export default function Users() {
   //control the status of updating form modal
   const [updateShow, setupdateShow] = useState(false);
   const [, setForce] = useState();
-
   const [users, setusers] = useState([]);
+  const [count, setCount] = useState(0);
+
 
   //the selected to be updated or deleted data
   const [selectedData, setselectedData] = useState({});
@@ -59,7 +60,7 @@ export default function Users() {
       key: "role",
     },
     {
-      title: "Operate",
+      title: "Settings",
       key: "operate",
       render: (data) => (
         <div className="operate-button">
@@ -106,6 +107,7 @@ export default function Users() {
       message.success("Added new user");
       setAddShow(false);
       setForce();
+      setCount(count + 1);
     }
   };
   //handle updating form
@@ -145,6 +147,7 @@ export default function Users() {
           console.log(result);
           if (result.status === 200) message.success("Successfully deleted user");
           resolve();
+          setCount(count + 1);
         });
       },
       onCancel() {
@@ -167,7 +170,7 @@ export default function Users() {
       setusers(tables);
     };
     func();
-  }, [users.length]);
+  }, [users.length, count]);
   return (
     <div className="settings-user">
       <Card title={title} bordered>
