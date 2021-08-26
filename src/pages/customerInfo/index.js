@@ -1,15 +1,15 @@
-import React, {useEffect, setState, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import {getRegion, updateCustomer, getRegionAPI, getCustomer, getCustomerAddresses, deleteCustomer, addAddress, addNotes, getNotes} from '../../api/customer';
-import { Redirect, useRouteMatch, useHistory } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import { withRouter } from "react-router";
 import {getUser} from '../../util/storage';
 const { Item } = Form;
 const { confirm } = Modal;
 const { Option } = Select;
-const {TextArea, Search} = Input;
-const { zonedTimeToUtc, utcToZonedTime, format } = require('date-fns-tz')
+const {TextArea} = Input;
+const { format } = require('date-fns-tz')
 
 export function CustomerInfo() {
 

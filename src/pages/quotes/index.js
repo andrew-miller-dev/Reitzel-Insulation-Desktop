@@ -1,22 +1,21 @@
+
 import React, {useEffect, useState } from "react";
-import { Route, Switch,  Link,  useParams,  useRouteMatch, useHistory } from "react-router-dom";
+import { Route, Switch,  Link,  useRouteMatch, useHistory } from "react-router-dom";
 import FormOne from "./FormOne";
 import QuoteOne from "./QuoteOne";
 import QuotePrint from "./QuotePrint";
 import QuoteList from "./quoteList";
 import QuoteEdit from './quoteEdit';
 import {Space, Button} from "antd";
-import { menuCreate } from "../../config/menucreate";
+
 
 export default function Quotes() {
 
   const [quoteDataId, setQuoteDataId] = useState('0');
   const [quoteData, setQuoteData] = useState({});
   const [quoteFormData, setQuoteFormData] = useState({});
-
   let { path, url } = useRouteMatch();
   let history = useHistory();
-
   function onSetQuoteDataChange(data) {
     if (!(data == null || data  == "" || data == undefined)) {
         setQuoteDataId(data.id);
@@ -26,7 +25,6 @@ export default function Quotes() {
         setQuoteData({});
     }
   }
-
   function onSetQuoteFormDataChange(data) {
     if (!(data == null || data  == "" || data == undefined)) {
         setQuoteFormData(data);
@@ -41,9 +39,6 @@ export default function Quotes() {
       history.push(`/quotes/${quoteData.id}/edit/`)
   }
 
-  useEffect(() => {
-    menuCreate();
-  })
   return (
     <div style={{padding: "10px", margin: "10px"}}>
       <div>
@@ -67,7 +62,7 @@ export default function Quotes() {
           <QuoteList/>
         </Route>
       </Switch>
-
+      
       
     </div>
   )

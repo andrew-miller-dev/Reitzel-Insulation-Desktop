@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { Menu } from "antd";
-import { manuList, salesMenu, officeMenu } from "../../config/leftnav";
 import Avatar from "../avatar";
 import "./index.css";
 import { menuCreate } from "../../config/menucreate";

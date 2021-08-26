@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, Input, Button, Select, message } from "antd";
-import { addOrder, addEstimate, getLatestCustomer, addAddress, getLatestAddress } from "../../api/neworder";
+import { addOrder, getLatestCustomer, addAddress } from "../../api/neworder";
 import "./index.css";
 const layout = {
   labelCol: { span: 2 },
@@ -25,16 +25,27 @@ export default function NewCustomer(props) {
     <Option key={index + 1}>{item}</Option>
   ));
   const onFinish = async (values) => {
-    console.log(values);
-    var result = await addOrder(values);
+    let newVal = {
+      BillingAddress : values.BillingAddress,
+      City: values.City,
+      Email: values.Email || ' ',
+      FirstName:values.FirstName,
+      LastName:values.LastName,
+      Phone:values.Phone,
+      PostalCode:values.PostalCode,
+      Prov:values.Prov,
+      Region:values.Region
+    }
+    console.log(newVal);
+    await addOrder(newVal);
     var customerID = await getLatestCustomer();
     var latestCustomer = customerID.data[0].CustomerID;
-    var newAddress = await addAddress(latestCustomer, values);
+    var newAddress = await addAddress(latestCustomer, newVal);
     console.log("new address",newAddress);
     if (newAddress.status == 200) {
       message.success("Added successfully");
       props.history.push("/customers");
-    } else message.warn("fail");
+    } else message.warn("Something went wrong");
   };
   return (
     <div className="neworder">

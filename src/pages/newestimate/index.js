@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import validator from "validator";
 import { Form, DatePicker, Input, Button, Select, message, Card, Modal } from "antd";
 import {
   addOrder,
@@ -13,6 +14,7 @@ import "./index.css";
 import TextArea from "antd/lib/input/TextArea";
 import Confirmation from "../../Components/Email_Templates/confirmation"
 import {renderEmail} from 'react-html-email';
+import { checkForUndefined } from "../../config/checks";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
@@ -24,6 +26,8 @@ export default function NewEstimate(props) {
   const [regions, setRegions] = useState([]);
   const [form] = Form.useForm();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [validEmail, setValidEmail] = useState('');
+  const [errorColor, setErrorColor] = useState('red');
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 14 },
@@ -35,6 +39,18 @@ export default function NewEstimate(props) {
   const options1 = jobs.map((item, index) => (
     <Option key={item}>{item}</Option>
   ));
+
+  const emailCheck = (value) => {
+    let word = value.target.value;
+    if(validator.isEmail(word)){
+      setValidEmail('Valid email');
+      setErrorColor('green');
+    }
+    else {
+      setValidEmail('Not a valid email');
+      setErrorColor('red');
+    }
+  }
 
   const getregions = async () => {
     const data = await getRegionAPI();
@@ -66,12 +82,12 @@ export default function NewEstimate(props) {
       FirstName: values.FirstName,
       LastName: values.LastName,
       Phone: values.Phone,
-      Email: values.Email,
-      BillingAddress: values.BillingAddress,
-      City: values.City,
-      Prov: values.Prov,
-      PostalCode: values.PostalCode,
-      Region: values.Region,
+      Email: values.Email || ' ',
+      BillingAddress: values.BillingAddress || ' ',
+      City: values.City || ' ',
+      Prov: values.Prov || ' ',
+      PostalCode: values.PostalCode || ' ',
+      Region: values.Region || ' ',
     };
     var siteAddress = {
       BillingAddress: values.siteAddress,
@@ -94,27 +110,30 @@ export default function NewEstimate(props) {
       ),
       estimateInfo: values.EstimateInfo,
     };
-    var result = await addOrder(customer);
 
-    if (result.status == 200) {
-      message.success("add success!");
-    } else message.warn("fail");
+    await addOrder(customer);
     var getCustomerID = await getLatestCustomer();
     var latestCustomer = getCustomerID.data[0].CustomerID;
-    if(customer.BillingAddress !== undefined){
-          var newAddress = await addAddress(latestCustomer, customer);
+    if(customer.BillingAddress !== ' ') {
+           await addAddress(latestCustomer, customer);
     }
-    if (siteAddress.BillingAddress !== undefined) {
-      var siteAddressSent = await addAddress(latestCustomer, siteAddress);
+    if (siteAddress.BillingAddress !== ' ') {
+          await addAddress(latestCustomer, siteAddress);
     }
     var getAddressID = await getLatestAddress();
-    var latestAddress = getAddressID.data[0].CustomerID;
+    var latestAddress = getAddressID.data[0].AddressID;
     var estimateResult = await addEstimate(
       latestCustomer,
-      getAddressID.data[0].AddressID,
+      latestAddress,
       estimate
     );
-    sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />))
+    if (estimateResult.status === 200) {
+      message.success("Added new estimate");
+    } 
+    else message.warn("Something went wrong");
+    if(validator.isEmail(customer.Email)){
+      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />))
+    }
     props.history.push("/home");
   };
 
@@ -168,8 +187,23 @@ export default function NewEstimate(props) {
             >
               <Input placeholder="Phone Number" />
             </Item>
-            <Item label="Email Address" name="Email">
-              <Input defaultValue=" " />
+            <Item
+             label="Email Address" 
+             name="Email"
+             >
+              <Input
+              onChange={emailCheck} />
+              
+            </Item>
+            <Item
+            label="Email Check">
+              <span 
+              style={{
+                fontSize:12,
+                color:errorColor
+              }}>
+          {validEmail}
+          </span>
             </Item>
             <Item label="Site Address" name="siteAddress"
             rules={[
@@ -222,25 +256,25 @@ export default function NewEstimate(props) {
               label="Billing Address"
               name="BillingAddress" 
             >
-            <Input defaultValue=" " />
+            <Input />
             </Item>
             <Item
               label="City"
               name="City"
             >
-              <Input defaultValue=" " />
+              <Input />
             </Item>
             <Item
               label="Province"
               name="Prov"
             >
-              <Input defaultValue=" " />
+              <Input  />
             </Item>
             <Item
               label="Postal Code"
               name="PostalCode"
             >
-              <Input defaultValue=" " />
+              <Input />
             </Item>
             <Item
               name="Region"
