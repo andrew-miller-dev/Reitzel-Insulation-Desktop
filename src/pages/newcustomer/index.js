@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useState} from "react";
 import { Form, Input, Button, Select, message } from "antd";
 import { addOrder, getLatestCustomer, addAddress } from "../../api/neworder";
 import "./index.css";
+import validator from "validator";
 const layout = {
   labelCol: { span: 2 },
   wrapperCol: { span: 16 },
@@ -21,6 +22,8 @@ export default function NewCustomer(props) {
     "Kitchener - Waterloo",
     "Brantford, Paris, Burford, Waterford, Brant County, Haldmald, Caledonia",
   ];
+  const [validEmail, setValidEmail] = useState('');
+  const [errorColor, setErrorColor] = ('red');
   const options = regions.map((item, index) => (
     <Option key={index + 1}>{item}</Option>
   ));
@@ -28,7 +31,7 @@ export default function NewCustomer(props) {
     let newVal = {
       BillingAddress : values.BillingAddress,
       City: values.City,
-      Email: values.Email || ' ',
+      Email: values.Email,
       FirstName:values.FirstName,
       LastName:values.LastName,
       Phone:values.Phone,
@@ -36,7 +39,6 @@ export default function NewCustomer(props) {
       Prov:values.Prov,
       Region:values.Region
     }
-    console.log(newVal);
     await addOrder(newVal);
     var customerID = await getLatestCustomer();
     var latestCustomer = customerID.data[0].CustomerID;
@@ -47,6 +49,17 @@ export default function NewCustomer(props) {
       props.history.push("/customers");
     } else message.warn("Something went wrong");
   };
+  const emailCheck = (value) => {
+    let word = value.target.value;
+    if(validator.isEmail(word)){
+      setValidEmail('Valid email');
+      setErrorColor('green');
+    }
+    else {
+      setValidEmail('Not a valid email');
+      setErrorColor('red');
+    }
+  }
   return (
     <div className="neworder">
       <Form form={form} onFinish={onFinish} {...layout}>
@@ -56,7 +69,7 @@ export default function NewCustomer(props) {
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >
@@ -68,7 +81,7 @@ export default function NewCustomer(props) {
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >
@@ -80,7 +93,7 @@ export default function NewCustomer(props) {
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >
@@ -92,7 +105,7 @@ export default function NewCustomer(props) {
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >
@@ -104,7 +117,7 @@ export default function NewCustomer(props) {
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >
@@ -116,7 +129,7 @@ export default function NewCustomer(props) {
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >
@@ -128,7 +141,7 @@ export default function NewCustomer(props) {
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >
@@ -137,16 +150,30 @@ export default function NewCustomer(props) {
         <Item
           label="Email"
           name="Email"
+          rules={[{
+            required: true,
+            message:"Required Field"
+          }]}
         >
-          <Input placeholder="Email" />
+          <Input onChange={emailCheck} placeholder="Email" />
         </Item>
+        <Item
+            label="Email Check">
+              <span 
+              style={{
+                fontSize:12,
+                color:errorColor
+              }}>
+          {validEmail}
+          </span>
+            </Item>
         <Item
           label="Region"
           name="Region"
           rules={[
             {
               required: true,
-              message: "Cannot be Empty",
+              message: "Required Field",
             },
           ]}
         >

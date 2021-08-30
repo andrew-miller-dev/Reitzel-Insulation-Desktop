@@ -42,7 +42,6 @@ export async function deleteEstimate(id) {
     }
   }
   export async function updateEstimate(id, values) {
-    console.log(id, values.startDate, values.endDate);
     var tableName = "estimates";
     var columnsAndValues = `startDate='${values.startDate}',endDate='${values.endDate}', UserID='${values.UserID}'`;
     var condition = `EstimateID='${id}'`;
@@ -51,7 +50,21 @@ export async function deleteEstimate(id) {
       { tableName, columnsAndValues, condition },
       "post"
     );
-    console.log("result", result);
+    if (result !== []) return result;
+    else {
+      return 0;
+    }
+  }
+
+  export async function updateEstimateInfo(id, value) {
+    var tableName = "estimates";
+    var columnsAndValues = `EstimateInfo = '${value}'`;
+    var condition = `EstimateID='${id}'`;
+    const result = await ajax(
+      `${baseURL}/updateValues`,
+      { tableName, columnsAndValues, condition },
+      "post"
+    );
     if (result !== []) return result;
     else {
       return 0;

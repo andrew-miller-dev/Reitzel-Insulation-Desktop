@@ -14,7 +14,6 @@ import "./index.css";
 import TextArea from "antd/lib/input/TextArea";
 import Confirmation from "../../Components/Email_Templates/confirmation"
 import {renderEmail} from 'react-html-email';
-import { checkForUndefined } from "../../config/checks";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
@@ -35,7 +34,7 @@ export default function NewEstimate(props) {
   const options = regions.map((item) => (
     <Option key={item.id}>{item.region}</Option>
   ));
-  const jobs = ["loosefill", "spray"];
+  const jobs = ["loosefill", "spray", "removal", 'fireproofing'];
   const options1 = jobs.map((item, index) => (
     <Option key={item}>{item}</Option>
   ));
@@ -82,7 +81,7 @@ export default function NewEstimate(props) {
       FirstName: values.FirstName,
       LastName: values.LastName,
       Phone: values.Phone,
-      Email: values.Email || ' ',
+      Email: values.Email,
       BillingAddress: values.BillingAddress || ' ',
       City: values.City || ' ',
       Prov: values.Prov || ' ',
@@ -157,7 +156,7 @@ export default function NewEstimate(props) {
               rules={[
                 {
                   required: true,
-                  message: "Cannot be Empty",
+                  message: "Required Field",
                 },
               ]}
             >
@@ -169,7 +168,7 @@ export default function NewEstimate(props) {
               rules={[
                 {
                   required: true,
-                  message: "Cannot be Empty",
+                  message: "Required Field",
                 },
               ]}
             >
@@ -181,7 +180,7 @@ export default function NewEstimate(props) {
               rules={[
                 {
                   required: true,
-                  message: "Cannot be Empty",
+                  message: "Required Field",
                 },
               ]}
             >
@@ -190,6 +189,12 @@ export default function NewEstimate(props) {
             <Item
              label="Email Address" 
              name="Email"
+             rules={[
+              {
+                required: true,
+                message: "Required Field",
+              },
+            ]}
              >
               <Input
               onChange={emailCheck} />
@@ -209,7 +214,7 @@ export default function NewEstimate(props) {
             rules={[
               {
                 required: true,
-                message: "Cannot be Empty",
+                message: "Required Field",
               },
             ]}>
               <Input placeholder="Address" />
@@ -218,7 +223,7 @@ export default function NewEstimate(props) {
             rules={[
               {
                 required: true,
-                message: "Cannot be Empty",
+                message: "Required Field",
               },
             ]}>
               <Input placeholder="City" />
@@ -227,7 +232,7 @@ export default function NewEstimate(props) {
             rules={[
               {
                 required: true,
-                message: "Cannot be Empty",
+                message: "Required Field",
               },
             ]}>
               <Input placeholder="Province" />
@@ -236,7 +241,7 @@ export default function NewEstimate(props) {
             rules={[
               {
                 required: true,
-                message: "Cannot be Empty",
+                message: "Required Field",
               },
             ]}>
               <Input placeholder="Postal Code" />
@@ -245,7 +250,7 @@ export default function NewEstimate(props) {
             rules={[
               {
                 required: true,
-                message: "Cannot be Empty",
+                message: "Required Field",
               },
             ]}>
               <Select>{options}</Select>
@@ -289,7 +294,7 @@ export default function NewEstimate(props) {
               rules={[
                 {
                   required: true,
-                  message: "Cannot be Empty",
+                  message: "Required Field",
                 },
               ]}
             >
@@ -310,7 +315,7 @@ export default function NewEstimate(props) {
               rules={[
                 {
                   required: true,
-                  message: "Cannot be Empty",
+                  message: "Required Field",
                 },
               ]}
             >
@@ -322,7 +327,7 @@ export default function NewEstimate(props) {
               rules={[
                 {
                   required: true,
-                  message: "Cannot be Empty",
+                  message: "Required Field",
                 },
               ]}
             >
@@ -334,7 +339,7 @@ export default function NewEstimate(props) {
               rules={[
                 {
                   required: true,
-                  message: "Cannot be Empty",
+                  message: "Required Field",
                 },
               ]}
             >

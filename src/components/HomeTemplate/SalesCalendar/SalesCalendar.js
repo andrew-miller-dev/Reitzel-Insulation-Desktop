@@ -11,6 +11,7 @@ import { message, Modal } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
+import { getAddress, getCustomer } from "../../../api/addresses.js";
 const { confirm } = Modal;
 
 const dataSource = new CustomStore({
@@ -24,6 +25,7 @@ const dataSource = new CustomStore({
       UserID : item.UserID,
       CreationDate : item.CreationDate,
       text : item.EstimateInfo,
+      JobType:item.JobType,
       RegionID : item.RegionID,
       startDate : item.startDate,
       endDate : item.endDate
@@ -43,11 +45,9 @@ const dataSource = new CustomStore({
       endDate : values.endDate
   }
     const check = await updateEstimate(key, formatData);
-    console.log(check);
     return check;
   },
   remove: async(key) => {
-    console.log(`removed ${key}`);
     const data = await deleteEstimate(key);
     return data
   },
@@ -80,7 +80,6 @@ const dataSource = new CustomStore({
 const sendEmailUpdate = async (values) => {
   console.log(values);
   let findCustomerEmail = await findCustomer(values.CustomerID);
-  console.log(findCustomerEmail);
   let customerEmail = findCustomerEmail.data[0];
   sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>));
 }
@@ -96,10 +95,9 @@ const renderResourceCell = (model) => {
   );
 }
 const onAppointmentDeleting = (e) => {
-  console.log(e);
   var cancel = true;
   e.cancel = cancel;
-  var r = confirm({title:"Do you want to delete this appointment?", onOk(){dataSource.remove(e.appointmentData.EstimateID) }, onCancel(){cancel = true}});
+  confirm({title:"Do you want to delete this appointment?", onOk(){dataSource.remove(e.appointmentData.EstimateID) }, onCancel(){cancel = true}});
 }
 
 class SalesCalendar extends React.Component {
@@ -129,21 +127,29 @@ class SalesCalendar extends React.Component {
   this.setState({regionList:regionData});
   this.setState({info:true});
 } 
-  
-onAppointmentForm(e) {
-  e.popup.option('showTitle', true);
-  e.popup.option('title', e.appointmentData.text ? 
-      e.appointmentData.text : 
-      'Quick appointment creation');
-  let user = e.appointmentData.UserID;
 
-  const form = e.form;
-  let newGroupItems = [];
-  newGroupItems.push({
+async onAppointmentForm (e) {
+  
+  if(e.appointmentData.CreationDate) {
+    e.cancel = true;
+  }
+  
+  else{
+  let address = await getAddress(e.appointmentData.AddressID);
+  let addressData = address.data;
+  let customer = await getCustomer(e.appointmentData.CustomerID);
+  let customerData = customer.data;
+  let form = e.form;
+  e.popup.option('showTitle', true);
+  e.popup.option('title', 'Quick appointment creation and editing');
+  let user = e.appointmentData.UserID;
+  let data = e.appointmentData;
+  let newGroupItems =[
+  {
     label:{text: "First Name"},
     isRequired:true,
     editorType:'dxTextBox',
-    dataField:"firstName"
+    dataField:"firstName",
   },
   {
     label:{text: "Last Name"},
@@ -159,9 +165,11 @@ onAppointmentForm(e) {
   },
   {
     label:{text:"Email"},
+    isRequired:true,
     editorType:'dxTextBox',
     dataField:"email",
   },
+
   {
     label:{text:"Site Address"},
     isRequired:true,
@@ -234,13 +242,14 @@ onAppointmentForm(e) {
     isRequired:true,
     editorType:'dxSelectBox',
     editorOptions:{
-      items:['loosefill','spray']
+      items:['loosefill','spray', "fireproofing","removal"]
     },
     dataField:'jobType'
   }
-  );
+];
 
   form.itemOption('mainGroup','items', newGroupItems)
+}
 }
 
 getUserName(id, array){
@@ -324,7 +333,7 @@ getRegionID(name, array){
         startDayHour={6}
         endDayHour={21}
         appointmentComponent={SalesTemplate}
-        //appointmentTooltipComponent={SalesTooltip}
+        appointmentTooltipComponent={SalesTooltip}
         onAppointmentDeleting={onAppointmentDeleting}
         onAppointmentFormOpening={this.onAppointmentForm}
         >

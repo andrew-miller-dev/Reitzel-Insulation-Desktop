@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./index.css";
 import { Card, Table, Button, Modal, Form, Input, message, Select } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { addUser, getUsers, updateUser, deleteUser } from "../../api/index";
-import { datas } from "../../api/index";
+import { addUser, getUsers, updateUser, deleteUser, getRoles } from "../../api/index";
 const { Item } = Form;
 const { confirm } = Modal;
 const { Option } = Select;
@@ -19,6 +18,7 @@ export default function Users() {
   const [, setForce] = useState();
   const [users, setusers] = useState([]);
   const [count, setCount] = useState(0);
+  const [roles, setRoles] = useState([]);
 
 
   //the selected to be updated or deleted data
@@ -35,8 +35,8 @@ export default function Users() {
     </Button>
   );
 
-  const options = datas.role.map((item) => (
-    <Option key={item.rolename}>{item.rolename}</Option>
+  const options = roles.map((item) => (
+    <Option key={item.RoleName}>{item.RoleName}</Option>
   ));
 
   //for table coloums
@@ -168,6 +168,8 @@ export default function Users() {
         role: item.SecurityLevel,
       }));
       setusers(tables);
+      var roles = await getRoles();
+      setRoles(roles.data);
     };
     func();
   }, [users.length, count]);

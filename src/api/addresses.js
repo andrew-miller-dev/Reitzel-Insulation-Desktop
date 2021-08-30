@@ -11,7 +11,6 @@ export async function getAddress(id) {
       { tableName, condition},
       "post"
     );
-    console.log("address", address);
     if (address !== []) return address;
     else {
       return 0;
@@ -25,7 +24,6 @@ export async function getAddress(id) {
       { tableName, condition},
       "post"
     );
-    console.log("quotes ", quotelist);
     if (quotelist !== []) return quotelist;
     else {
       return 0;

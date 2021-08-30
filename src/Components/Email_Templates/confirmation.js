@@ -1,7 +1,9 @@
 import React from 'react';
-import { Email, Item, A} from 'react-html-email';
+import { Email, Item} from 'react-html-email';
+import { getUser } from '../../util/storage';
 const header = "https://i.ibb.co/0snCVqq/header.png";
 const footer = "https://ibb.co/kHTHdfL";
+const user = getUser();
 
 const { format} = require("date-fns-tz");
 
@@ -31,11 +33,19 @@ function Confirmation(props){
                 <a href="src\assets\COVID-19.docx" download="COVID-19">COVID-19 Info</a>
             </Item>
             <Item>
-               If you have any questions after reading this document, please reply to this email or call the office at 519-886-6100.
+                <p>
+                    This is an automated email. If you have any questions after reading this document, please reply to your rep at {user.Email} or call the office at 519-886-6100.
             Thank you for your business!
-            Regards,
-
-            The Reitzel Team 
+                </p>
+               <Item>
+                  <p>
+                  Regards,
+                    
+            The Reitzel Team  
+               </p> 
+               </Item>
+               
+            
             </Item>
 
 
