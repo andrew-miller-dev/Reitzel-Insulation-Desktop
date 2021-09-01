@@ -75,6 +75,7 @@ function Customers(props) {
       className="searchbar"
       size = "medium"
       enterButton="Find Customer"
+      placeholder="Search customer list"
       onChange={(e) => {findCustomers(e.target.value)}} />
 
       <Table
