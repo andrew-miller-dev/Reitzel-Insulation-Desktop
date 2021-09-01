@@ -22,11 +22,7 @@ function Confirmation(props){
             <br />
             </Item>
             <Item>
-            Download document:<br />
-            <a href="\assets\Customer Info Sheet _ Reitzel Insulation.pdf" download>Customer Info</a>
-                <br/>
-                Download COVID-19 protocols:<br />
-                <A href="\assets\COVID-19.docx" download="COVID-19">COVID-19 Info</A>
+            <p>Find attached documents to help prepare your house for your appointment</p>
 
             </Item>
             <Item>

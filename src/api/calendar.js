@@ -103,12 +103,14 @@ export async function deleteEstimate(id) {
     else return 0;
  }
 
- export async function sendUpdate(customer, email){
+ export async function sendUpdate(customer, email, attach){
   var to = customer;
   var subject = "Booking Update - Reitzel Insulation";
   var html = email;
+  var file = attach;
+  console.log(file);
 
-  var completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html}, "post");
+  var completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html, file}, "post");
   if (completed !== []) return completed;
   else return 0;
 }

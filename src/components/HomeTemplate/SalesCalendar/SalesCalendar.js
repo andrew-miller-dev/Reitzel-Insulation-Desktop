@@ -5,13 +5,14 @@ import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
-import {getEstimates, deleteEstimate, getUsers, updateEstimate, getRegionAPI, sendUpdate, findCustomer, addNewCustomer, addNewAddress, getLatestCustomer, getLatestAddress, addEstimate} from '../../../api/calendar';
+import {getEstimates, deleteEstimate, getUsers, updateEstimate, getRegionAPI, sendUpdate, findCustomer, addNewCustomer, addNewAddress, getLatestCustomer, getLatestAddress, addEstimate, sendConfirm} from '../../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
 import { message, Modal } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
-import { getAddress, getCustomer } from "../../../api/addresses.js";
+import { customer_info_sheet } from "../../../assets/paths.js";
+import Confirmation from "../../Email_Templates/confirmation.js";
 const { confirm } = Modal;
 
 const dataSource = new CustomStore({
@@ -54,10 +55,10 @@ const dataSource = new CustomStore({
   insert: async (values) => {
     console.log('values', values);
     try{
-      const addCustomer = await addNewCustomer(values);
+      await addNewCustomer(values);
       const latestCustomer = await getLatestCustomer();
       const customerID = latestCustomer.data[0].CustomerID;
-      const addAddress = await addNewAddress(customerID, values);
+      await addNewAddress(customerID, values);
       const latestAddress = await getLatestAddress();
       const addressID = latestAddress.data[0].AddressID;
       const addEstimates = await addEstimate(
@@ -65,6 +66,15 @@ const dataSource = new CustomStore({
         addressID,
         values);
         message.success("New estimate added");
+        let customer = {
+          FirstName:values.firstName,
+          LastName:values.lastName
+        }
+        let estimate = {
+          JobType:values.jobType,
+          startDate:values.startDate
+        }
+      sendConfirm(values.email, renderEmail(<Confirmation customerInfo = {customer} estimateInfo = {estimate} />), customer_info_sheet);
       return addEstimates;
     }
     catch(e){
@@ -74,14 +84,14 @@ const dataSource = new CustomStore({
     
   },
   onUpdating: (key, values) => {
+    
     confirm({title:"Send email update to customer?", onOk() {sendEmailUpdate(values)}, cancelText:"No"})
   }
 });
 const sendEmailUpdate = async (values) => {
-  console.log(values);
   let findCustomerEmail = await findCustomer(values.CustomerID);
   let customerEmail = findCustomerEmail.data[0];
-  sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>));
+  sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>), customer_info_sheet);
 }
 
 const currentDate = new Date();
@@ -135,15 +145,10 @@ async onAppointmentForm (e) {
   }
   
   else{
-  let address = await getAddress(e.appointmentData.AddressID);
-  let addressData = address.data;
-  let customer = await getCustomer(e.appointmentData.CustomerID);
-  let customerData = customer.data;
   let form = e.form;
   e.popup.option('showTitle', true);
-  e.popup.option('title', 'Quick appointment creation and editing');
+  e.popup.option('title', 'Quick appointment creation');
   let user = e.appointmentData.UserID;
-  let data = e.appointmentData;
   let newGroupItems =[
   {
     label:{text: "First Name"},

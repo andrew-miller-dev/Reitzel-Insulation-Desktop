@@ -69,8 +69,9 @@ function Customers(props) {
   }
   return (
     <div>
+      <h2>Customers</h2>
       <Search
-      style={{width:"40%"}}
+      style={{width:"40%", padding:"5px"}}
       className="searchbar"
       size = "medium"
       enterButton="Find Customer"

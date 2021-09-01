@@ -2,7 +2,6 @@ import React from 'react';
 import { Email, Item} from 'react-html-email';
 import { getUser } from '../../util/storage';
 const header = "https://i.ibb.co/0snCVqq/header.png";
-const footer = "https://ibb.co/kHTHdfL";
 const user = getUser();
 
 const { format} = require("date-fns-tz");
@@ -22,15 +21,9 @@ function Confirmation(props){
             <p>Date: {format(new Date(props.estimateInfo.startDate),"MMMM do',' yyyy")}</p>
             <p> Approximate Arrival Time:  {format(new Date(props.estimateInfo.startDate),"K:mm")}</p>
             <br />
-            <p>Included is some information on "How to Prepare your Home Before Your Insulation Arrives."</p>
-            <br/>
             </Item>
             <Item>
-            Download document:
-                <a href="src\assets\Customer Info Sheet _ Reitzel Insulation.pdf" download="Customer_Info_Sheet_Reitzel_Insulation">Customer Info</a>
-                <br/>
-                Download COVID-19 protocols:
-                <a href="src\assets\COVID-19.docx" download="COVID-19">COVID-19 Info</a>
+            Please read the attached pdf for preparing your home.
             </Item>
             <Item>
                 <p>

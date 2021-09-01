@@ -14,10 +14,12 @@ import "./index.css";
 import TextArea from "antd/lib/input/TextArea";
 import Confirmation from "../../Components/Email_Templates/confirmation"
 import {renderEmail} from 'react-html-email';
+import { customer_info_sheet } from "../../assets/paths";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
 const { format } = require("date-fns-tz");
+
 
 export default function NewEstimate(props) {
   const [info, setInfo] = useState(false);
@@ -131,7 +133,7 @@ export default function NewEstimate(props) {
     } 
     else message.warn("Something went wrong");
     if(validator.isEmail(customer.Email)){
-      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />))
+      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />), customer_info_sheet)
     }
     props.history.push("/home");
   };

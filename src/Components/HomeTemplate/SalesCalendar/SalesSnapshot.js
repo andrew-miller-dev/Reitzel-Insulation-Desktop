@@ -4,14 +4,9 @@ import 'devextreme/dist/css/dx.light.css';
 import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
-import SalesTooltip from './salesTooltip.js';
-import {getEstimates, getUsers, getRegionAPI, sendUpdate, findCustomer} from '../../../api/calendar';
+import {getEstimates, getUsers, getRegionAPI} from '../../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
-import { Modal } from 'antd';
-import UpdateConfirm from '../../Email_Templates/updateConfirm';
-import {renderEmail} from 'react-html-email';
-
-const { zonedTimeToUtc, utcToZonedTime, format } = require('date-fns-tz')
+import SalesToolSnap from "./salesToolSnap.js";
 
 const dataSource = new CustomStore({
   key: "EstimateID",
@@ -25,31 +20,13 @@ const dataSource = new CustomStore({
       CreationDate : item.CreationDate,
       text : item.EstimateInfo,
       RegionID : item.RegionID,
-      startDate : timeFormat(item.startDate),
-      endDate : timeFormat(item.endDate)
+      startDate : item.startDate,
+      endDate : item.endDate
     }));
     return formatData
   }
 });
-const sendEmailUpdate = async (values) => {
-  console.log(values);
-  let findCustomerEmail = await findCustomer(values.CustomerID);
-  console.log(findCustomerEmail);
-  let customerEmail = findCustomerEmail.data[0];
-  sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>));
-}
 
-const timeFormat = (date) => {
-   let newdate = zonedTimeToUtc(new Date(date), 'America/Edmonton');
-   var formatteddate = format(newdate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-   return formatteddate;
-}
-
-const timeDeformat = (date) => {
-  let newdate = utcToZonedTime(new Date(date), 'America/Edmonton');
-  var formatteddate = format(newdate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-   return formatteddate;
-}
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 const views = ['day','workWeek','month'];
@@ -145,7 +122,7 @@ class SalesCalendar extends React.Component {
         startDayHour={6}
         endDayHour={21}
         appointmentComponent={SalesTemplate}
-        //appointmentTooltipComponent={SalesTooltip}
+        appointmentTooltipComponent={SalesToolSnap}
         onAppointmentAdding={(e) => {e.cancel = true}}
         onAppointmentDeleting={(e) => {e.cancel = true}}
         onAppointmentFormOpening={(e) => {e.cancel = true}}

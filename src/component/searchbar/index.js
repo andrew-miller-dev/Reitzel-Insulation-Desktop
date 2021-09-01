@@ -1,28 +1,14 @@
 import React, { useState } from "react";
-import { Input, Radio, Form, message, Modal, Button } from "antd";
-import Orders from "../../pages/orders";
+import { Input, Radio, message, Button, Space, } from "antd";
 import "./index.css";
 import { withRouter } from "react-router";
 
 const { Search } = Input;
-const id = 0;
 function Searchbar(props) {
-  const [value, setValue] = useState("");
-  const [newOrderShow, setNewOrderShow] = useState(false);
-  const handleChange = (e) => {
-    setValue(e.target.value);
-    if (e.target.value == "customer") {
-      props.history.push("/newcustomer");
-    } else props.history.push("/newestimate");
-  };
+  
   const onSearch = (value) => {
     message.success(value);
   };
-
-  const options = [
-    { label: "New Customer", value: "customer" },
-    { label: "New Estimate", value: "order" },
-  ];
 
   return (
     <div className="content-searchbar">
@@ -33,13 +19,20 @@ function Searchbar(props) {
         onSearch={onSearch}
         enterButton
       />
-      <Radio.Group
-        options={options}
-        onChange={handleChange}
-        value={value}
-        optionType="button"
-        buttonStyle="solid"
-      ></Radio.Group>
+      <Space>
+         <Button
+         onClick={() => {
+          props.history.push('/newcustomer');
+         }}>
+        New Customer
+      </Button>
+      <Button
+      onClick={() => {
+        props.history.push('/newestimate')
+      }}>
+        New Estimate
+      </Button>
+      </Space>
     </div>
   );
 }
