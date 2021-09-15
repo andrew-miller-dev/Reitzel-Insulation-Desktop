@@ -199,3 +199,29 @@ export async function addEstimate(id, address, value) {
     return 0;
   }
 }
+
+export async function getCustomers() {
+  var tableName = 'customers';
+
+  var customers = await ajax (
+    `${baseURL}/fetchValues`,
+    {tableName},
+    "post"
+  );
+  if(customers !== []) return customers;
+  else return 0;
+}
+
+export async function getAddressList(id) {
+  var tableName = "Address";
+  var condition = `CustomerID = '${id}'`
+  const address = await ajax(
+    `${baseURL}/fetchValues`,
+    { tableName, condition},
+    "post"
+  );
+  if (address !== []) return address;
+  else {
+    return 0;
+  }
+}

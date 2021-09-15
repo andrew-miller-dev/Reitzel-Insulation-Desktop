@@ -5,15 +5,33 @@ import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
-import {getEstimates, deleteEstimate, getUsers, updateEstimate, getRegionAPI, sendUpdate, findCustomer, addNewCustomer, addNewAddress, getLatestCustomer, getLatestAddress, addEstimate, sendConfirm} from '../../../api/calendar';
+import {getEstimates, 
+        deleteEstimate, 
+        getUsers, 
+        updateEstimate, 
+        getRegionAPI, 
+        sendUpdate, 
+        findCustomer, 
+        addNewCustomer, 
+        addNewAddress, 
+        getLatestCustomer, 
+        getLatestAddress, 
+        addEstimate, 
+        sendConfirm, 
+        getCustomers,
+        getAddressList} from '../../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
-import { message, Modal } from 'antd';
+import { message, Modal, Space } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
+import 'devextreme-react/autocomplete';
 import { customer_info_sheet } from "../../../assets/paths.js";
 import Confirmation from "../../Email_Templates/confirmation.js";
+import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button } from "devextreme-react";
+import { Item } from "devextreme-react/form";
 const { confirm } = Modal;
+const { format } = require("date-fns-tz");
 
 const dataSource = new CustomStore({
   key: "EstimateID",
@@ -114,11 +132,45 @@ class SalesCalendar extends React.Component {
   constructor(props) {
     super(props);
     this.state={
+
       groupByDate:false,
-      cancel:true,
+      useExisting:false,
       userList:"",
       regionList:"",
-      info:false
+      info:false,
+      findCustomerList:[],
+      customerAddresses:[],
+      showForm:false,
+      clickedSalesman:"",
+      siteID:"",
+      custID:"",
+      apptDates:{
+        start:"",
+        end:""
+      },
+      basicInfo:{
+        firstName:"",
+        lastName:"",
+        phone:"",
+        email:"",
+        billingAddress:"",
+        billingCity:"",
+        billingPostal:"",
+        billingRegion:""
+      },
+      siteInfo:{
+        siteAddress:"",
+        siteCity:"",
+        siteProv:"",
+        sitePostal:"",
+        siteRegion:"",
+        },
+      appointmentInfo:{
+        startDate:"",
+        endDate:"",
+       },
+      description:"",
+      jobType:"",
     };
     
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
@@ -126,15 +178,15 @@ class SalesCalendar extends React.Component {
     this.salesmanSource = this.salesmanSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
-    this.getRegionNames = this.getRegionNames.bind(this);
     this.getUserName = this.getUserName.bind(this);
-    this.getRegionID  = this.getRegionID.bind(this);
   }
   async InfoIsHere() {
+  let customerData = await getCustomers();
   let regionData = await this.regionSource();
   let userData = await this.salesmanSource();
   this.setState({userList:userData});
   this.setState({regionList:regionData});
+  this.setState({findCustomerList:customerData.data});
   this.setState({info:true});
 } 
 
@@ -150,17 +202,37 @@ async onAppointmentForm (e) {
   e.popup.option('title', 'Quick appointment creation');
   let user = e.appointmentData.UserID;
   let newGroupItems =[
+    {
+      editorType:'dxButton',
+      colSpan:2,
+      editorOptions:{
+        text:'Existing Customer Lookup',
+        onClick:(evt) => {
+          e.popup.hide();
+          this.setState({showForm:true});
+          var appointmentInfo = {...this.state.appointmentInfo};
+          appointmentInfo.startDate = format(new Date(e.appointmentData.startDate),"M/d/yyyy, hh:mm a");
+          appointmentInfo.endDate = format(new Date(e.appointmentData.endDate),"M/d/yyyy, hh:mm a");
+          var apptDates = {...this.state.apptDates};
+          apptDates.start = e.appointmentData.startDate;
+          apptDates.end = e.appointmentData.endDate;
+          this.setState({apptDates});
+          this.setState({appointmentInfo});
+          this.setState({clickedSalesman:e.appointmentData.UserID})
+        } 
+      },
+    },
   {
     label:{text: "First Name"},
     isRequired:true,
     editorType:'dxTextBox',
-    dataField:"firstName",
+    dataField:"firstName"
   },
   {
     label:{text: "Last Name"},
     isRequired:true,
     editorType:'dxTextBox',
-    dataField:"lastName"
+    dataField:"lastName",
   },
   {
     label:{text:'Phone'},
@@ -253,7 +325,7 @@ async onAppointmentForm (e) {
   }
 ];
 
-  form.itemOption('mainGroup','items', newGroupItems)
+  form.itemOption('mainGroup','items', newGroupItems);
 }
 }
 
@@ -265,24 +337,8 @@ getUserName(id, array){
     }
   })
   return user;
-} 
+}
 
-getRegionNames(array) {
-  let names = [];
-  array.map((item) => {
-    names.push(item.region);
-  });
-  return names;
-}
-getRegionID(name, array){
-  let id = '';
-  array.map((item) => {
-    if(item.region === name) {
-      id = item.FirstName + " " + item.LastName;
-    }
-  })
-  return id;
-}
   onGroupByDateChanged(args) {
     this.setState({
       groupByDate: args.value
@@ -295,7 +351,6 @@ getRegionID(name, array){
       region: item.Region,
       color: item.color
     }))
-    console.log(regionData);
     return regionData;
   }
 
@@ -306,11 +361,11 @@ getRegionID(name, array){
       FirstName : item.FirstName,
       LastName: item.LastName
     }))
-    console.log(salesData);
     return salesData;
   }
   componentDidMount(){
     this.InfoIsHere();
+
 }
  
   render() {
@@ -334,9 +389,9 @@ getRegionID(name, array){
         views={views}
         defaultCurrentView="workWeek"
         defaultCurrentDate={date}
-        height={800}
-        startDayHour={6}
-        endDayHour={21}
+        height={600}
+        startDayHour={7}
+        endDayHour={19}
         appointmentComponent={SalesTemplate}
         appointmentTooltipComponent={SalesTooltip}
         onAppointmentDeleting={onAppointmentDeleting}
@@ -362,6 +417,179 @@ getRegionID(name, array){
           />
         </div>
       </div>
+      <Popup
+      height='95%'
+      title="Existing Customer Appointment Creation"
+      visible={this.state.showForm}
+      onHiding={() => {this.setState({showForm:false})}}
+      >
+          <Autocomplete
+          dataSource={this.state.findCustomerList}
+          valueExpr="CustLastName"
+          placeholder="Look up by last name..."
+          itemRender={(data) => {
+            return (
+              <span>{data.CustFirstName} {data.CustLastName}</span>
+            )
+          }}
+          onItemClick={async(data) => {
+            var customer = data.itemData
+            var basicInfo = {...this.state.basicInfo};
+            basicInfo.firstName = customer.CustFirstName;
+            basicInfo.lastName = customer.CustLastName;
+            basicInfo.phone = customer.Phone;
+            basicInfo.email = customer.Email;
+            basicInfo.billingAddress = customer.BillingAddress;
+            basicInfo.billingCity = customer.CustCity;
+            basicInfo.billingPostal = customer.CustPostalCode;
+            basicInfo.billingRegion = customer.CustRegion;
+            this.setState({basicInfo});
+            this.setState({custID:customer.CustomerID})
+            let result = await getAddressList(customer.CustomerID);
+            this.setState({customerAddresses:result.data});
+          }}
+          />
+          <br/>
+        <Form
+        formData={this.state.basicInfo}
+        colCount={3}
+        >
+        <Item editorOptions={{readOnly:true}} dataField='firstName' />  
+        <Item editorOptions={{readOnly:true}} dataField='lastName' />
+        <Item editorOptions={{readOnly:true}} dataField='phone' />
+        <Item editorOptions={{readOnly:true}} dataField='email' />  
+        <Item editorOptions={{readOnly:true}} dataField='billingAddress' />
+        <Item editorOptions={{readOnly:true}} dataField='billingCity' />
+        <Item editorOptions={{readOnly:true}} dataField="billingPostal" />
+        <Item dataField="billingRegion" 
+              editorType="dxSelectBox" 
+              editorOptions={{dataSource: this.state.regionList, value:this.state.siteInfo.siteRegion, displayExpr:"region", valueExpr:"id", readOnly:true}} />
+
+        </Form>
+        <br />
+        <CheckBox
+        text="Use Existing Address"
+        onValueChanged={() => {
+          if(this.state.useExisting === true){
+            this.setState({useExisting:false});
+          }
+          else {
+            this.setState({useExisting:true});
+          }
+          }}
+        ></CheckBox>
+        <br />
+        <SelectBox
+          visible={this.state.useExisting}
+          dataSource={this.state.customerAddresses}
+          itemRender={(data) => {
+            return (
+              <span>{data.Address}, {data.City} {data.PostalCode}</span>
+            )
+          }}
+          onItemClick={(data) => {
+            var address = data.itemData;
+            var siteInfo = {...this.state.siteInfo};
+            siteInfo.siteAddress = address.Address;
+            siteInfo.siteCity = address.City;
+            siteInfo.siteProv = address.Province;
+            siteInfo.sitePostal = address.PostalCode;
+            siteInfo.siteRegion = address.Region;
+            this.setState({siteID:address.AddressID});
+            this.setState({siteInfo});
+          }}
+          />
+        <br />
+        <Form
+        colCount={3}
+        formData={this.state.siteInfo}
+        >
+        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteAddress' />  
+        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteCity' />
+        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteProv' />
+        <Item editorOptions={{readOnly:this.state.useExisting}} dataField="sitePostal" />
+        <Item dataField="siteRegion" 
+              editorType="dxSelectBox" 
+              editorOptions={{dataSource: this.state.regionList, value:this.state.siteInfo.siteRegion, displayExpr:"region", valueExpr:"id", readOnly:this.state.useExisting}} />
+        </Form>
+        
+        <br/>
+        <Form
+        col count={2}
+        formData={this.state.appointmentInfo}>
+        
+        </Form>
+        Description:
+        <TextArea
+        onValueChanged={(data) => {
+          this.setState({description:data.value});
+        }}>
+
+        </TextArea>
+        Job Type:
+        <SelectBox
+        onValueChanged={(data) => {
+          this.setState({jobType:data.value});
+        }}
+        items={["fireproofing","removal","spray","loosefill"]}>
+        </SelectBox>
+        Assigned Salesman:
+        <TextBox
+        readOnly={true}
+        value={this.getUserName(this.state.clickedSalesman, this.state.userList)}>
+        </TextBox>
+        <br />
+        <div style={{float:"right"}}>
+
+        <Space>
+        <Button
+        style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
+        onClick={(e) => {
+          let func = async() => {
+                let info = {
+                  UserID:this.state.clickedSalesman,
+                  jobType:this.state.jobType,
+                  apptInfo:this.state.description,
+                  siteRegion:this.state.siteInfo.siteRegion,
+                  startDate:this.state.apptDates.start,
+                  endDate:this.state.apptDates.end
+               }
+               if(this.state.useExisting){
+              let result = await addEstimate(this.state.custID, this.state.siteID, info);
+              console.log(result);
+              this.setState({showForm:false});
+              if(result.status === 200){
+                message.success("Added new estimate");
+              }
+          }
+          
+          else {
+            let result = await addNewAddress(this.state.custID, this.state.siteInfo);
+            if(result.status === 200){
+              let address = await getLatestAddress();
+              let final = await addEstimate(this.state.custID, address.data[0].AddressID, info);
+              this.setState({showForm:false});
+              if(final.status === 200) {
+                message.success("Added new address and estimate");
+              }
+            }
+            else{
+              message.warn("Something went wrong");
+            }
+          }
+          }
+        func();
+        }}
+        >Done</Button>
+        <Button
+         style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
+         onClick={() => {this.setState({showForm:false})}}>
+          Cancel
+        </Button>
+        </Space>
+        </div>
+      </Popup>
+      
     </div>
     );
   }

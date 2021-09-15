@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Link } from "react";
-import { Card, Table, Button, Modal, Form, Input, message, Select } from "antd";
-import { getCustomers, getAddresses, customerLookup } from "../../api/customer";
+import React, { useState, useEffect} from "react";
+import {Table, Button, Form, Input} from "antd";
+import { getCustomers, customerLookup } from "../../api/customer";
 import "./index.css";
 import { withRouter } from "react-router";
 

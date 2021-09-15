@@ -119,8 +119,8 @@ class SalesCalendar extends React.Component {
         defaultCurrentView="workWeek"
         defaultCurrentDate={date}
         height={800}
-        startDayHour={6}
-        endDayHour={21}
+        startDayHour={7}
+        endDayHour={19}
         appointmentComponent={SalesTemplate}
         appointmentTooltipComponent={SalesToolSnap}
         onAppointmentAdding={(e) => {e.cancel = true}}
