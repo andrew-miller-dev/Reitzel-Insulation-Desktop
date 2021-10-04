@@ -8,6 +8,7 @@ import { message, Card } from "antd";
 import {sendQuote, addNewQuote, addNewDetails, addNewProductLine, getLatestQuote, getLatestDetail} from '../../api/quotes';
 import QuoteEmail from "../../Components/Email_Templates/quote_template";
 import {renderEmail} from 'react-html-email';
+import QuoteToWord from '../../Components/Word_Templates/quoteWord';
 
 
 function printQuote() {
@@ -52,6 +53,10 @@ async function emailQuote (customer){
   //var content = document.getElementById("printContents");
   //var email = sendQuote(customer.email, content.innerHTML);
   //message.success("Email sent");
+}
+
+function downloadQuote(quote) {
+  QuoteToWord(quote);
 }
 
 function QuotePrint(props) {
@@ -158,7 +163,8 @@ function QuotePrint(props) {
               <Footerforquoto />
       </div>
       <button onClick={printQuote}> Print this Quote</button>
-      <button onClick={() => emailQuote(quoteFormData)}>Submit and send as Email</button> 
+      <button onClick={() => emailQuote(quoteFormData)}>Submit and send as Email</button>
+      <button onClick={() => downloadQuote(quoteFormData)}> Download this Quote</button>
       <iframe
         id="ifmcontentstoprint"
         style={{ height: "0px", width: "0px", position: "absolute" }}

@@ -98,7 +98,7 @@ class SalesCalendar extends React.Component {
 
  
   render() {
-    if (this.state.info == false){
+    if (this.state.info === false){
         return (
           <p>Loading information...</p>
         )

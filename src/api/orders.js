@@ -1,6 +1,5 @@
 import ajax from "./base";
 const baseURL = "https://reitzel-server.herokuapp.com";
-const {format} = require('date-fns-tz');
 
 export async function getAllInfoID(id){
     var sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID

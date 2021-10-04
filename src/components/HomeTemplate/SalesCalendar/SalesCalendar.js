@@ -463,7 +463,7 @@ getUserName(id, array){
         <Item editorOptions={{readOnly:true}} dataField="billingPostal" />
         <Item dataField="billingRegion" 
               editorType="dxSelectBox" 
-              editorOptions={{dataSource: this.state.regionList, value:this.state.siteInfo.siteRegion, displayExpr:"region", valueExpr:"id", readOnly:true}} />
+              editorOptions={{dataSource: this.state.regionList, value:this.state.basicInfo.billingRegion, displayExpr:"region", valueExpr:"id", readOnly:true}} />
 
         </Form>
         <br />
@@ -577,8 +577,12 @@ getUserName(id, array){
               message.warn("Something went wrong");
             }
           }
+          
           }
-        func();
+        func().then(() => {
+          dataSource.load();
+        })
+        
         }}
         >Done</Button>
         <Button

@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { Input, Radio, message, Button, Space, } from "antd";
+import React from "react";
+import { Input, message, Button, Space, } from "antd";
 import "./index.css";
 import { withRouter } from "react-router";
+import { getUser } from "../../util/storage";
 
+const user = getUser();
 const { Search } = Input;
 function Searchbar(props) {
   
@@ -10,16 +12,24 @@ function Searchbar(props) {
     message.success(value);
   };
 
-  return (
-    <div className="content-searchbar">
-      <Search
-        allowClear
-        className="searchbar"
-        placeholder="Search"
-        onSearch={onSearch}
-        enterButton
-      />
+const buttons = () => {
+  console.log(user);
+  if (user.SecurityLevel === "salesman"){
+    return (
       <Space>
+         <Button
+         onClick={() => {
+          props.history.push('/newcustomer');
+         }}>
+        New Customer
+      </Button>
+      </Space>
+    )
+
+    
+  }
+  else return (
+<Space>
          <Button
          onClick={() => {
           props.history.push('/newcustomer');
@@ -33,6 +43,19 @@ function Searchbar(props) {
         New Estimate
       </Button>
       </Space>
+  )
+}
+
+  return (
+    <div className="content-searchbar">
+      <Search
+        allowClear
+        className="searchbar"
+        placeholder="Search"
+        onSearch={onSearch}
+        enterButton
+      />
+      {buttons()}
     </div>
   );
 }

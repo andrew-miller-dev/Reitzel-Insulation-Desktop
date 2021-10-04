@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from "react";
-import { useRouteMatch, useHistory } from "react-router-dom";
+import {useHistory } from "react-router-dom";
 import Button from "../../component/quotes/Button";
 import {useInput} from '../../hooks/input-hook';
 import { useParams } from "react-router";
-import {useSelector, useDispatch} from "react-redux";
+import { useDispatch} from "react-redux";
 import qData from './quoteData.js';
 import {getCustomerAddresses, getCustomers} from '../../api/customer';
 import {getUser} from '../../util/storage';
@@ -13,22 +13,17 @@ function QuoteOne(props) {
     const [isLoading, setLoading] = useState(true);
 
     let { qid } = useParams();
-
     let history = useHistory();
 
-    const {value, bind, reset} = useInput('');
-    
-    const data = useSelector( state => state.quoteOneReducer.quote_one);
     
     let  quotes = qData.quote_data;
-    let selectedQuote  = (parseInt(qid)) ? quotes.find((d) => { return parseInt(d.id) == parseInt(qid) }): {};
+    let selectedQuote  = (parseInt(qid)) ? quotes.find((d) => { return parseInt(d.id) === parseInt(qid) }): {};
     
     
-    if(Object.keys(selectedQuote).length == 0){
+    if(Object.keys(selectedQuote).length === 0){
         history.push(`/quotes`);
     }
     const [user, setUser] = useState([]);
-    const [quoteData, setQuoteData] = useState({});
     const [customers, setCustomers] = useState([]);
     const [addresses, setAddresses] = useState([]);
     
@@ -93,7 +88,7 @@ function QuoteOne(props) {
     
     
     async function onCustomerSelect(e, option) {
-        if ((e == null || e == "" || e == undefined)) {
+        if ((e === null || e === "" || e === undefined)) {
             
         } else {
             assignCustID(option.id)
@@ -122,7 +117,7 @@ function QuoteOne(props) {
     }
 
     async function onAddressSelect(e, option){
-        if ((e == null || e == "" || e == undefined)) {
+        if ((e === null || e === "" || e === undefined)) {
             
         } else {
             assignAddressID(option.id)
@@ -163,23 +158,15 @@ function QuoteOne(props) {
         })
 
         props.onSetQuoteFormDataChange(payload);
-        reset();
         evt.preventDefault();
 
     }
 
-    
-
-    const handleSubmitEvent = (values) => {
-        console.log((values))
-        values.preventDefault();
-    }
-
     const changeTax = () => {
-        if (tax == true){
+        if (tax === true){
             setTax(false);
         }
-        else if (tax == false){
+        else if (tax === false){
             setTax(true);
         }
     }        
@@ -187,7 +174,7 @@ function QuoteOne(props) {
         e.preventDefault();
         setcounter(counter +1);
         var temp = quotedetails;
-        if(temp[temp.length] == 0){
+        if(temp[temp.length] === 0){
             temp[0] = {
                 key:detailKey,
                 details:"",
@@ -211,7 +198,7 @@ function QuoteOne(props) {
         setcounter(counter + 1);
         var temp = quotedetails;
         var index = temp.indexOf(details);
-        if(temp[index].productArr.length == 0){
+        if(temp[index].productArr.length === 0){
             temp[index].productArr[0] = {
                 prodKey:prodKey,
                 product:"",
@@ -258,7 +245,7 @@ function QuoteOne(props) {
         prod.notes = e.target.value;
     }
     const handleProductPrice = (prod, e) => {
-        if(e.target.value == ""){
+        if(e.target.value === ""){
             e.target.value = 0.00;
         }
         let newPrice = parseFloat(e.target.value);
@@ -391,7 +378,6 @@ function QuoteOne(props) {
     return (
         <form onSubmit={handleSubmit}>
             <div className="Quote" style={{width:"80%"}}>
-                <h2> {quoteData.name}</h2>
                 <div>
                     Select Customer:
                     <AutoComplete 

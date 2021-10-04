@@ -1,5 +1,5 @@
-import React, {useEffect, setState, useState} from 'react';
-import { Card, Table, Button, Modal, Form, Input, message, Select} from "antd";
+import React, {useEffect, useState} from 'react';
+import { Card, Table, Button, Modal, Input} from "antd";
 import { useHistory } from "react-router-dom";
 import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quoteEditAPI";
 import { getUser } from '../../util/storage';
@@ -11,24 +11,24 @@ const {format } = require('date-fns-tz')
   let user = getUser();
   const [loaded, setLoaded] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const currentDate = new Date();
   const [formData, setFormData] = useState([]);
   const [testData, setTestData] = useState([]);
   const [detailData, setDetailData] = useState([]);
   const [prodData, setProdData] = useState([]);
 
-    useEffect(async() => {
+    useEffect(() => {
           const func = async () => {
           await getAllInfo().then((result) => {
             setTestData(result.data);
           });
-        }
+        
           await getDetails().then((item) => {
             setDetailData(item.data);
           });
           await getProducts().then((item) => {
             setProdData(item.data);
           })
+        }
         func();
         
         if(testData !== []){
@@ -48,7 +48,6 @@ const {format } = require('date-fns-tz')
       }
     const getDetailsByID = (id) => {
         let array = [];
-        let arr = [];
         detailData.map((item) => {
           if(item.quoteID === id){
             array.push({

@@ -1,4 +1,4 @@
-import { getAddressID, getCustomerID, getQuoteDetails, getUserID, getProductList, getQuoteID, updateQuote, updateDetail, updateProduct, deleteProduct, deleteDetail, getAllInfoID } from "../../api/quoteEditAPI";
+import {getQuoteDetails, getProductList, updateQuote, updateDetail, updateProduct, deleteProduct, deleteDetail, getAllInfoID } from "../../api/quoteEditAPI";
 import {addNewDetails, addNewProductLine} from '../../api/quotes';
 import React, {useState, useEffect} from 'react';
 import Button from "../../component/quotes/Button";
@@ -14,9 +14,6 @@ function QuoteEdit (props) {
     const [allData, setAllData] = useState([]);
     const [quoteData, setQuoteData] = useState([]);
     const [quoteDetail, setQuoteDetail] = useState([]);
-    const [customerData, setCustomerData] = useState([]);
-    const [addressData, setAddressData] = useState([]);
-    const [userData, setUserData] = useState([]);
     const [productList, setProductList] = useState([]);
     const [detailKey, setDetailKey] = useState(0);
     const [prodKey, setProdKey] = useState(0);
@@ -86,7 +83,6 @@ function QuoteEdit (props) {
         });        
     }
     const setText = (allInfo) => {
-        assignCustID(allInfo.CustomerID);
         assignFirstName(allInfo.CustFirstName);
         assignLastName(allInfo.CustLastName);
         assignPhoneNumber(allInfo.Phone);
@@ -106,26 +102,24 @@ function QuoteEdit (props) {
     setcounter(counter + 1);
     }
 
-    const {value: custID, bind: bindCustID, reset: resetCustID, assignValue: assignCustID} = useInput();
-    const {value: firstName, bind: bindFirstName, reset: resetFirstName,assignValue: assignFirstName} = useInput();
-    const {value: lastName, bind: bindLastName, reset: resetLastName,assignValue: assignLastName} = useInput();
-    const {value: billingAddress, bind: bindBillingAddress, reset: resetBillingAddress, assignValue: assignBillingAddress} = useInput();
-    const {value: city, bind: bindCity, reset: resetCity, assignValue: assignCity} = useInput();
-    const {value: postCode, bind: bindPostCode, reset: resetPostCode,assignValue: assignPostCode} = useInput();
-    const {value: phoneNumber, bind: bindPhoneNumber, reset: resetPhoneNumber, assignValue: assignPhoneNumber} = useInput();
-    const {value: email, bind: bindEmail, reset: resetEmail, assignValue: assignEmail} = useInput();
+    const {value: firstName, assignValue: assignFirstName} = useInput();
+    const {value: lastName, assignValue: assignLastName} = useInput();
+    const {value: billingAddress,  assignValue: assignBillingAddress} = useInput();
+    const {value: city,  assignValue: assignCity} = useInput();
+    const {value: postCode, assignValue: assignPostCode} = useInput();
+    const {value: phoneNumber,  assignValue: assignPhoneNumber} = useInput();
+    const {value: email,  assignValue: assignEmail} = useInput();
 
-    const {value: addressID, bind: bindAddressID, reset: resetAddressID, assignValue: assignAddressID} = useInput();
-    const {value: siteAddress, bind: bindSiteAddress, reset: resetSiteAddress, assignValue: assignSiteAddress} = useInput();
-    const {value: siteCity, bind: bindSiteCity, reset: resetSiteCity, assignValue: assignSiteCity} = useInput();
-    const {value: siteCode, bind: bindSiteCode, reset: resetSiteCode,assignValue: assignSiteCode} = useInput();
-    const {value: siteProv, bind: bindSiteProv, reset: resetSiteProv, assignValue: assignSiteProv} = useInput();
+    const {value: siteAddress,  assignValue: assignSiteAddress} = useInput();
+    const {value: siteCity,  assignValue: assignSiteCity} = useInput();
+    const {value: siteCode, assignValue: assignSiteCode} = useInput();
+    const {value: siteProv,  assignValue: assignSiteProv} = useInput();
     
-    const {value: customerNotes, bind: bindCustomerNotes, reset: resetCustomerNotes, assignValue: assignCustomerNotes} = useInput();
-    const {value: installerNotes, bind: bindInstallerNotes, reset: resetInstallerNotes, assignValue: assignInstallerNotes} = useInput();
+    const {value: customerNotes, bind: bindCustomerNotes, assignValue: assignCustomerNotes} = useInput();
+    const {value: installerNotes, bind: bindInstallerNotes, assignValue: assignInstallerNotes} = useInput();
 
-    const {value: userFirstName, bind: bindUserFirstName, reset: resetUserFirstName, assignValue: assignUserFirstName} = useInput();
-    const {value: userLastName, bind: bindUserLastName, reset: resetUserLastName, assignValue: assignUserLastName} = useInput();
+    const {value: userFirstName, assignValue: assignUserFirstName} = useInput();
+    const {value: userLastName, assignValue: assignUserLastName} = useInput();
 
     const [tax, setTax] = useState(true);
     const [counter, setcounter] = useState(1);
@@ -149,11 +143,11 @@ function QuoteEdit (props) {
                 details.productArr.map(async (prod) => {
                     if(prod.id !== null){
                         
-                        let prodEdit = await updateProduct(prod);
+                        await updateProduct(prod);
                     } 
                     else{
                         
-                        let newProd = await addNewProductLine(prod, quoteID, details.id);
+                        await addNewProductLine(prod, quoteID, details.id);
                     }
                 });
             });
@@ -163,10 +157,10 @@ function QuoteEdit (props) {
                 await addNewDetails(details, quoteID).then(() => {
                      details.productArr.map(async (prod) => {
                     if(prod.id !== null){
-                        let prodEdit = await updateProduct(prod);
+                        await updateProduct(prod);
                     } 
                     else{
-                        let newProd = await addNewProductLine(prod, quoteID, details.id);
+                        await addNewProductLine(prod, quoteID, details.id);
                     }
                 });
                 });
@@ -185,10 +179,10 @@ function QuoteEdit (props) {
     }
 
     const changeTax = () => {
-        if (tax == true){
+        if (tax === true){
             setTax(false);
         }
-        else if (tax == false){
+        else if (tax === false){
             setTax(true);
         }
     }        
@@ -196,7 +190,7 @@ function QuoteEdit (props) {
         e.preventDefault();
         setcounter(counter +1);
         var temp = quotedetails;
-        if(temp[temp.length] == 0){
+        if(temp[temp.length] === 0){
             temp[0] = {
                 id:null,
                 key:detailKey,
@@ -223,7 +217,7 @@ function QuoteEdit (props) {
         setcounter(counter + 1);
         var temp = quotedetails;
         var index = temp.indexOf(details);
-        if(temp[index].productArr.length == 0){
+        if(temp[index].productArr.length === 0){
             temp[index].productArr[0] = {
                 id:null,
                 prodKey:prodKey,
@@ -246,7 +240,6 @@ function QuoteEdit (props) {
     }
     const handleRemoveRow = async(details, prod ,e) => {
         e.preventDefault();
-        console.log(prod.id);
         await deleteProduct(prod.id);
         setcounter(counter - 1);
         var temp = quotedetails;
@@ -257,7 +250,6 @@ function QuoteEdit (props) {
     }
     const handleRemoveDetail = async(details,e) => {
         e.preventDefault();
-        console.log(details.id);
         details.productArr.forEach(async element => {
             console.log(element.id);
             await deleteProduct(element.id);
@@ -280,7 +272,7 @@ function QuoteEdit (props) {
         prod.notes = e.target.value;
     }
     const handleProductPrice = (prod, e) => {
-        if(e.target.value == ""){
+        if(e.target.value === ""){
             e.target.value = 0.00;
         }
         let newPrice = parseFloat(e.target.value);
@@ -336,7 +328,7 @@ function QuoteEdit (props) {
         details.productArr.map((item) => {
             total = total + parseFloat(item.price);
         });
-        if (tax == true){
+        if (tax === true){
             total = total * 1.13;
         }
         total = total.toFixed(2);

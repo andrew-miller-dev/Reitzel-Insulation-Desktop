@@ -2,18 +2,25 @@ import React from "react";
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
-import {getEstimateByID, getUsers,  getRegionAPI} from '../../api/calendar';
+import {getUsers,  getRegionAPI, getEstimateByIDToday, getEstimateByIDTomorrow} from '../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
 import { getUser } from "../../util/storage";
 import Legend from "../../Components/Legend";
+import SalesToolSnap from "../../Components/HomeTemplate/SalesCalendar/salesToolSnap";
 
-const { zonedTimeToUtc, format } = require('date-fns-tz')
+const { zonedTimeToUtc, format } = require('date-fns-tz');
+
+const currentDate = new Date();
+let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+let hourCheck = currentDate.getHours();
 
 const dataSource = new CustomStore({
   key: "EstimateID",
   load: async () => {
     let user = getUser();
-    const data = await getEstimateByID(user.UserID);
+    if(hourCheck < 18){
+      console.log(hourCheck);
+    const data = await getEstimateByIDToday(user.UserID);
     let formatData = data.data.map((item) => ({
       EstimateID : item.EstimateID,
       CustomerID : item.CustomerID,
@@ -26,6 +33,22 @@ const dataSource = new CustomStore({
       endDate : timeFormat(item.endDate)
     }));
     return formatData
+    }
+    else {
+      const data = await getEstimateByIDTomorrow(user.UserID);
+    let formatData = data.data.map((item) => ({
+      EstimateID : item.EstimateID,
+      CustomerID : item.CustomerID,
+      AddressID : item.AddressID,
+      UserID : item.UserID,
+      CreationDate : item.CreationDate,
+      text : item.EstimateInfo,
+      RegionID : item.RegionID,
+      startDate : timeFormat(item.startDate),
+      endDate : timeFormat(item.endDate)
+    }));
+    return formatData
+    }
   }
 });
 
@@ -35,8 +58,7 @@ const timeFormat = (date) => {
    return formatteddate;
 }
 
-const currentDate = new Date();
-let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+
 const views = ['day'];
 
 const renderResourceCell = (model) => {
@@ -130,8 +152,9 @@ class SalesmanTemplate extends React.Component {
               defaultCurrentDate={date}
               width={'60%'}
               height={800}
-              startDayHour={6}
-              endDayHour={21}
+              startDayHour={7}
+              endDayHour={19}
+              appointmentTooltipComponent={SalesToolSnap}
               onAppointmentAdding={(e) => {e.cancel = true}}
               onAppointmentDeleting={(e) => {e.cancel = true}}
               onAppointmentFormOpening={(e) => {e.cancel = true}}

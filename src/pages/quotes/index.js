@@ -17,7 +17,7 @@ export default function Quotes() {
   let { path, url } = useRouteMatch();
   let history = useHistory();
   function onSetQuoteDataChange(data) {
-    if (!(data == null || data  == "" || data == undefined)) {
+    if (!(data === null || data  === "" || data === undefined)) {
         setQuoteDataId(data.id);
         setQuoteData(data);
         history.push(`${url}/${data.id}/new/`)
@@ -26,7 +26,7 @@ export default function Quotes() {
     }
   }
   function onSetQuoteFormDataChange(data) {
-    if (!(data == null || data  == "" || data == undefined)) {
+    if (!(data === null || data  === "" || data === undefined)) {
         setQuoteFormData(data);
         console.log(data);
         history.push(`${url}/${quoteDataId}/print/`)

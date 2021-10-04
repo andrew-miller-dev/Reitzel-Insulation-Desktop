@@ -2,6 +2,7 @@ import ajax from "./base";
 
 const baseURL = "https://reitzel-server.herokuapp.com";
 const {format} = require('date-fns-tz');
+let date = new Date();
 
 
 export async function getEstimates() {
@@ -108,7 +109,6 @@ export async function deleteEstimate(id) {
   var subject = "Booking Update - Reitzel Insulation";
   var html = email;
   var file = attach;
-  console.log(file);
 
   var completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html, file}, "post");
   if (completed !== []) return completed;
@@ -127,9 +127,9 @@ export async function findCustomer(id){
   else return 0;
 }
 
-export async function getEstimateByID(id) {
+export async function getEstimateByIDToday(id) {
   var tableName = "estimates";
-  var condition = `UserID = '${id}'`;
+  var condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 1 DAY`;
     const estimatelist = await ajax(
       `${baseURL}/fetchValues`,
       { tableName, condition},
@@ -140,6 +140,21 @@ export async function getEstimateByID(id) {
       return 0;
     }
 }
+
+export async function getEstimateByIDTomorrow(id) {
+  var tableName = "estimates";
+  var condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 2 DAY`;
+    const estimatelist = await ajax(
+      `${baseURL}/fetchValues`,
+      { tableName, condition},
+      "post"
+    );
+    if (estimatelist !== []) return estimatelist;
+    else {
+      return 0;
+    }
+}
+
 
 export async function addNewCustomer(values) {
   var tableName = "customers";
@@ -182,7 +197,6 @@ export async function addNewAddress(id, value){
   var values = `${null},'${id}','${value.siteAddress}','${value.sitePostal}','${value.siteCity}','${value.siteProv}','${value.siteRegion}'`;
 
   var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  console.log("address", address);
   if (address !== []) return address;
   else {
     return 0;

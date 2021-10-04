@@ -1,24 +1,17 @@
-import React, {useEffect, setState, useState} from 'react';
-import { Card, Table, Button, Modal, Form, Input, message, Select } from "antd";
-import {getQuotes, getAddress, getUser, } from '../../api/addresses';
-import { useHistory, useRouteMatch, Route, Switch } from "react-router-dom";
+import React, {useEffect, useState} from 'react';
+import { Card, Table, Button, Modal, Form } from "antd";
+import { useRouteMatch } from "react-router-dom";
 import {getAllInfo} from "../../api/quoteEditAPI";
 const { Item } = Form;
-const { confirm } = Modal;
-const { Option } = Select;
 const {format } = require('date-fns-tz')
 
 export default function AddressInfo() {
  
-  let history = useHistory();
   let match = useRouteMatch('/addressinfo/:address').params.address;
   const [addressInfo, setaddressinfo] = useState([]);
-  const [quoteList, setQuoteList] = useState([]);
-  const [userData, setUserData] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [tableData, setTableData] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const currentDate = new Date();
   const [formView] = Form.useForm();
   const [formData, setFormData] = useState([]);
   const [testData, setTestData] = useState([]);
@@ -60,15 +53,6 @@ export default function AddressInfo() {
       return tableList;
     };
 
-    const findSalesman = (id) => {
-      let salesman = "";
-      userData.forEach(element => {
-        if(element.id === id){
-          salesman = element.firstName + " " + element.lastName;
-        }
-      });
-      return salesman;
-    }
     const columns =[
       
       {
