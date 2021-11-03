@@ -49,7 +49,6 @@ export async function getCustomers() {
       { tableName, condition},
       "post"
     );
-    console.log("customerlist", customerlist);
     if (customerlist !== []) return customerlist;
     else {
       return 0;
@@ -60,7 +59,6 @@ export async function getCustomers() {
     var tableName = "quotes";
     var values = `'${null}','${value.addressID}','${value.id}','${value.userInfo.UserID}','${value.total}','${value.customer_notes}','${value.installer_notes}','${date}',${null},${null}`;
     var quote = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-    console.log("quote", quote);
     if (quote !== []) return quote;
     else {
       return 0;
@@ -68,10 +66,10 @@ export async function getCustomers() {
     }
 
   export async function addNewDetails(values, id){
+    var sql = `INSERT INTO subtotallines VALUES ('${null}','${id}','${values.details}','${values.total}')`
     var tableName = "subtotallines";
     var values = `'${null}','${id}','${values.details}','${values.total}'`;
-    var details = await ajax(`${baseURL}/insertValues`, {tableName, values }, "post");
-    console.log(details);
+    var details = await ajax(`${baseURL}/processCustomQuery`, {sql}, "post");
     if(details !== []) return details;
     else{
       return 0;

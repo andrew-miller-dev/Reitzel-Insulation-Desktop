@@ -1,13 +1,104 @@
 import React from 'react';
-import { Document, ImageRun, Packer, Paragraph, TextRun } from 'docx';
-import * as fs from 'fs';
+import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell } from 'docx';
 
 const header = "https://i.ibb.co/0snCVqq/header.png";
+const footer = 'https://i.ibb.co/tm6mdt0/footer.png';
 const docx = require("docx");
 const {format } = require('date-fns-tz');
-let formatDate = format(new Date(), "yyyy-MM-dd");
+let formatDate = format(new Date(), "yyyy_MM_dd");
+
+
+
+let renderDetails = (info) => {
+    let rowArray = [];
+    info.details.map((item) => {
+        let newRow = new TableRow({
+            width:{
+                size:8000
+            },
+            children:[
+                new TableCell({
+                    width:{
+                        size:8000
+                    },
+                    children:[
+                        new Paragraph({
+                             text:item.details
+                        })
+                    ]
+                   
+                })
+            ]
+        });
+        let newProdTable = new TableRow({
+            width:{
+                size:8000
+            },
+            children:[
+                new TableCell({
+                    children:[
+                        new Table({
+                            rows:renderProds(item.productArr)
+                        }),
+                        new Paragraph({
+                            text:`Detail Total: ${item.total}`
+                        })
+                    ]
+                })
+            ]
+            
+        })
+        rowArray.push(newRow);
+        rowArray.push(newProdTable);
+        return newRow;
+    })
+    return rowArray;
+}
+
+let renderProds = (info) => {
+    console.log(info);
+    let detailArr = [];
+    info.map((item) => {
+        let newRow = new TableRow({
+            children:[
+                new TableCell({
+                  children:[
+                      new Paragraph({
+                          text:item.product
+                      })
+                  ]  
+                }),
+                new TableCell({
+                    children:[
+                        new Paragraph({
+                            text:item.notes
+                        })
+                    ]
+                }),
+                new TableCell({
+                    children:[
+                        new Paragraph({
+                            text:item.price
+                        })
+                    ]  
+                })
+            ]
+    });
+    detailArr.push(newRow);
+    return newRow;
+    })
+    console.log(info);
+    return detailArr;
+}
 
 export default async function QuoteToWord(info) {
+    const head = await fetch(
+        "https://i.ibb.co/0snCVqq/header.png"
+    ).then(r => r.blob());
+    const foot = await fetch(
+        'https://i.ibb.co/tm6mdt0/footer.png'
+    ).then(r => r.blob());
+
     const doc = new Document({
             sections: [{
                 properties: {},
@@ -15,10 +106,10 @@ export default async function QuoteToWord(info) {
                     new Paragraph({
                         children:[
                             new ImageRun({
-                                data:fs.readFileSync(header),
+                                data:head,
                                 transformation:{
-                                    width:500,
-                                    height:100
+                                    width:600,
+                                    height:125
                                 }
                             })
                         ]
@@ -104,6 +195,68 @@ export default async function QuoteToWord(info) {
                                 text:info.site_postal
                             }),
                         ],
+                    }),
+                    new Table({
+                        width:{
+                            size:8000
+                        },
+                        rows:[
+                            new TableRow({
+                                children:[
+                                    new TableCell({
+                                        width:{
+                                            size:8000
+                                        },
+                                        children:[
+                                            new Paragraph({
+                                                text:"Quote Details"
+                                            })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    new Table({
+                        rows: renderDetails(info)
+                    }),
+                    new Paragraph({
+                        text:`Quote total: ${info.total}`
+                    }),
+                    new Paragraph({
+                        break:2
+                    }),
+                    new Paragraph({
+                        children:[
+                            new TextRun({
+                                text:"Customer Notes: ",
+                                break:1
+                            }),
+                            new TextRun({
+                                text:info.customer_notes
+                            })
+                        ]
+                    }),
+                    new Paragraph({
+                        children:[
+                            new TextRun({
+                                text:`PLEASE BE AWARE THAT POLYURETHANE SPRAY FOAM INSULATION REQUIRES A THERMAL BARRIER I.E. DRYWALL, OR FIREPROOFING. ¼ INCH TOLERANCE DURING APPLICATION IS REQUIRED.`,
+                                break:2,
+                                size:13
+                            }),
+                            new TextRun({
+                                text:`PAYMENT UPON COMPLETION OF WORK IS REQUIRED IN FULL BY CASH, CHEQUE, VISA, MASTERCARD, OR AMERICAN EXPRESS. REITZEL INSULATION DOES NOT GIVE TERMS UNLESS PRE-AUTHORIZED PRIOR TO PROJECT START DATE.`,
+                                break:1,
+                                size:13
+                            }),
+                            new ImageRun({
+                                data:foot,
+                                transformation:{
+                                    width:600,
+                                    height:80
+                                }
+                            })
+                        ]
                     })
                 ],
             }],

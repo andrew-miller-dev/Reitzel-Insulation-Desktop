@@ -5,10 +5,11 @@ import qData from "./quoteData.js";
 import Headerforquoto from "../headforquote";
 import Footerforquoto from "../footer";
 import { message, Card } from "antd";
-import {sendQuote, addNewQuote, addNewDetails, addNewProductLine, getLatestQuote, getLatestDetail} from '../../api/quotes';
+import {sendQuote, addNewQuote, addNewDetails, addNewProductLine, getLatestQuote} from '../../api/quotes';
 import QuoteEmail from "../../Components/Email_Templates/quote_template";
 import {renderEmail} from 'react-html-email';
 import QuoteToWord from '../../Components/Word_Templates/quoteWord';
+var Promise = require("bluebird");
 
 
 function printQuote() {
@@ -22,18 +23,18 @@ function printQuote() {
 }
 
 async function emailQuote (customer){
-  console.log(customer);
   try {
      await addNewQuote(customer)
-    let latestQuote = await getLatestQuote()
+    let latestQuote = await getLatestQuote();
     let quoteID = latestQuote.data[0].QuoteID;
-    customer.details.map(async (detail) => {
-       await addNewDetails(detail, quoteID);
-      let latestDetail = await getLatestDetail()
-      let detailID = latestDetail.data[0].SubtotalID;
-      detail.productArr.map(async (prod) => {
-       await addNewProductLine(prod, quoteID, detailID);
+    customer.details.map(async(details) => {
+      let detailsConfirm = await addNewDetails(details, quoteID);
+      let detailsID = detailsConfirm;
+      details.productArr.map(async(item) => {
+        await addNewProductLine(item, quoteID, detailsID.data.insertId);
+        return item;
       })
+      return details;
     })
     message.success("Quote added");
   } catch (error) {
@@ -48,11 +49,6 @@ async function emailQuote (customer){
     console.log(error);
     message.error("Email failed to send");
   }
-
-  
-  //var content = document.getElementById("printContents");
-  //var email = sendQuote(customer.email, content.innerHTML);
-  //message.success("Email sent");
 }
 
 function downloadQuote(quote) {

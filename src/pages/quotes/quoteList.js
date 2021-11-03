@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import { Card, Table, Button, Modal, Input} from "antd";
+import { Card, Table, Button, Modal, Input, Space} from "antd";
 import { useHistory } from "react-router-dom";
 import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quoteEditAPI";
 import { getUser } from '../../util/storage';
+import getWordDoc from './quoteToWordBypass';
 const {Search} = Input;
 const {format } = require('date-fns-tz')
 
@@ -24,11 +25,9 @@ const {format } = require('date-fns-tz')
         
           await getDetails().then((item) => {
             setDetailData(item.data);
-            console.log(item.data);
           });
           await getProducts().then((item) => {
             setProdData(item.data);
-            console.log(item.data);
           })
         }
         func();
@@ -184,12 +183,20 @@ const {format } = require('date-fns-tz')
         title:"Options",
         key:"options",
         render: (data) => (
+          <Space>
           <Button
             onClick={() => {
               history.push(`/orders/${data.QuoteID}/new`)
             }}>
               Create Work Order
             </Button>
+          <Button
+          onClick={() => {
+            getWordDoc(data);
+          }}>
+            Download Quote
+          </Button>
+          </Space>
         )
       }   
     ]
