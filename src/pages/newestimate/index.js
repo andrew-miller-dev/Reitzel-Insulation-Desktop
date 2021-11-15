@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import validator from "validator";
 import { Form, DatePicker, Input, Button, Select, message, Card, Modal } from "antd";
 import {
-  addOrder,
+  addCustomer,
   addEstimate,
-  getLatestCustomer,
   addAddress,
   getLatestAddress,
 } from "../../api/neworder";
@@ -112,9 +111,8 @@ export default function NewEstimate(props) {
       estimateInfo: values.EstimateInfo,
     };
 
-    await addOrder(customer);
-    var getCustomerID = await getLatestCustomer();
-    var latestCustomer = getCustomerID.data[0].CustomerID;
+    let customerInfo = await addCustomer(customer);
+    var latestCustomer = customerInfo.data.insertId;
     if(customer.BillingAddress !== ' ') {
            await addAddress(latestCustomer, customer);
     }

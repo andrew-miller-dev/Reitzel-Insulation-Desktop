@@ -17,7 +17,7 @@ export async function getTrucks() {
 
 export async function addTruck(data) {
     var tableName = 'trucks';
-    var values = `'${null}','${data.truckInfo}','${data.truckPlate}','${0}','${data.truckNumber}'`;
+    var values = `'${null}','${data.truckInfo}','${data.truckPlate}','${0}','${data.truckNumber}','${data.truckType}'`;
     const truck = await ajax(
         `${baseURL}/insertValues`,
         {tableName,values},

@@ -66,10 +66,9 @@ export async function getCustomers() {
     }
 
   export async function addNewDetails(values, id){
-    var sql = `INSERT INTO subtotallines VALUES ('${null}','${id}','${values.details}','${values.total}')`
     var tableName = "subtotallines";
     var values = `'${null}','${id}','${values.details}','${values.total}'`;
-    var details = await ajax(`${baseURL}/processCustomQuery`, {sql}, "post");
+    var details = await ajax(`${baseURL}/insertValues`, {tableName, values}, "post");
     if(details !== []) return details;
     else{
       return 0;

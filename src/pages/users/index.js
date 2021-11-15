@@ -118,7 +118,6 @@ export default function Users() {
     const value = form1.getFieldsValue();
     const { loginFirstName, loginLastName, loginPwd, email, role } = value;
     const id = selectedData.id;
-    console.log("id", id);
     //update data in the backend
     const result = await updateUser(id, loginFirstName, loginLastName, loginPwd, email, role);
     setupdateShow(false);

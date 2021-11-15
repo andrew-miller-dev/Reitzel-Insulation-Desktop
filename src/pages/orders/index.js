@@ -15,7 +15,7 @@ export default function Orders() {
  function updateOrderData(values) {
   if (!(values == null || values  == "" || values == undefined)) {
     setOrderData(values);
-    history.push(`${url}/preview`);
+    history.push(`/home`);
 }else{
     setOrderData({});
 }

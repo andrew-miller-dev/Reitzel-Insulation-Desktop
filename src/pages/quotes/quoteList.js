@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Card, Table, Button, Modal, Input, Space} from "antd";
+import { Card, Table, Button, Modal, Input, Space, Popover} from "antd";
 import { useHistory } from "react-router-dom";
 import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quoteEditAPI";
 import { getUser } from '../../util/storage';
@@ -16,7 +16,7 @@ const {format } = require('date-fns-tz')
   const [testData, setTestData] = useState([]);
   const [detailData, setDetailData] = useState([]);
   const [prodData, setProdData] = useState([]);
-
+  
     useEffect(() => {
           const func = async () => {
           await getAllInfo().then((result) => {
@@ -38,6 +38,26 @@ const {format } = require('date-fns-tz')
         
       },[]);
 
+      const getCompleted = (array) => {
+        let newArr = [];
+        array.forEach((item) => {
+          if (item.completed) {
+            newArr.push(item);
+          }
+        });
+        if(newArr.length === 0) return null;
+        else return newArr;
+      }
+      const getNotCompleted = (array) => {
+        let newArr = [];
+        array.forEach((item) => {
+          if (!item.completed) {
+            newArr.push(item);
+          }
+        });
+        if(newArr === []) return null;
+        else return newArr;
+      }
       const getUserQuotes = (list) => {
         let newList = [];
         list.map((item) => {
@@ -146,22 +166,6 @@ const {format } = require('date-fns-tz')
           </div>
          
         )
-        
-      },
-      {
-        title:"Show/Edit Quote Info",
-        key:"OpenQuote",
-        render: (data) => 
-          (
-            <div>
-            <Button
-            onClick={() => {
-                
-                setFormData(getDetailsByID(data.QuoteID));
-                setShowForm(true);     
-                            }}>
-            View Quote</Button>
-            </div>)
       },
       {
         title:"Creation Date",
@@ -183,20 +187,109 @@ const {format } = require('date-fns-tz')
         title:"Options",
         key:"options",
         render: (data) => (
-          <Space>
-          <Button
+          <Popover content={
+          <div>
+            <Button
+              onClick={() => {
+                history.push(`/orders/${data.QuoteID}/new`)
+              }}>
+                Create Work Order
+              </Button>
+              <br />
+              <br />
+            <Button
             onClick={() => {
-              history.push(`/orders/${data.QuoteID}/new`)
+              getWordDoc(data);
             }}>
-              Create Work Order
+              Download Quote
             </Button>
-          <Button
-          onClick={() => {
-            getWordDoc(data);
-          }}>
-            Download Quote
-          </Button>
-          </Space>
+            <br />
+            <br />
+            <Button
+            onClick={() => {
+                
+                setFormData(getDetailsByID(data.QuoteID));
+                setShowForm(true);     
+                            }}>
+            View Quote</Button>
+            </div>}
+            trigger='clicked'>
+            <Button>. . .</Button>
+          </Popover>
+          
+        )
+      }   
+    ];
+
+    const colComplete = [
+      {
+        title:"Customer Name",
+        key:"customer",
+        render:(data) => (
+          <p>{data.CustFirstName + " " + data.CustLastName}</p>
+        )
+      },
+      {
+        title:"Address",
+        key:"address",
+        render:(data) => (
+          <p>{data.Address  + "," + " " + data.City}</p>
+        )
+      },
+      {},
+
+      {
+        title:"Salesman",
+        key:"user",
+        render: (data) =>(
+          <div>
+             <p>{data.FirstName + " " + data.LastName}</p>
+          </div>
+         
+        )
+      },
+      {
+        title:"Creation Date",
+        key:"date",
+        render: (data) => (
+          <p>{format(new Date(data.creationDate),"MMMM do',' yyyy")}</p>
+        ),
+        sorter: (a,b) => new Date(a.creationDate) - new Date(b.creationDate)
+      },
+      {
+        title:"Completed Date",
+        key:"completeDate",
+        render: (data) => (
+          <p>{checkDate(format(new Date(data.modifyDate), "MMMM do',' yyyy"))}</p>
+        ),
+        sorter: (a,b) => new Date(a.modifyDate) - new Date(b.modifyDate)
+      },
+      {
+        title:"Options",
+        key:"options",
+        render: (data) => (
+          <Popover content={
+          <div>
+            <Button
+            onClick={() => {
+              getWordDoc(data);
+            }}>
+              Download Quote
+            </Button>
+            <br />
+            <br />
+            <Button
+            onClick={() => {
+                
+                setFormData(getDetailsByID(data.QuoteID));
+                setShowForm(true);     
+                            }}>
+            View Quote</Button>
+            </div>}
+            trigger='clicked'>
+            <Button>. . .</Button>
+          </Popover>
+          
         )
       }   
     ]
@@ -219,12 +312,20 @@ const {format } = require('date-fns-tz')
         <Table
         style={{ width: "80%", margin: "0 auto" }}
         rowKey="id"
-        dataSource={testData}
+        dataSource={getNotCompleted(testData)}
         columns={columns}
         tableLayout="auto"
         pagination={{ pageSize: 10 }}>
           </Table>
-
+        <h2>Completed Quotes</h2>
+        <Table
+        style={{ width: "80%", margin: "0 auto" }}
+        rowKey="id"
+        dataSource={getCompleted(testData)}
+        columns={colComplete}
+        tableLayout="auto"
+        pagination={{ pageSize: 10 }}>
+          </Table>
         <Modal
         visible={showForm}
         title="View Quote"
@@ -256,12 +357,20 @@ const {format } = require('date-fns-tz')
         <Table
         style={{ width: "80%", margin: "0 auto" }}
         rowKey="id"
-        dataSource={getUserQuotes(testData)}
+        dataSource={getUserQuotes(getNotCompleted(testData))}
         columns={columns}
         tableLayout="auto"
         pagination={{ pageSize: 10 }}>
           </Table>
-
+          <h2>Your Completed Quotes</h2>
+          <Table
+        style={{ width: "80%", margin: "0 auto" }}
+        rowKey="id"
+        dataSource={getUserQuotes(getCompleted(testData))}
+        columns={columns}
+        tableLayout="auto"
+        pagination={{ pageSize: 10 }}>
+          </Table>
         <Modal
         visible={showForm}
         title="View Quote"

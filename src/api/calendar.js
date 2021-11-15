@@ -4,7 +4,9 @@ const baseURL = "https://reitzel-server.herokuapp.com";
 const {format} = require('date-fns-tz');
 let date = new Date();
 
-
+//Estimate Calendar APIs
+//
+//
 export async function getEstimates() {
     var tableName = "estimates";
     const estimatelist = await ajax(
@@ -235,6 +237,26 @@ export async function getAddressList(id) {
     "post"
   );
   if (address !== []) return address;
+  else {
+    return 0;
+  }
+}
+
+//
+//
+//
+// Calendar Fill Truck APIs
+//
+//
+
+export async function getWorkOrders() {
+  var tableName = "workorders";
+  const estimatelist = await ajax(
+    `${baseURL}/fetchValues`,
+    { tableName},
+    "post"
+  );
+  if (estimatelist !== []) return estimatelist;
   else {
     return 0;
   }

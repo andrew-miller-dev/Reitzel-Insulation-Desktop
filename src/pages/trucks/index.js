@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {Button, Switch, Card, Table, Form, Modal, Input, message} from 'antd';
+import {Button, Switch, Card, Table, Form, Modal, Input, message, Select} from 'antd';
 import { getTrucks, addTruck, changeAvailable, deleteTruckID } from '../../api/trucks';
 const {Item} = Form;
+const {Option} = Select;
 
 export default function Trucks(props) {
 
@@ -9,6 +10,10 @@ export default function Trucks(props) {
     const [truckList, setTruckList] = useState([]);
     const [count, setCount] = useState(0);
     const [form] = Form.useForm();
+    const types = ["foam","loosefill"];
+    const options = types.map((item, index) => (
+      <Option key={item}>{item}</Option>
+    ));
     const title = (
         <Button
           onClick={() => {
@@ -35,6 +40,11 @@ export default function Trucks(props) {
             title:"License Plate",
             key:"truckPlate",
             dataIndex:'plate'
+        },
+        {
+          title:"Truck Type",
+          key:"truckType",
+          dataIndex:"type"
         },
         {
             title:"Available",
@@ -72,6 +82,7 @@ export default function Trucks(props) {
                     number:item.TruckNumber,
                     info:item.TruckInfo,
                     plate:item.LicensePlate,
+                    type:item.TruckType,
                     available:item.Available
                 }
             ));
@@ -84,7 +95,6 @@ export default function Trucks(props) {
         const validResult = await form.validateFields();
         if (validResult.errorFields && validResult.errorFields.length > 0) return;
         const value = form.getFieldsValue();
-  
         const result = await addTruck(value);
     if (result.data && result.data.affectedRows > 0) {
       message.success("Added new truck");
@@ -176,6 +186,17 @@ export default function Trucks(props) {
               ]}
             >
               <Input />
+                </Item>
+                <Item
+                label="Truck Type"
+                name="truckType"
+                rules={[{
+                  required:true,
+                  message:"Required"
+                }]}>
+                  <Select>
+                  {options}
+                  </Select>
                 </Item>
         </Form>
         </Modal>

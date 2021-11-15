@@ -1,17 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {useInput} from '../../hooks/input-hook';
-import { Card, Checkbox, Row, Col, Form, DatePicker, Modal, Button, Select} from 'antd';
+import { useHistory } from 'react-router';
+import { Card, Checkbox, Row, Col, Form, DatePicker, Modal, Button, Select, message} from 'antd';
 import { useRouteMatch } from "react-router-dom";
-import { getAllInfoID, getDetailsID, getProductsID, getAvailableTrucks } from '../../api/orders';
+import { getAllInfoID, getDetailsID, getProductsID, getAvailableTrucks, addNewOrder, addNewOrderDetail, addNewOrderProduct, updateQuoteOnComplete } from '../../api/orders';
 
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const {Option} = Select;
+const { format } = require("date-fns-tz");
 
 function NewOrder (props) {
     
     let quoteID = useRouteMatch('/orders/:oid/new').params.oid;
-
+    const history = useHistory();
     const [quoteData, setQuoteData] = useState([]);
     const [detailData, setDetailData] = useState([]);
     const [prodData, setProdData] = useState([]);
@@ -26,7 +27,6 @@ function NewOrder (props) {
 
         await getAllInfoID(quoteID).then((result) => {
           setQuoteData(result.data[0]);
-          console.log(result.data[0]);
         });
         let detailsInfo = await getDetailsID(quoteID);
           setDetailData(detailsInfo.data);
@@ -36,8 +36,6 @@ function NewOrder (props) {
         await getAvailableTrucks().then((result) => {
           setTrucks(result.data);
         })
-        
-      
       }
       
       catch(e) {
@@ -52,23 +50,77 @@ function NewOrder (props) {
       
     }, [])
 
-    const options = trucks.map((item, index) => (
-      <Option key = {index + 1}>{item.TruckNumber + " " + item.TruckInfo} </Option> 
+    const options = trucks.map((item) => (
+      <Option key = {item.TruckID}>{item.TruckNumber + " " + item.TruckInfo} </Option> 
     ))
 
-    const createOrder = (values) => {
+    const createOrder = async(values) => {
+    const validResult = await form.validateFields();
+    if (validResult.errorFields && validResult.errorFields.length > 0) return;
       const workOrderInfo = {
         allInfo:quoteData,
         selectedDetails:findSelectedDetails(),
-        selectedDates:values.selectedDate,
-        selectedTruck:null
+        total:getSelectedTotal(findSelectedDetails()),
+        startDate: format(
+          values.selectedDate[0]._d,
+          "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+        ),
+        endDate: format(
+          values.selectedDate[1]._d,
+          "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+        ),
+        selectedTruck:values.selectedTruck,
+      }
+      let selectedTruckType = getTruckType(workOrderInfo.selectedTruck);
+      let order = await addNewOrder(workOrderInfo, selectedTruckType);
+      try {
+      let orderID = order.data.insertId;
+      workOrderInfo.selectedDetails.forEach(async(item) => {
+        let detail = await addNewOrderDetail(item, orderID);
+        let detailID = detail.data.insertID;
+        item.productArr.forEach(async(prod) => {
+          await addNewOrderProduct(prod, orderID, detailID);
+        });
+      })
+    }
+    catch(e) {
+      message.error("Something went wrong - please try again");
+      console.log(e);
+    }
+    finally{
+      if(order.status === 200){
+        message.success("Order created");
       }
       props.updateOrder(workOrderInfo);
+      updateAndCompleteQuote(workOrderInfo);
+      history.push('/home');
+    }
+    }
+
+    async function updateAndCompleteQuote(values) {
+      let confirm = await updateQuoteOnComplete(values);
+      return confirm;
+    }
+
+    function getTruckType(id) {
+      trucks.forEach((truck) => {
+        if(truck.TruckID === id) return truck.TruckType;
+      });
+    }
+
+    function getSelectedTotal() {
+      let total = 0;
+      quoteDetails.forEach((item) => {
+        if(item.selected){
+          total = total + item.total;
+        }
+      })
+      return total;
     }
 
     function findSelectedDetails() {
       let selectItem = [];
-      quoteDetails.map((item) => {
+      quoteDetails.forEach((item) => {
         if(item.selected){
           selectItem.push(item);
         }
@@ -88,7 +140,6 @@ function NewOrder (props) {
               
           }
           prodlist.map((prod) => {
-            console.log(prod);
               if(prod.subtotalID === detail.SubtotalID){
                   let prodObj = {
                       id:prod.QuoteLineID,
@@ -216,6 +267,12 @@ function NewOrder (props) {
               <Card title="Select the date">
                 <Item
               name="selectedDate"
+              rules={[
+                {
+                   required:true,
+                   message:"Please select a date"
+                }
+              ]}
             >
               <RangePicker
                 showTime={{ format: "HH:mm" }}
@@ -234,8 +291,16 @@ function NewOrder (props) {
               <Item>
               <h1>Select truck</h1>
             </Item>
-            <Item>
-              <Select>{options}</Select>
+            <Item
+            name="selectedTruck"
+            rules={[
+              {
+                 required:true,
+                 message:"Please select a truck"
+              }
+            ]}>
+              <Select
+              notFoundContent="No trucks available">{options}</Select>
             </Item>
             </Card>
             
@@ -250,7 +315,6 @@ function NewOrder (props) {
             onCancel={() => {setShowCalendar(false)}}
             width="90%"
             >
-
             </Modal>
              
         </div>

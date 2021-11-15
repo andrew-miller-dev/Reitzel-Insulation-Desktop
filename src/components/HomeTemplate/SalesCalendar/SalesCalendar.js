@@ -5,7 +5,7 @@ import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
-import {getEstimates, 
+import {getEstimates,
         deleteEstimate, 
         getUsers, 
         updateEstimate, 
@@ -14,8 +14,6 @@ import {getEstimates,
         findCustomer, 
         addNewCustomer, 
         addNewAddress, 
-        getLatestCustomer, 
-        getLatestAddress, 
         addEstimate, 
         sendConfirm, 
         getCustomers,
@@ -71,14 +69,12 @@ const dataSource = new CustomStore({
     return data
   },
   insert: async (values) => {
-    console.log('values', values);
     try{
-      await addNewCustomer(values);
-      const latestCustomer = await getLatestCustomer();
-      const customerID = latestCustomer.data[0].CustomerID;
-      await addNewAddress(customerID, values);
-      const latestAddress = await getLatestAddress();
-      const addressID = latestAddress.data[0].AddressID;
+      let customerInfo = await addNewCustomer(values);
+      console.log(customerInfo);
+      const customerID = customerInfo.data.insertId;
+      let addressInfo = await addNewAddress(customerID, values);
+      const addressID = addressInfo.data.insertId;
       const addEstimates = await addEstimate(
         customerID,
         addressID,
@@ -566,8 +562,8 @@ getUserName(id, array){
           else {
             let result = await addNewAddress(this.state.custID, this.state.siteInfo);
             if(result.status === 200){
-              let address = await getLatestAddress();
-              let final = await addEstimate(this.state.custID, address.data[0].AddressID, info);
+              let address = result.data.insertId;
+              let final = await addEstimate(this.state.custID, address, info);
               this.setState({showForm:false});
               if(final.status === 200) {
                 message.success("Added new address and estimate");

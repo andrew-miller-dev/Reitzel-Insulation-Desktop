@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { Form, Input, Button, Select, message } from "antd";
-import { addOrder, getLatestCustomer, addAddress } from "../../api/neworder";
+import { addCustomer, addAddress } from "../../api/neworder";
 import "./index.css";
 import validator from "validator";
 const layout = {
@@ -39,9 +39,8 @@ export default function NewCustomer(props) {
       Prov:values.Prov,
       Region:values.Region
     }
-    await addOrder(newVal);
-    var customerID = await getLatestCustomer();
-    var latestCustomer = customerID.data[0].CustomerID;
+    let customerInfo = await addCustomer(newVal);
+    var latestCustomer = customerInfo.data.insertId;
     var newAddress = await addAddress(latestCustomer, newVal);
     console.log("new address",newAddress);
     if (newAddress.status == 200) {

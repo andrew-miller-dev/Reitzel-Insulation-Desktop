@@ -5,7 +5,7 @@ import qData from "./quoteData.js";
 import Headerforquoto from "../headforquote";
 import Footerforquoto from "../footer";
 import { message, Card } from "antd";
-import {sendQuote, addNewQuote, addNewDetails, addNewProductLine, getLatestQuote} from '../../api/quotes';
+import {sendQuote, addNewQuote, addNewDetails, addNewProductLine} from '../../api/quotes';
 import QuoteEmail from "../../Components/Email_Templates/quote_template";
 import {renderEmail} from 'react-html-email';
 import QuoteToWord from '../../Components/Word_Templates/quoteWord';
@@ -24,9 +24,8 @@ function printQuote() {
 
 async function emailQuote (customer){
   try {
-     await addNewQuote(customer)
-    let latestQuote = await getLatestQuote();
-    let quoteID = latestQuote.data[0].QuoteID;
+    let quoteInfo = await addNewQuote(customer)
+    let quoteID = quoteInfo.data.insertId;
     customer.details.map(async(details) => {
       let detailsConfirm = await addNewDetails(details, quoteID);
       let detailsID = detailsConfirm;
