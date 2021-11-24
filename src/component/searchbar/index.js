@@ -13,7 +13,6 @@ function Searchbar(props) {
   };
 
 const buttons = () => {
-  console.log(user);
   if (user.SecurityLevel === "salesman"){
     return (
       <Space>

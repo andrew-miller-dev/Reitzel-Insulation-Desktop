@@ -1,26 +1,9 @@
-import { getOverlappingDaysInIntervals } from "date-fns";
 import ajax from "./base";
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 const baseURL = "https://reitzel-server.herokuapp.com";
 
 
-
-
-export async function getCustomers() {
-    console.log("here");
-    var tableName = "Customers";
-    const customerlist = await ajax(
-      `${baseURL}/fetchValues`,
-      { tableName},
-      "post"
-    );
-    console.log("customerlist", customerlist);
-    if (customerlist !== []) return customerlist;
-    else {
-      return 0;
-    }
-  }
   export async function getAddresses() {
     console.log("here");
     var tableName = "Addresses";
@@ -57,27 +40,6 @@ export async function getCustomers() {
       "post"
     );
     if(addressList !== []) return addressList;
-    else return 0;
-  }
-  export async function getRegion(id){
-    var tableName = "region";
-    var condition = `RegionID = '${id}'`
-    const region = await ajax(
-      `${baseURL}/fetchValues`,
-      {tableName, condition},
-      "post"
-    );
-    if(region !== []) return region;
-    else return 0;
-  }
-  export async function getRegionAPI(){
-    var tableName = "region";
-    const region = await ajax(
-      `${baseURL}/fetchValues`,
-      {tableName},
-      "post"
-    );
-    if(region !== []) return region;
     else return 0;
   }
 

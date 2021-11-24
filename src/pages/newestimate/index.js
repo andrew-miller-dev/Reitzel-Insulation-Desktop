@@ -5,7 +5,6 @@ import {
   addCustomer,
   addEstimate,
   addAddress,
-  getLatestAddress,
 } from "../../api/neworder";
 import SalesSnapshot from '../../Components/HomeTemplate/SalesCalendar/SalesSnapshot'
 import { getRegionAPI, getUsers, sendConfirm } from "../../api/calendar";
@@ -114,22 +113,31 @@ export default function NewEstimate(props) {
     let customerInfo = await addCustomer(customer);
     var latestCustomer = customerInfo.data.insertId;
     if(customer.BillingAddress !== ' ') {
-           await addAddress(latestCustomer, customer);
+           let addressResult = await addAddress(latestCustomer, customer);
+           let addressID = addressResult.data.insertId;
+           var estimateResult = await addEstimate(
+            latestCustomer,
+            addressID,
+            estimate
+          );
+          if (estimateResult.status === 200) {
+            message.success("Added new estimate");
+          } 
+          else message.warn("Something went wrong");
     }
     if (siteAddress.BillingAddress !== ' ') {
-          await addAddress(latestCustomer, siteAddress);
+          let addressResult = await addAddress(latestCustomer, siteAddress);
+          let addressID = addressResult.data.insertId;
+           var estimateResult = await addEstimate(
+            latestCustomer,
+            addressID,
+            estimate
+          );
+          if (estimateResult.status === 200) {
+            message.success("Added new estimate");
+          } 
+          else message.warn("Something went wrong");
     }
-    var getAddressID = await getLatestAddress();
-    var latestAddress = getAddressID.data[0].AddressID;
-    var estimateResult = await addEstimate(
-      latestCustomer,
-      latestAddress,
-      estimate
-    );
-    if (estimateResult.status === 200) {
-      message.success("Added new estimate");
-    } 
-    else message.warn("Something went wrong");
     if(validator.isEmail(customer.Email)){
       sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />), customer_info_sheet)
     }

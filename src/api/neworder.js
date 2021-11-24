@@ -25,48 +25,6 @@ export async function addEstimate(id, address, value) {
   }
 }
 
-export async function getEstimates() {
-  var tableName = "estimates";
-  var columns = "*";
-  var condition = ``;
-  const user = await ajax(
-    `${baseURL}/fetchValues`,
-    { tableName, columns, condition },
-    "post"
-  );
-  console.log("user", user);
-  if (user !== []) return user;
-  else {
-    return 0;
-  }
-}
-
-export async function getLatestCustomer() {
-  let sql = `SELECT * FROM customers ORDER BY CustomerID DESC LIMIT 1`
-  const customer = await ajax(
-    `${baseURL}/processCustomQuery`,
-    {sql},
-    "post"
-  );
-  if (customer !== []) return customer;
-  else{
-    return 0;
-  }
-}
-
-export async function getLatestAddress() {
-  let sql = `SELECT * FROM address ORDER BY AddressID DESC LIMIT 1`
-  const address = await ajax(
-    `${baseURL}/processCustomQuery`,
-    {sql},
-    "post"
-  );
-  if (address !== []) return address;
-  else{
-    return 0;
-  }
-}
-
 export async function addAddress(id, value){
   var tableName = "address";
   var values = `${null},'${id}','${value.BillingAddress}','${value.PostalCode}','${value.City}','${value.Prov}','${value.Region}'`;

@@ -4,10 +4,14 @@ import { getRegionAPI } from '../api/calendar';
 
 function Legend(props) {
 
-    useEffect(async () => {
-        let result = await getRegionAPI();
-        setRegionInfo(result.data);
-    },[]);
+    useEffect(() => {
+        let func = async() => {
+            let result = await getRegionAPI();
+            setRegionInfo(result.data);
+        }
+        func();
+    }
+    ,[]);
     const [regionInfo, setRegionInfo] = useState([]);
 
     const renderLegend = () => {

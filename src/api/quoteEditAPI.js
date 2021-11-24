@@ -1,33 +1,9 @@
-import { getDate } from "date-fns";
 import ajax from "./base";
 
 const baseURL = "https://reitzel-server.herokuapp.com";
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 
-export async function getCustomerID(id){
-    var tableName = "customers";
-    var condition = `CustomerID = '${id}'`;
-    const customer = await ajax (
-        `${baseURL}/fetchValues`,
-        {tableName, condition},
-        "post"
-    );
-    if(customer !== []) return customer;
-    else return 0; 
-}
-
-export async function getAddressID(id){
-    var tableName = "address";
-    var condition = `AddressID = '${id}'`;
-    const addressinfo = await ajax (
-        `${baseURL}/fetchValues`,
-        {tableName, condition},
-        "post"
-    );
-    if(addressinfo !== []) return addressinfo;
-    else return 0;
-}
 
 export async function getQuoteDetails(id){
     var tableName = "subtotallines";

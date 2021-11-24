@@ -29,27 +29,3 @@ export async function getAddress(id) {
       return 0;
     }
   }
-
-  export async function getCustomer(id){
-    var tableName = "customers";
-    var condition = `CustomerID = '${id}'`
-    const customer = await ajax(
-      `${baseURL}/fetchValues`,
-      {tableName, condition},
-      "post"
-    );
-      if(customer !== []) return customer;
-      else return 0;
-
-    }
-  
-  export async function getUser(){
-    var tableName = "users";
-    const user = await ajax(
-      `${baseURL}/fetchValues`,
-      {tableName},
-      "post"
-    );
-    if(user !== []) return user;
-    else return 0;
-  }

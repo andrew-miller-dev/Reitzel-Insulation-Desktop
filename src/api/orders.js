@@ -88,7 +88,7 @@ export async function addNewOrderProduct(value, order, detail) {
 
 export async function updateQuoteOnComplete(value) {
     var tableName = 'quotes';
-    var columnsAndValues  = `completed = '1'`;
+    var columnsAndValues  = `completed = '${new Date()}'`;
     var condition = `QuoteID = '${value.allInfo.QuoteID}'`;
     var updated = await ajax(
         `${baseURL}/updateValues`,

@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import {getRegion, updateCustomer, getRegionAPI, getCustomer, getCustomerAddresses, deleteCustomer, addAddress, addNotes, getNotes} from '../../api/customer';
+import {getRegion, updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addAddress, addNotes, getNotes} from '../../api/customer';
+
 import { useRouteMatch } from "react-router-dom";
 import { withRouter } from "react-router";
 import {getUser} from '../../util/storage';
+import { getRegionAPI } from '../../api/calendar';
 const { Item } = Form;
 const { confirm } = Modal;
 const { Option } = Select;
@@ -60,7 +62,7 @@ export function CustomerInfo() {
       }, [count]);
 
     const getAddressList = async () => {
-        var result = await getCustomerAddresses(match).then((list) => {
+        await getCustomerAddresses(match).then((list) => {
           var addresses = list.data.map((item) =>({
           id: item.AddressID,
           address: item.Address,

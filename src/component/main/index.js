@@ -13,7 +13,6 @@ import AddressInfo from "../../pages/addressInfo";
 import NewCusomter from "../../pages/newcustomer";
 import NewEstimate from "../../pages/newestimate";
 import "./index.css";
-import QuoteTemplate from "../../Components/Email_Templates/test_quote";
 
 const id = 0;
 export default function Main() {
@@ -32,7 +31,6 @@ export default function Main() {
         <Route path="/addressinfo/:address" component={AddressInfo} />
         <Route path="/newcustomer" component={NewCusomter} />
         <Route path="/newestimate" component={NewEstimate} />
-        <Route path="/testquote" component={QuoteTemplate} />
         <Redirect to="/home"></Redirect>
       </Switch>
     </div>

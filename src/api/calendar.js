@@ -117,18 +117,6 @@ export async function deleteEstimate(id) {
   else return 0;
 }
 
-export async function findCustomer(id){
-  var tableName = "customers";
-  var condition = `CustomerID ='${id}'`
-  var customer = await ajax(
-    `${baseURL}/fetchValues`,
-    {tableName, condition},
-    "post"
-  );
-  if (customer !== []) return customer;
-  else return 0;
-}
-
 export async function getEstimateByIDToday(id) {
   var tableName = "estimates";
   var condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 1 DAY`;
@@ -164,32 +152,6 @@ export async function addNewCustomer(values) {
   var orders = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (orders !== []) return orders;
   else {
-    return 0;
-  }
-}
-
-export async function getLatestCustomer() {
-  let sql = `SELECT * FROM customers ORDER BY CustomerID DESC LIMIT 1`
-  const customer = await ajax(
-    `${baseURL}/processCustomQuery`,
-    {sql},
-    "post"
-  );
-  if (customer !== []) return customer;
-  else{
-    return 0;
-  }
-}
-
-export async function getLatestAddress() {
-  let sql = `SELECT * FROM address ORDER BY AddressID DESC LIMIT 1`
-  const address = await ajax(
-    `${baseURL}/processCustomQuery`,
-    {sql},
-    "post"
-  );
-  if (address !== []) return address;
-  else{
     return 0;
   }
 }
@@ -260,4 +222,77 @@ export async function getWorkOrders() {
   else {
     return 0;
   }
+}
+
+export async function getDetailsByID(id) {
+  var tableName = 'workorderdetail';
+  var condition = `OrderID = '${id}'`;
+  var detArr = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post"
+  );
+  if(detArr !== []) return detArr;
+  else return 0;
+}
+
+export async function getProductsByID(id) {
+  var tableName = 'workorderprod';
+  var condition = `WODetailID = '${id}'`;
+  var detArr = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post"
+  );
+  if(detArr !== []) return detArr;
+  else return 0;
+}
+
+export async function updateWorkOrder(id, values) {
+  var tableName = "workorders";
+  var columnsAndValues = `startDate='${values.startDate}',endDate='${values.endDate}', TruckID='${values.TruckID}'`;
+  var condition = `WorkOrderID='${id}'`;
+  const result = await ajax(
+    `${baseURL}/updateValues`,
+    { tableName, columnsAndValues, condition },
+    "post"
+  );
+  if (result !== []) return result;
+  else {
+    return 0;
+  }
+}
+
+export async function getCustomerQuotes(id) {
+  var tableName = 'quotes';
+  var condition = `CustomerID ='${id}' AND completed IS NULL`
+  const result = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post"
+  );
+  if (result !== []) return result;
+  else return 0;
+}
+
+export async function getQuoteDetails(id) {
+  var tableName = 'subtotallines';
+  var condition = `quoteID = '${id}'`;
+  const result = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post"
+  );
+  return result;
+}
+
+export async function getQuoteProducts(id) {
+  var tableName = 'quotelines';
+  var condition = `subtotalID = '${id}'`;
+  const result = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post"
+  );
+  return result;
 }

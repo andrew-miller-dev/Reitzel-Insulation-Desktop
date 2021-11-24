@@ -5,7 +5,8 @@ import {useInput} from '../../hooks/input-hook';
 import { useParams } from "react-router";
 import { useDispatch} from "react-redux";
 import qData from './quoteData.js';
-import {getCustomerAddresses, getCustomers} from '../../api/customer';
+import {getCustomerAddresses} from '../../api/customer';
+import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
 import { AutoComplete, Card, Row, Col, Checkbox } from "antd";
 

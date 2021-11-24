@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from "react";
 import {Table, Button, Form, Input} from "antd";
-import { getCustomers, customerLookup } from "../../api/customer";
+import { customerLookup } from "../../api/customer";
+import { getCustomers } from "../../api/calendar";
 import "./index.css";
 import { withRouter } from "react-router";
 

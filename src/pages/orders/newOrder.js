@@ -77,7 +77,7 @@ function NewOrder (props) {
       let orderID = order.data.insertId;
       workOrderInfo.selectedDetails.forEach(async(item) => {
         let detail = await addNewOrderDetail(item, orderID);
-        let detailID = detail.data.insertID;
+        let detailID = detail.data.insertId;
         item.productArr.forEach(async(prod) => {
           await addNewOrderProduct(prod, orderID, detailID);
         });

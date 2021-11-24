@@ -8,16 +8,20 @@ import FillTooltip from './FillTooltip';
 import {getWorkOrders,
         deleteEstimate, 
         getUsers, 
-        updateEstimate, 
         getRegionAPI, 
         sendUpdate, 
-        findCustomer, 
         addNewCustomer, 
         addNewAddress, 
         addEstimate, 
         sendConfirm, 
         getCustomers,
-        getAddressList} from '../../../api/calendar';
+        getDetailsByID,
+        getProductsByID,
+        updateWorkOrder,
+        getCustomerQuotes,
+        getQuoteDetails,
+        getQuoteProducts} from '../../../api/calendar';
+import { getCustomer } from "../../../api/customer.js";
 import CustomStore from 'devextreme/data/custom_store';
 import { message, Modal, Space } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
@@ -26,7 +30,7 @@ import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import { customer_info_sheet } from "../../../assets/paths.js";
 import Confirmation from "../../Email_Templates/confirmation.js";
-import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button } from "devextreme-react";
+import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button, List } from "devextreme-react";
 import { Item } from "devextreme-react/form";
 import { getTrucks } from "../../../api/trucks.js";
 const { confirm } = Modal;
@@ -36,22 +40,53 @@ const dataSource = new CustomStore({
   key: "WorkOrderID",
   load: async () => {
     const data = await getWorkOrders();
-
-    return data.data;
+    let formatData = data.data.map((item) => ({
+      WorkOrderID:item.WorkOrderID,
+      CustomerID:item.CustomerID,
+      AddressID:item.AddressID,
+      TruckID:item.TruckID,
+      UserID:item.UserID,
+      RegionID:5,
+      type:item.WorkType,
+      total:item.TotalAmount,
+      startDate:item.startDate,
+      endDate:item.endDate,
+      details:async function() {
+        let detailArr = await getDetailsByID(item.WorkOrderID);
+        let detArr = detailArr.data.map((det) => (
+          {
+            DetailID:det.WODetailID,
+            OrderID: det.OrderID,
+            text:det.Details,
+            subtotal:det.DetailTotal,
+            products:async function() {
+              let productArr = await getProductsByID(det.WODetailID);
+              let prodArr = productArr.data.map((prod) => (
+                {
+                  ProductID:prod.WOProdID,
+                  OrderID:prod.OrderID,
+                  DetailID:prod.WODetailID,
+                  product:prod.Product,
+                  notes:prod.Notes,
+                  proce:prod.Price
+                }
+              ));
+              return prodArr;
+            }
+          }
+        ));
+        return detArr;
+      }
+     }));
+    return formatData;
   },
   update: async (key, values) => {
     let formatData = {
-      EstimateID : values.EstimateID,
-      CustomerID : values.CustomerID,
-      AddressID : values.AddressID,
-      UserID : values.UserID,
-      CreationDate : values.CreationDate,
-      EstimateInfo : values.EstimateInfo,
-      RegionID : values.RegionID,
+      TruckID: values.TruckID,
       startDate : values.startDate,
       endDate : values.endDate
   }
-    const check = await updateEstimate(key, formatData);
+    const check = await updateWorkOrder(key, formatData);
     return check;
   },
   remove: async(key) => {
@@ -91,7 +126,7 @@ const dataSource = new CustomStore({
   }
 });
 const sendEmailUpdate = async (values) => {
-  let findCustomerEmail = await findCustomer(values.CustomerID);
+  let findCustomerEmail = await getCustomer(values.CustomerID);
   let customerEmail = findCustomerEmail.data[0];
   sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>), customer_info_sheet);
 }
@@ -109,7 +144,7 @@ const renderResourceCell = (model) => {
 const onAppointmentDeleting = (e) => {
   var cancel = true;
   e.cancel = cancel;
-  confirm({title:"Do you want to delete this appointment?", onOk(){dataSource.remove(e.appointmentData.EstimateID) }, onCancel(){cancel = true}});
+  confirm({title:"Do you want to delete this work order?", onOk(){dataSource.remove(e.appointmentData.EstimateID) }, onCancel(){cancel = true}});
 }
 
 class FillCalendar extends React.Component {
@@ -118,21 +153,16 @@ class FillCalendar extends React.Component {
     this.state={
 
       groupByDate:false,
-      useExisting:false,
       userList:"",
       regionList:"",
       truckList:"",
       info:false,
       findCustomerList:[],
-      customerAddresses:[],
       showForm:false,
-      clickedSalesman:"",
-      siteID:"",
-      custID:"",
-      apptDates:{
-        start:"",
-        end:""
-      },
+      clickedTruck:"",
+      custInfo:[],
+      custQuotes:[],
+      mounted:false,
       basicInfo:{
         firstName:"",
         lastName:"",
@@ -160,123 +190,92 @@ class FillCalendar extends React.Component {
     
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
     this.onAppointmentForm = this.onAppointmentForm.bind(this);
-    this.salesmanSource = this.salesmanSource.bind(this);
+    this.truckSource = this.truckSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
     this.getUserName = this.getUserName.bind(this);
   }
   async InfoIsHere() {
+    if(this.mounted === true){
   let customerData = await getCustomers();
   let regionData = await this.regionSource();
-  let userData = await this.salesmanSource();
-  let truckData = await getTrucks();
-  this.setState({userList:userData});
+  let truckData = await this.truckSource();
   this.setState({regionList:regionData});
   this.setState({findCustomerList:customerData.data});
-  this.setState({truckList:truckData.data});
+  this.setState({truckList:truckData});
   this.setState({info:true});
+    }
 } 
 
 async onAppointmentForm (e) {
   
-  if(e.appointmentData.CreationDate) {
+  if(e.appointmentData.total) {
     e.cancel = true;
   }
   
   else{
   let form = e.form;
   e.popup.option('showTitle', true);
-  e.popup.option('title', 'Quick appointment creation');
-  let user = e.appointmentData.UserID;
+  e.popup.option('title', 'Quick work order creation');
   let newGroupItems =[
     {
-      editorType:'dxButton',
+      label:{text:"Lookup by Customer"},
       colSpan:2,
+      editorType:"dxAutocomplete",
       editorOptions:{
-        text:'Existing Customer Lookup',
-        onClick:(evt) => {
-          e.popup.hide();
-          this.setState({showForm:true});
-          var appointmentInfo = {...this.state.appointmentInfo};
-          appointmentInfo.startDate = format(new Date(e.appointmentData.startDate),"M/d/yyyy, hh:mm a");
-          appointmentInfo.endDate = format(new Date(e.appointmentData.endDate),"M/d/yyyy, hh:mm a");
-          var apptDates = {...this.state.apptDates};
-          apptDates.start = e.appointmentData.startDate;
-          apptDates.end = e.appointmentData.endDate;
-          this.setState({apptDates});
-          this.setState({appointmentInfo});
-          this.setState({clickedSalesman:e.appointmentData.UserID})
-        } 
-      },
-    },
-  {
-    label:{text: "First Name"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"firstName"
-  },
-  {
-    label:{text: "Last Name"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"lastName",
-  },
-  {
-    label:{text:'Phone'},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:'phone'
-  },
-  {
-    label:{text:"Email"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"email",
-  },
+        dataSource:this.state.findCustomerList,
+          valueExpr:"CustLastName",
+          placeholder:"Look up by last name...",
+          itemRender:(data) => {
+            return (
+              <span>{data.CustFirstName} {data.CustLastName}</span>
+            )
+          },
+          onItemClick:async(data) => {
+            this.setState({custInfo:data.itemData});
+            let listQuotes = await getCustomerQuotes(data.itemData.CustomerID);
+            let quoteList = listQuotes.data.map((item) => (
+              {
+                id:item.QuoteID,
+                AddressID:item.AddressID,
+                CustomerID:item.CustomerID,
+                UserID:item.UserID,
+                total:item.QuoteTotal,
+                customerNotes:item.notesCustomers,
+                installerNotes:item.notesInstallers,
+                creationDate:item.creationDate,
+                completed:item.completed,
+                detailArr:async() => {
+              let details = await getQuoteDetails(item.QuoteID);
+              let detailsArr = details.data.map((det) => (
+                {
+                  id:det.SubtotalID,
+                  quoteID:det.quoteID,
+                  subtotal:det.subtotalAmount,
+                  details:det.subtotalLines,
+                  productArr:async() => {
+                    let products = await getQuoteProducts(det.SubtotalID);
+                    let productArr = products.data.map((prod) => (
+                      {
+                        id:prod.QuoteLineID,
+                        subtotalID:prod.subtotalID,
+                        quoteID:prod.QuoteID,
+                        product:prod.Product,
+                        notes:prod.Notes,
+                        price:prod.Subtotal
+                      }
+                    ))
+                    return productArr;
+                }}))
+              return detailsArr;
+            }}));
 
-  {
-    label:{text:"Site Address"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"siteAddress"
-  },
-  {
-    label:{text:"Site City"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"siteCity"
-  },
-  {
-    label:{text:"Site Province"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"siteProv"
-  },
-  {
-    label:{text:"Postal Code"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"sitePostal"
-  },
-  {
-    label:{text:"Region"},
-    isRequired:true,
-    editorType:'dxSelectBox',
-    editorOptions:{
-      displayExpr:"region",
-      valueExpr:"id",
-      dataSource: this.state.regionList,
+            this.setState({custQuotes:quoteList});
+            this.setState({showForm:true});
+            console.log(this.state.custQuotes);
+          }
+      }
     },
-    dataField:'siteRegion'
-  },
-  {
-    label:{text:"Assigned Salesman"},
-    editorType: 'dxTextBox',
-    editorOptions:{
-      value:this.getUserName(user, this.state.userList),
-      readOnly:true
-    }
-  },
   {
     label:{text: "Start Date"},
     colSpan:2,
@@ -292,23 +291,6 @@ async onAppointmentForm (e) {
     editorOptions:{type:'datetime', width:'100%'},
     isRequired:true,
     dataField:'endDate'
-  },
-  {
-    label:{text:"Description"},
-    colSpan:2,
-    editorType:'dxTextArea',
-    isRequired:true,
-    dataField:'apptInfo'
-  },
-  {
-    label:{text:"Job Type"},
-    colSpan:2,
-    isRequired:true,
-    editorType:'dxSelectBox',
-    editorOptions:{
-      items:['loosefill','spray', "fireproofing","removal"]
-    },
-    dataField:'jobType'
   }
 ];
 
@@ -318,11 +300,6 @@ async onAppointmentForm (e) {
 
 getUserName(id, array){
   let user = '';
-  array.map((item) => {
-    if(item.id === id) {
-      user = item.FirstName + " " + item.LastName;
-    }
-  })
   return user;
 }
 
@@ -341,20 +318,27 @@ getUserName(id, array){
     return regionData;
   }
 
-  async salesmanSource() {
-    const data = await getUsers();
-    let salesData = data.data.map((item) => ({
-      id: item.UserID,
-      FirstName : item.FirstName,
-      LastName: item.LastName
+  async truckSource() {
+    const data = await getTrucks();
+    let truckData = data.data.map((item) => ({
+      id: item.TruckID,
+      TruckInfo:item.TruckInfo,
+      LicensePlate:item.LicensePlate,
+      Available:item.Available,
+      TruckNumber:item.TruckNumber,
+      TruckType:item.TruckType
     }))
-    return salesData;
+    return truckData;
   }
   componentDidMount(){
+
+    this.mounted = true;
     this.InfoIsHere();
 
 }
- 
+  componentWillUnmount(){
+    this.mounted = false;
+  }
   render() {
     if (this.state.info === false){
         return (
@@ -368,7 +352,7 @@ getUserName(id, array){
       
       <div>
       <Scheduler
-        cellDuration="60"
+        cellDuration={60}
         timeZone="America/Edmonton"
         groups = {groups}
         groupByDate={this.state.groupByDate}
@@ -406,101 +390,30 @@ getUserName(id, array){
         </div>
       </div>
       <Popup
-      height='95%'
-      title="Existing Customer Appointment Creation"
+      height='75%'
+      title="Work Order Lookup"
       visible={this.state.showForm}
       onHiding={() => {this.setState({showForm:false})}}
       >
-          <Autocomplete
-          dataSource={this.state.findCustomerList}
-          valueExpr="CustLastName"
-          placeholder="Look up by last name..."
+          <h2>Customer Active Quotes</h2>
+          <List
+          dataSource={this.state.custQuotes}
           itemRender={(data) => {
-            return (
-              <span>{data.CustFirstName} {data.CustLastName}</span>
-            )
-          }}
-          onItemClick={async(data) => {
-            var customer = data.itemData
-            var basicInfo = {...this.state.basicInfo};
-            basicInfo.firstName = customer.CustFirstName;
-            basicInfo.lastName = customer.CustLastName;
-            basicInfo.phone = customer.Phone;
-            basicInfo.email = customer.Email;
-            basicInfo.billingAddress = customer.BillingAddress;
-            basicInfo.billingCity = customer.CustCity;
-            basicInfo.billingPostal = customer.CustPostalCode;
-            basicInfo.billingRegion = customer.CustRegion;
-            this.setState({basicInfo});
-            this.setState({custID:customer.CustomerID})
-            let result = await getAddressList(customer.CustomerID);
-            this.setState({customerAddresses:result.data});
-          }}
-          />
-          <br/>
-        <Form
-        formData={this.state.basicInfo}
-        colCount={3}
-        >
-        <Item editorOptions={{readOnly:true}} dataField='firstName' />  
-        <Item editorOptions={{readOnly:true}} dataField='lastName' />
-        <Item editorOptions={{readOnly:true}} dataField='phone' />
-        <Item editorOptions={{readOnly:true}} dataField='email' />  
-        <Item editorOptions={{readOnly:true}} dataField='billingAddress' />
-        <Item editorOptions={{readOnly:true}} dataField='billingCity' />
-        <Item editorOptions={{readOnly:true}} dataField="billingPostal" />
-        <Item dataField="billingRegion" 
-              editorType="dxSelectBox" 
-              editorOptions={{dataSource: this.state.regionList, value:this.state.basicInfo.billingRegion, displayExpr:"region", valueExpr:"id", readOnly:true}} />
-
-        </Form>
-        <br />
-        <CheckBox
-        text="Use Existing Address"
-        onValueChanged={() => {
-          if(this.state.useExisting === true){
-            this.setState({useExisting:false});
-          }
-          else {
-            this.setState({useExisting:true});
-          }
-          }}
-        ></CheckBox>
-        <br />
-        <SelectBox
-          visible={this.state.useExisting}
-          dataSource={this.state.customerAddresses}
-          itemRender={(data) => {
-            return (
-              <span>{data.Address}, {data.City} {data.PostalCode}</span>
-            )
+          return (
+            <span>Quote Total: {data.total}  Date created: {format(new Date(data.creationDate),"MMMM do',' yyyy")} </span>
+          )
           }}
           onItemClick={(data) => {
-            var address = data.itemData;
-            var siteInfo = {...this.state.siteInfo};
-            siteInfo.siteAddress = address.Address;
-            siteInfo.siteCity = address.City;
-            siteInfo.siteProv = address.Province;
-            siteInfo.sitePostal = address.PostalCode;
-            siteInfo.siteRegion = address.Region;
-            this.setState({siteID:address.AddressID});
-            this.setState({siteInfo});
-          }}
-          />
-        <br />
-        <Form
-        colCount={3}
-        formData={this.state.siteInfo}
-        >
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteAddress' />  
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteCity' />
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteProv' />
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField="sitePostal" />
-        <Item dataField="siteRegion" 
-              editorType="dxSelectBox" 
-              editorOptions={{dataSource: this.state.regionList, value:this.state.siteInfo.siteRegion, displayExpr:"region", valueExpr:"id", readOnly:this.state.useExisting}} />
-        </Form>
-        
+            return(
+              <Popup
+              visible={true}>
+
+              </Popup>
+            )
+          }
+
+          }>
+          </List>
         <br/>
         <Form
         col count={2}

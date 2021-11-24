@@ -14,33 +14,6 @@ export async function sendQuote(customer, email){
     else return 0;
  }
 
- 
-export async function getCustomers() {
-    var tableName = "Customers";
-    const customerlist = await ajax(
-      `${baseURL}/fetchValues`,
-      { tableName},
-      "post"
-    );
-    console.log("customerlist", customerlist);
-    if (customerlist !== []) return customerlist;
-    else {
-      return 0;
-    }
-  }
-
-  export async function getCustomerAddresses(id){
-    var tableName = "address";
-    var condition = `CustomerID = '${id}'`
-    const addressList = await ajax(
-      `${baseURL}/fetchValues`,
-      {tableName, condition},
-      "post"
-    );
-    if(addressList !== []) return addressList;
-    else return 0;
-  }
-
   export async function getCustomerFiltered(filter){
     var tableName = "Customers";
     var condition = `FirstName = '${filter}%'`
@@ -65,9 +38,9 @@ export async function getCustomers() {
     }
     }
 
-  export async function addNewDetails(values, id){
+  export async function addNewDetails(value, id){
     var tableName = "subtotallines";
-    var values = `'${null}','${id}','${values.details}','${values.total}'`;
+    var values = `'${null}','${id}','${value.details}','${value.total}'`;
     var details = await ajax(`${baseURL}/insertValues`, {tableName, values}, "post");
     if(details !== []) return details;
     else{
@@ -75,38 +48,12 @@ export async function getCustomers() {
     }
   }
 
-  export async function addNewProductLine(values, id, detailID){
+  export async function addNewProductLine(value, id, detailID){
     var tableName = "quotelines";
-    var values = `'${null}','${detailID}', '${id}','${values.product}','${values.notes}', '${values.price}'`;
+    var values = `'${null}','${detailID}', '${id}','${value.product}','${value.notes}', '${value.price}'`;
     var product = await ajax(`${baseURL}/insertValues`, {tableName, values }, "post");
     console.log(product);
     if(product !== []) return product;
-    else{
-      return 0;
-    }
-  }
-
-  export async function getLatestQuote() {
-    let sql = `SELECT * FROM quotes ORDER BY QuoteID DESC LIMIT 1`
-    const quote = await ajax(
-      `${baseURL}/processCustomQuery`,
-      {sql},
-      "post"
-    );
-    if (quote !== []) return quote;
-    else{
-      return 0;
-    }
-  }
-
-  export async function getLatestDetail() {
-    let sql = `SELECT * FROM subtotallines ORDER BY subtotalID DESC LIMIT 1`
-    const quote = await ajax(
-      `${baseURL}/processCustomQuery`,
-      {sql},
-      "post"
-    );
-    if (quote !== []) return quote;
     else{
       return 0;
     }

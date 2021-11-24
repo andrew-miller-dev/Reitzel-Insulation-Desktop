@@ -11,13 +11,13 @@ import {getEstimates,
         updateEstimate, 
         getRegionAPI, 
         sendUpdate, 
-        findCustomer, 
         addNewCustomer, 
         addNewAddress, 
         addEstimate, 
         sendConfirm, 
         getCustomers,
         getAddressList} from '../../../api/calendar';
+import { getCustomer } from "../../../api/customer.js";
 import CustomStore from 'devextreme/data/custom_store';
 import { message, Modal, Space } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
@@ -94,8 +94,6 @@ const dataSource = new CustomStore({
     catch(e){
       console.log(e);
     }
-
-    
   },
   onUpdating: (key, values) => {
     
@@ -103,7 +101,7 @@ const dataSource = new CustomStore({
   }
 });
 const sendEmailUpdate = async (values) => {
-  let findCustomerEmail = await findCustomer(values.CustomerID);
+  let findCustomerEmail = await getCustomer(values.CustomerID);
   let customerEmail = findCustomerEmail.data[0];
   sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>), customer_info_sheet);
 }
@@ -128,7 +126,7 @@ class SalesCalendar extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-
+      mounted:false,
       groupByDate:false,
       useExisting:false,
       userList:"",
@@ -177,13 +175,16 @@ class SalesCalendar extends React.Component {
     this.getUserName = this.getUserName.bind(this);
   }
   async InfoIsHere() {
-  let customerData = await getCustomers();
+  if(this.mounted){
+    let customerData = await getCustomers();
   let regionData = await this.regionSource();
   let userData = await this.salesmanSource();
   this.setState({userList:userData});
   this.setState({regionList:regionData});
   this.setState({findCustomerList:customerData.data});
   this.setState({info:true});
+  }
+  
 } 
 
 async onAppointmentForm (e) {
@@ -360,10 +361,14 @@ getUserName(id, array){
     return salesData;
   }
   componentDidMount(){
+    this.mounted = true;
     this.InfoIsHere();
 
 }
  
+  componentWillUnmount(){
+    this.mounted = false;
+  }
   render() {
     if (this.state.info === false){
         return (
