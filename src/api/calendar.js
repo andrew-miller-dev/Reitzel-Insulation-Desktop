@@ -8,7 +8,7 @@ let date = new Date();
 //
 //
 export async function getEstimates() {
-    var tableName = "estimates";
+    const tableName = "estimates";
     const estimatelist = await ajax(
       `${baseURL}/fetchValues`,
       { tableName},
@@ -21,8 +21,8 @@ export async function getEstimates() {
   }
 
 export async function deleteEstimate(id) {
-    var tableName = "estimates";
-    var condition = `EstimateID='${id}'`;
+    const tableName = "estimates";
+    const condition = `EstimateID='${id}'`;
     const result = await ajax(`${baseURL}/deleteValues`, { tableName, condition }, "post");
     console.log("result", result);
     if (result !== []) return result;
@@ -32,8 +32,8 @@ export async function deleteEstimate(id) {
   }
 
   export async function getUsers() {
-    var tableName = "users";
-    var condition = "SecurityLevel = 'salesman'"
+    const tableName = "users";
+    const condition = "SecurityLevel = 'salesman'"
     const userlist = await ajax(
       `${baseURL}/fetchValues`,
       { tableName, condition},
@@ -45,9 +45,9 @@ export async function deleteEstimate(id) {
     }
   }
   export async function updateEstimate(id, values) {
-    var tableName = "estimates";
-    var columnsAndValues = `startDate='${values.startDate}',endDate='${values.endDate}', UserID='${values.UserID}'`;
-    var condition = `EstimateID='${id}'`;
+    const tableName = "estimates";
+    const columnsAndValues = `startDate='${values.startDate}',endDate='${values.endDate}', UserID='${values.UserID}'`;
+    const condition = `EstimateID='${id}'`;
     const result = await ajax(
       `${baseURL}/updateValues`,
       { tableName, columnsAndValues, condition },
@@ -60,9 +60,9 @@ export async function deleteEstimate(id) {
   }
 
   export async function updateEstimateInfo(id, value) {
-    var tableName = "estimates";
-    var columnsAndValues = `EstimateInfo = '${value}'`;
-    var condition = `EstimateID='${id}'`;
+    const tableName = "estimates";
+    const columnsAndValues = `EstimateInfo = '${value}'`;
+    const condition = `EstimateID='${id}'`;
     const result = await ajax(
       `${baseURL}/updateValues`,
       { tableName, columnsAndValues, condition },
@@ -75,8 +75,8 @@ export async function deleteEstimate(id) {
   }
 
   export async function getRegion(id){
-    var tableName = "region";
-    var condition = `RegionID = '${id}'`
+    const tableName = "region";
+    const condition = `RegionID = '${id}'`
     const region = await ajax(
       `${baseURL}/fetchValues`,
       {tableName, condition},
@@ -86,7 +86,7 @@ export async function deleteEstimate(id) {
     else return 0;
   }
   export async function getRegionAPI(){
-    var tableName = "region";
+    const tableName = "region";
     const region = await ajax(
       `${baseURL}/fetchValues`,
       {tableName},
@@ -97,29 +97,29 @@ export async function deleteEstimate(id) {
   }
 
   export async function sendConfirm(customer, email){
-    var to = customer;
-    var subject = "Booking Confirmation - Rietzel Insulation";
-    var html = email;
+    const to = customer;
+    const subject = "Booking Confirmation - Rietzel Insulation";
+    const html = email;
 
-    var completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html}, "post");
+    const completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html}, "post");
     if (completed !== []) return completed;
     else return 0;
  }
 
  export async function sendUpdate(customer, email, attach){
-  var to = customer;
-  var subject = "Booking Update - Reitzel Insulation";
-  var html = email;
-  var file = attach;
+  const to = customer;
+  const subject = "Booking Update - Reitzel Insulation";
+  const html = email;
+  const file = attach;
 
-  var completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html, file}, "post");
+  const completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html, file}, "post");
   if (completed !== []) return completed;
   else return 0;
 }
 
 export async function getEstimateByIDToday(id) {
-  var tableName = "estimates";
-  var condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 1 DAY`;
+  const tableName = "estimates";
+  const condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 1 DAY`;
     const estimatelist = await ajax(
       `${baseURL}/fetchValues`,
       { tableName, condition},
@@ -132,8 +132,8 @@ export async function getEstimateByIDToday(id) {
 }
 
 export async function getEstimateByIDTomorrow(id) {
-  var tableName = "estimates";
-  var condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 2 DAY`;
+  const tableName = "estimates";
+  const condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 2 DAY`;
     const estimatelist = await ajax(
       `${baseURL}/fetchValues`,
       { tableName, condition},
@@ -146,10 +146,10 @@ export async function getEstimateByIDTomorrow(id) {
 }
 
 
-export async function addNewCustomer(values) {
-  var tableName = "customers";
-  var values = `${null},'${values.firstName}','${values.lastName}','${values.phone}','${values.email}','${values.siteAddress}','${values.siteCity}','${values.sitePostal}','${values.Region}'`;
-  var orders = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
+export async function addNewCustomer(value) {
+  const tableName = "customers";
+  const values = `${null},'${value.firstName}','${value.lastName}','${value.phone}','${value.email}','${value.siteAddress}','${value.siteCity}','${value.sitePostal}','${value.Region}'`;
+  const orders = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (orders !== []) return orders;
   else {
     return 0;
@@ -157,10 +157,10 @@ export async function addNewCustomer(values) {
 }
 
 export async function addNewAddress(id, value){
-  var tableName = "address";
-  var values = `${null},'${id}','${value.siteAddress}','${value.sitePostal}','${value.siteCity}','${value.siteProv}','${value.siteRegion}'`;
+  const tableName = "address";
+  const values = `${null},'${id}','${value.siteAddress}','${value.sitePostal}','${value.siteCity}','${value.siteProv}','${value.siteRegion}'`;
 
-  var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
+  const address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (address !== []) return address;
   else {
     return 0;
@@ -168,10 +168,10 @@ export async function addNewAddress(id, value){
 }
 
 export async function addEstimate(id, address, value) {
-  var tableName = "estimates";
-  var values = `${null},'${id}','${address}','${value.UserID}','${value.jobType}','${format(new Date(),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}','${value.apptInfo}','${value.siteRegion}','${value.startDate}','${value.endDate}'`;
+  const tableName = "estimates";
+  const values = `${null},'${id}','${address}','${value.UserID}','${value.jobType}','${format(new Date(),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}','${value.apptInfo}','${value.siteRegion}','${value.startDate}','${value.endDate}'`;
 
-  var estimate = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
+  const estimate = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (estimate !== []) return estimate;
   else {
     return 0;
@@ -179,9 +179,9 @@ export async function addEstimate(id, address, value) {
 }
 
 export async function getCustomers() {
-  var tableName = 'customers';
+  const tableName = 'customers';
 
-  var customers = await ajax (
+  const customers = await ajax (
     `${baseURL}/fetchValues`,
     {tableName},
     "post"
@@ -191,8 +191,8 @@ export async function getCustomers() {
 }
 
 export async function getAddressList(id) {
-  var tableName = "Address";
-  var condition = `CustomerID = '${id}'`
+  const tableName = "Address";
+  const condition = `CustomerID = '${id}'`
   const address = await ajax(
     `${baseURL}/fetchValues`,
     { tableName, condition},
@@ -212,7 +212,7 @@ export async function getAddressList(id) {
 //
 
 export async function getWorkOrders() {
-  var tableName = "workorders";
+  const tableName = "workorders";
   const estimatelist = await ajax(
     `${baseURL}/fetchValues`,
     { tableName},
@@ -225,9 +225,9 @@ export async function getWorkOrders() {
 }
 
 export async function getDetailsByID(id) {
-  var tableName = 'workorderdetail';
-  var condition = `OrderID = '${id}'`;
-  var detArr = await ajax(
+  const tableName = 'workorderdetail';
+  const condition = `OrderID = '${id}'`;
+  const detArr = await ajax(
     `${baseURL}/fetchValues`,
     {tableName, condition},
     "post"
@@ -237,9 +237,9 @@ export async function getDetailsByID(id) {
 }
 
 export async function getProductsByID(id) {
-  var tableName = 'workorderprod';
-  var condition = `WODetailID = '${id}'`;
-  var detArr = await ajax(
+  const tableName = 'workorderprod';
+  const condition = `WODetailID = '${id}'`;
+  const detArr = await ajax(
     `${baseURL}/fetchValues`,
     {tableName, condition},
     "post"
@@ -249,9 +249,9 @@ export async function getProductsByID(id) {
 }
 
 export async function updateWorkOrder(id, values) {
-  var tableName = "workorders";
-  var columnsAndValues = `startDate='${values.startDate}',endDate='${values.endDate}', TruckID='${values.TruckID}'`;
-  var condition = `WorkOrderID='${id}'`;
+  const tableName = "workorders";
+  const columnsAndValues = `startDate='${values.startDate}',endDate='${values.endDate}', TruckID='${values.TruckID}'`;
+  const condition = `WorkOrderID='${id}'`;
   const result = await ajax(
     `${baseURL}/updateValues`,
     { tableName, columnsAndValues, condition },
@@ -263,9 +263,19 @@ export async function updateWorkOrder(id, values) {
   }
 }
 
+export async function deleteWorkOrder(id){
+    const tableName = "workorders";
+    const condition = `WorkOrderID='${id}'`;
+    const result = await ajax(`${baseURL}/deleteValues`, { tableName, condition }, "post");
+    if (result !== []) return result;
+    else {
+      return 0;
+    }
+}
+
 export async function getCustomerQuotes(id) {
-  var tableName = 'quotes';
-  var condition = `CustomerID ='${id}' AND completed IS NULL`
+  const tableName = 'quotes';
+  const condition = `CustomerID ='${id}' AND completed IS NULL`
   const result = await ajax(
     `${baseURL}/fetchValues`,
     {tableName, condition},
@@ -276,8 +286,8 @@ export async function getCustomerQuotes(id) {
 }
 
 export async function getQuoteDetails(id) {
-  var tableName = 'subtotallines';
-  var condition = `quoteID = '${id}'`;
+  const tableName = 'subtotallines';
+  const condition = `quoteID = '${id}'`;
   const result = await ajax(
     `${baseURL}/fetchValues`,
     {tableName, condition},
@@ -287,12 +297,37 @@ export async function getQuoteDetails(id) {
 }
 
 export async function getQuoteProducts(id) {
-  var tableName = 'quotelines';
-  var condition = `subtotalID = '${id}'`;
+  const tableName = 'quotelines';
+  const condition = `QuoteID = '${id}'`;
   const result = await ajax(
     `${baseURL}/fetchValues`,
     {tableName, condition},
     "post"
   );
   return result;
+}
+
+export async function addNewOrder(info){
+  const tableName = 'workorders';
+  const values = `${null},'${info.CustomerID}','${info.AddressID}','${info.TruckID}','${info.UserID}','${info.WorkType}','${info.total}','${format(new Date(info.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}','${format(new Date(info.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}'`;
+  
+  const result = await ajax(
+    `${baseURL}/insertValues`,
+    {tableName, values},
+    "post"
+  );
+  return result;
+}
+
+export async function markQuoteComplete(value) {
+  var tableName = 'quotes';
+  var columnsAndValues  = `completed = '${new Date()}'`;
+  var condition = `QuoteID = '${value.QuoteID}'`;
+  var updated = await ajax(
+      `${baseURL}/updateValues`,
+      {tableName, columnsAndValues, condition},
+      "post"
+  );
+  if (updated !== []) return updated;
+  else return 0;
 }

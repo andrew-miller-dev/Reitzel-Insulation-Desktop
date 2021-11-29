@@ -6,13 +6,8 @@ import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import FillTemplate from './FillTemplate.js';
 import FillTooltip from './FillTooltip';
 import {getWorkOrders,
-        deleteEstimate, 
-        getUsers, 
         getRegionAPI, 
         sendUpdate, 
-        addNewCustomer, 
-        addNewAddress, 
-        addEstimate, 
         sendConfirm, 
         getCustomers,
         getDetailsByID,
@@ -20,19 +15,24 @@ import {getWorkOrders,
         updateWorkOrder,
         getCustomerQuotes,
         getQuoteDetails,
-        getQuoteProducts} from '../../../api/calendar';
+        getQuoteProducts,
+        deleteWorkOrder,
+        addNewOrder,
+        markQuoteComplete} from '../../../api/calendar';
 import { getCustomer } from "../../../api/customer.js";
 import CustomStore from 'devextreme/data/custom_store';
-import { message, Modal, Space } from 'antd';
+import { message, Modal, Space, Card } from 'antd';
 import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import { customer_info_sheet } from "../../../assets/paths.js";
 import Confirmation from "../../Email_Templates/confirmation.js";
-import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button, List } from "devextreme-react";
+import { Autocomplete, Checkbox, Form, Popup, SelectBox, TextArea, TextBox, Button, List } from "devextreme-react";
 import { Item } from "devextreme-react/form";
 import { getTrucks } from "../../../api/trucks.js";
+import { createDetails, getSelectedDetails, getSelectedTotal, getTruckType, renderList } from "./FillFunctions.js";
+import { addNewOrderDetail, addNewOrderProduct } from "../../../api/orders.js";
 const { confirm } = Modal;
 const { format } = require("date-fns-tz");
 
@@ -51,32 +51,6 @@ const dataSource = new CustomStore({
       total:item.TotalAmount,
       startDate:item.startDate,
       endDate:item.endDate,
-      details:async function() {
-        let detailArr = await getDetailsByID(item.WorkOrderID);
-        let detArr = detailArr.data.map((det) => (
-          {
-            DetailID:det.WODetailID,
-            OrderID: det.OrderID,
-            text:det.Details,
-            subtotal:det.DetailTotal,
-            products:async function() {
-              let productArr = await getProductsByID(det.WODetailID);
-              let prodArr = productArr.data.map((prod) => (
-                {
-                  ProductID:prod.WOProdID,
-                  OrderID:prod.OrderID,
-                  DetailID:prod.WODetailID,
-                  product:prod.Product,
-                  notes:prod.Notes,
-                  proce:prod.Price
-                }
-              ));
-              return prodArr;
-            }
-          }
-        ));
-        return detArr;
-      }
      }));
     return formatData;
   },
@@ -90,35 +64,32 @@ const dataSource = new CustomStore({
     return check;
   },
   remove: async(key) => {
-    const data = await deleteEstimate(key);
+    const data = await deleteWorkOrder(key);
     return data
   },
   insert: async (values) => {
     try{
-      let customerInfo = await addNewCustomer(values);
-      console.log(customerInfo);
-      const customerID = customerInfo.data.insertId;
-      let addressInfo = await addNewAddress(customerID, values);
-      const addressID = addressInfo.data.insertId;
-      const addEstimates = await addEstimate(
-        customerID,
-        addressID,
-        values);
-        message.success("New estimate added");
-        let customer = {
-          FirstName:values.firstName,
-          LastName:values.lastName
-        }
-        let estimate = {
-          JobType:values.jobType,
-          startDate:values.startDate
-        }
-      sendConfirm(values.email, renderEmail(<Confirmation customerInfo = {customer} estimateInfo = {estimate} />), customer_info_sheet);
-      return addEstimates;
+      const result = await addNewOrder(values);
+      let workID = result.data.insertId;
+      values.details.forEach(async detail => {
+        const detailResult = await addNewOrderDetail(detail, workID);
+        let detailID = detailResult.data.insertId;
+        detail.productArr.forEach(async prod => {
+           await addNewOrderProduct(prod, workID, detailID);
+        });
+      });
+      let complete = await markQuoteComplete(values);
+      if(complete.status === 200){
+        message.success("Work order added");
+      }
     }
-    catch(e){
+    catch(e) {
+      message.error("Something went wrong");
       console.log(e);
-    }    
+    }
+    finally {
+
+    }
   },
   onUpdating: (key, values) => {
     
@@ -132,7 +103,7 @@ const sendEmailUpdate = async (values) => {
 }
 
 const currentDate = new Date();
-let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+const date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 const views = ['day','week', 'workWeek','month'];
 const groups = ['TruckID'];
 
@@ -144,56 +115,38 @@ const renderResourceCell = (model) => {
 const onAppointmentDeleting = (e) => {
   var cancel = true;
   e.cancel = cancel;
-  confirm({title:"Do you want to delete this work order?", onOk(){dataSource.remove(e.appointmentData.EstimateID) }, onCancel(){cancel = true}});
+  confirm({title:"Do you want to delete this work order?", onOk(){dataSource.remove(e.appointmentData.WorkOrderID) }, onCancel(){cancel = true}});
 }
 
 class FillCalendar extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-
       groupByDate:false,
-      userList:"",
       regionList:"",
       truckList:"",
       info:false,
       findCustomerList:[],
       showForm:false,
+      showQuote:false,
       clickedTruck:"",
+      dates:{
+        start:"",
+        end:""
+      },
       custInfo:[],
       custQuotes:[],
+      selectQuote:[],
+      selectQuoteDetails:[],
       mounted:false,
-      basicInfo:{
-        firstName:"",
-        lastName:"",
-        phone:"",
-        email:"",
-        billingAddress:"",
-        billingCity:"",
-        billingPostal:"",
-        billingRegion:""
-      },
-      siteInfo:{
-        siteAddress:"",
-        siteCity:"",
-        siteProv:"",
-        sitePostal:"",
-        siteRegion:"",
-        },
-      appointmentInfo:{
-        startDate:"",
-        endDate:"",
-       },
-      description:"",
-      jobType:"",
     };
     
+    this.createOrder = this.createOrder.bind(this);
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
     this.onAppointmentForm = this.onAppointmentForm.bind(this);
     this.truckSource = this.truckSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
-    this.getUserName = this.getUserName.bind(this);
   }
   async InfoIsHere() {
     if(this.mounted === true){
@@ -205,7 +158,28 @@ class FillCalendar extends React.Component {
   this.setState({truckList:truckData});
   this.setState({info:true});
     }
-} 
+}
+
+createOrder () {
+  console.log(this.state);
+    let values = {
+        startDate:this.state.dates.start,
+        endDate:this.state.dates.end,
+        TruckID:this.state.clickedTruck,
+        CustomerID:this.state.custInfo.CustomerID,
+        AddressID:this.state.selectQuote.AddressID,
+        UserID:this.state.selectQuote.UserID,
+        QuoteID:this.state.selectQuote.id,
+        WorkType:getTruckType(this.state.clickedTruck, this.state.truckList),
+        total:getSelectedTotal(this.state.selectQuoteDetails),
+        details:getSelectedDetails(this.state.selectQuoteDetails),
+    }
+    dataSource.insert(values);
+    this.setState({showQuote:false}); 
+    this.setState({selectQuote:[]});
+    this.setState({showForm:false});
+
+}
 
 async onAppointmentForm (e) {
   
@@ -215,6 +189,12 @@ async onAppointmentForm (e) {
   
   else{
   let form = e.form;
+  this.setState({clickedTruck:e.appointmentData.TruckID});
+  var dates = {...this.state.dates};
+          dates.start = format(new Date(e.appointmentData.startDate),"M/d/yyyy, hh:mm a");
+          dates.end = format(new Date(e.appointmentData.endDate),"M/d/yyyy, hh:mm a");
+          this.setState({dates});
+          console.log(this.state.dates);
   e.popup.option('showTitle', true);
   e.popup.option('title', 'Quick work order creation');
   let newGroupItems =[
@@ -232,6 +212,7 @@ async onAppointmentForm (e) {
             )
           },
           onItemClick:async(data) => {
+            e.popup.hide();
             this.setState({custInfo:data.itemData});
             let listQuotes = await getCustomerQuotes(data.itemData.CustomerID);
             let quoteList = listQuotes.data.map((item) => (
@@ -245,34 +226,11 @@ async onAppointmentForm (e) {
                 installerNotes:item.notesInstallers,
                 creationDate:item.creationDate,
                 completed:item.completed,
-                detailArr:async() => {
-              let details = await getQuoteDetails(item.QuoteID);
-              let detailsArr = details.data.map((det) => (
-                {
-                  id:det.SubtotalID,
-                  quoteID:det.quoteID,
-                  subtotal:det.subtotalAmount,
-                  details:det.subtotalLines,
-                  productArr:async() => {
-                    let products = await getQuoteProducts(det.SubtotalID);
-                    let productArr = products.data.map((prod) => (
-                      {
-                        id:prod.QuoteLineID,
-                        subtotalID:prod.subtotalID,
-                        quoteID:prod.QuoteID,
-                        product:prod.Product,
-                        notes:prod.Notes,
-                        price:prod.Subtotal
-                      }
-                    ))
-                    return productArr;
-                }}))
-              return detailsArr;
-            }}));
+                
+            }));
 
             this.setState({custQuotes:quoteList});
             this.setState({showForm:true});
-            console.log(this.state.custQuotes);
           }
       }
     },
@@ -298,11 +256,6 @@ async onAppointmentForm (e) {
 }
 }
 
-getUserName(id, array){
-  let user = '';
-  return user;
-}
-
   onGroupByDateChanged(args) {
     this.setState({
       groupByDate: args.value
@@ -321,7 +274,7 @@ getUserName(id, array){
   async truckSource() {
     const data = await getTrucks();
     let truckData = data.data.map((item) => ({
-      id: item.TruckID,
+      id:item.TruckID,
       TruckInfo:item.TruckInfo,
       LicensePlate:item.LicensePlate,
       Available:item.Available,
@@ -338,7 +291,7 @@ getUserName(id, array){
 }
   componentWillUnmount(){
     this.mounted = false;
-  }
+  }  
   render() {
     if (this.state.info === false){
         return (
@@ -391,7 +344,7 @@ getUserName(id, array){
       </div>
       <Popup
       height='75%'
-      title="Work Order Lookup"
+      title="Quote Lookup"
       visible={this.state.showForm}
       onHiding={() => {this.setState({showForm:false})}}
       >
@@ -403,98 +356,50 @@ getUserName(id, array){
             <span>Quote Total: {data.total}  Date created: {format(new Date(data.creationDate),"MMMM do',' yyyy")} </span>
           )
           }}
-          onItemClick={(data) => {
-            return(
-              <Popup
-              visible={true}>
-
-              </Popup>
-            )
+          onItemClick={async(data) => {
+            let detailList = await getQuoteDetails(data.itemData.id);
+            let prodList = await getQuoteProducts(data.itemData.id);
+            let quoteDetails = createDetails(detailList.data, prodList.data);
+            this.setState({selectQuoteDetails:quoteDetails});
+            this.setState({selectQuote:data.itemData});
+            this.setState({showQuote:true});
           }
 
           }>
           </List>
         <br/>
-        <Form
-        col count={2}
-        formData={this.state.appointmentInfo}>
         
-        </Form>
-        Description:
-        <TextArea
-        onValueChanged={(data) => {
-          this.setState({description:data.value});
-        }}>
-
-        </TextArea>
-        Job Type:
-        <SelectBox
-        onValueChanged={(data) => {
-          this.setState({jobType:data.value});
-        }}
-        items={["fireproofing","removal","spray","loosefill"]}>
-        </SelectBox>
-        Assigned Salesman:
-        <TextBox
-        readOnly={true}
-        value={this.getUserName(this.state.clickedSalesman, this.state.userList)}>
-        </TextBox>
-        <br />
         <div style={{float:"right"}}>
 
         <Space>
         <Button
-        style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
-        onClick={(e) => {
-          let func = async() => {
-                let info = {
-                  UserID:this.state.clickedSalesman,
-                  jobType:this.state.jobType,
-                  apptInfo:this.state.description,
-                  siteRegion:this.state.siteInfo.siteRegion,
-                  startDate:this.state.apptDates.start,
-                  endDate:this.state.apptDates.end
-               }
-               if(this.state.useExisting){
-              let result = await addEstimate(this.state.custID, this.state.siteID, info);
-              console.log(result);
-              this.setState({showForm:false});
-              if(result.status === 200){
-                message.success("Added new estimate");
-              }
-          }
-          
-          else {
-            let result = await addNewAddress(this.state.custID, this.state.siteInfo);
-            if(result.status === 200){
-              let address = result.data.insertId;
-              let final = await addEstimate(this.state.custID, address, info);
-              this.setState({showForm:false});
-              if(final.status === 200) {
-                message.success("Added new address and estimate");
-              }
-            }
-            else{
-              message.warn("Something went wrong");
-            }
-          }
-          
-          }
-        func().then(() => {
-          dataSource.load();
-        })
-        
-        }}
-        >Done</Button>
-        <Button
          style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
-         onClick={() => {this.setState({showForm:false})}}>
+         onClick={() => {this.setState({showForm:false}); this.setState({selectQuote:[]}); this.setState({selectQuoteDetails:[]})}}>
           Cancel
         </Button>
         </Space>
         </div>
       </Popup>
-      
+      <Popup
+      visible={this.state.showQuote}
+      onHiding={()=>{this.setState({showQuote:false}); this.setState({selectQuote:[]})}}>
+        <Form
+        title="Work Order Creation">
+          <Item>
+           <h2> Select details</h2> 
+            </Item>        
+            <Item>
+              <table>
+                <tbody>
+                    {renderList(this.state.selectQuoteDetails)}
+                </tbody>
+              </table>
+            </Item>
+            <Item>
+              <Button onClick={() => {this.createOrder()}} text="Create Work Order"/>
+            </Item>      
+        </Form>
+      </Popup>
     </div>
     );
   }

@@ -68,7 +68,7 @@ export default function Roles() {
     const values = formEdit.getFieldsValue();
     const role = row;
     let menu = "";
-    values.treeAccess.map ((item) => {
+    values.treeAccess.forEach((item) => {
       menu = menu + item + ", "
     });
     const result = await updateRole(menu, role);

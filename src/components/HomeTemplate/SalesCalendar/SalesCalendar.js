@@ -71,7 +71,6 @@ const dataSource = new CustomStore({
   insert: async (values) => {
     try{
       let customerInfo = await addNewCustomer(values);
-      console.log(customerInfo);
       const customerID = customerInfo.data.insertId;
       let addressInfo = await addNewAddress(customerID, values);
       const addressID = addressInfo.data.insertId;
