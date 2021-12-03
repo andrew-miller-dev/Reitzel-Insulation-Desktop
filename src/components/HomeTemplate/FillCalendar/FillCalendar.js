@@ -5,13 +5,10 @@ import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import FillTemplate from './FillTemplate.js';
 import FillTooltip from './FillTooltip';
-import {getWorkOrders,
+import {getWorkOrderType,
         getRegionAPI, 
-        sendUpdate, 
-        sendConfirm, 
+        sendEmail,
         getCustomers,
-        getDetailsByID,
-        getProductsByID,
         updateWorkOrder,
         getCustomerQuotes,
         getQuoteDetails,
@@ -22,15 +19,14 @@ import {getWorkOrders,
 import { getCustomer } from "../../../api/customer.js";
 import CustomStore from 'devextreme/data/custom_store';
 import { message, Modal, Space, Card } from 'antd';
-import UpdateConfirm from '../../Email_Templates/updateConfirm';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
-import { customer_info_sheet } from "../../../assets/paths.js";
-import Confirmation from "../../Email_Templates/confirmation.js";
-import { Autocomplete, Checkbox, Form, Popup, SelectBox, TextArea, TextBox, Button, List } from "devextreme-react";
+import ConfirmWorkOrder from "../../Email_Templates/confirm_work.js";
+import UpdateWork from "../../Email_Templates/update_work.js";
+import { Form, Popup, Button, List } from "devextreme-react";
 import { Item } from "devextreme-react/form";
-import { getTrucks } from "../../../api/trucks.js";
+import { getTrucksByType } from "../../../api/trucks.js";
 import { createDetails, getSelectedDetails, getSelectedTotal, getTruckType, renderList } from "./FillFunctions.js";
 import { addNewOrderDetail, addNewOrderProduct } from "../../../api/orders.js";
 const { confirm } = Modal;
@@ -39,7 +35,7 @@ const { format } = require("date-fns-tz");
 const dataSource = new CustomStore({
   key: "WorkOrderID",
   load: async () => {
-    const data = await getWorkOrders();
+    const data = await getWorkOrderType("loosefill");
     let formatData = data.data.map((item) => ({
       WorkOrderID:item.WorkOrderID,
       CustomerID:item.CustomerID,
@@ -65,7 +61,8 @@ const dataSource = new CustomStore({
   },
   remove: async(key) => {
     const data = await deleteWorkOrder(key);
-    return data
+    return data;
+    
   },
   insert: async (values) => {
     try{
@@ -87,9 +84,8 @@ const dataSource = new CustomStore({
       message.error("Something went wrong");
       console.log(e);
     }
-    finally {
-
-    }
+    const custEmail = findCustomerEmail(values.CustomerID);
+    sendEmail(custEmail.Email, renderEmail(<ConfirmWorkOrder info = {values} />,"Job Confirmation - Reitzel Insulation"));
   },
   onUpdating: (key, values) => {
     
@@ -97,9 +93,14 @@ const dataSource = new CustomStore({
   }
 });
 const sendEmailUpdate = async (values) => {
-  let findCustomerEmail = await getCustomer(values.CustomerID);
-  let customerEmail = findCustomerEmail.data[0];
-  sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>), customer_info_sheet);
+  let customerEmail = findCustomerEmail(values.CustomerID);
+  sendEmail(customerEmail.Email, renderEmail(<UpdateWork info = {values}/>),"Job Update - Reitzel Insulation");
+}
+
+const findCustomerEmail = async(id) => {
+  const email = await getCustomer(id);
+  const customerEmail = email.data[0];
+  return customerEmail;
 }
 
 const currentDate = new Date();
@@ -161,7 +162,6 @@ class FillCalendar extends React.Component {
 }
 
 createOrder () {
-  console.log(this.state);
     let values = {
         startDate:this.state.dates.start,
         endDate:this.state.dates.end,
@@ -182,8 +182,7 @@ createOrder () {
 }
 
 async onAppointmentForm (e) {
-  
-  if(e.appointmentData.total) {
+  if(e.appointmentData.WorkOrderID) {
     e.cancel = true;
   }
   
@@ -191,10 +190,9 @@ async onAppointmentForm (e) {
   let form = e.form;
   this.setState({clickedTruck:e.appointmentData.TruckID});
   var dates = {...this.state.dates};
-          dates.start = format(new Date(e.appointmentData.startDate),"M/d/yyyy, hh:mm a");
-          dates.end = format(new Date(e.appointmentData.endDate),"M/d/yyyy, hh:mm a");
+          dates.start = e.appointmentData.startDate;
+          dates.end = e.appointmentData.endDate;
           this.setState({dates});
-          console.log(this.state.dates);
   e.popup.option('showTitle', true);
   e.popup.option('title', 'Quick work order creation');
   let newGroupItems =[
@@ -272,7 +270,7 @@ async onAppointmentForm (e) {
   }
 
   async truckSource() {
-    const data = await getTrucks();
+    const data = await getTrucksByType("loosefill");
     let truckData = data.data.map((item) => ({
       id:item.TruckID,
       TruckInfo:item.TruckInfo,
@@ -350,6 +348,7 @@ async onAppointmentForm (e) {
       >
           <h2>Customer Active Quotes</h2>
           <List
+          noDataText="Customer has no active quotes"
           dataSource={this.state.custQuotes}
           itemRender={(data) => {
           return (

@@ -6,8 +6,8 @@ let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' 
 
 
 export async function getQuoteDetails(id){
-    var tableName = "subtotallines";
-    var condition = `quoteID = '${id}'`;
+    const tableName = "subtotallines";
+    const condition = `quoteID = '${id}'`;
     const detaillist = await ajax (
         `${baseURL}/fetchValues`,
         {tableName, condition},
@@ -18,8 +18,8 @@ export async function getQuoteDetails(id){
 }
 
 export async function getProductList(id){
-    var tableName = "quotelines";
-    var condition = `QuoteID = '${id}'`;
+    const tableName = "quotelines";
+    const condition = `QuoteID = '${id}'`;
     const productlist = await ajax(
         `${baseURL}/fetchValues`,
         {tableName, condition},
@@ -30,8 +30,8 @@ export async function getProductList(id){
 }
 
 export async function getUserID(id){
-    var tableName = 'users';
-    var condition = `UserID = '${id}'`;
+    const tableName = 'users';
+    const condition = `UserID = '${id}'`;
     const userinfo = await ajax (
         `${baseURL}/fetchValues`,
         {tableName, condition},
@@ -42,8 +42,8 @@ export async function getUserID(id){
 }
 
 export async function getQuoteID(id){
-    var tableName = 'quotes';
-    var condition = `QuoteID = ${id}`;
+    const tableName = 'quotes';
+    const condition = `QuoteID = ${id}`;
     const quoteData = await ajax(
         `${baseURL}/fetchValues`,
         {tableName, condition},
@@ -54,9 +54,9 @@ export async function getQuoteID(id){
 }
 
 export async function updateQuote(values){
-    var tableName = 'quotes';
-    var columnsAndValues = `QuoteTotal = '${values.total}', notesCustomers = '${values.customer_notes}', notesInstallers = '${values.installer_notes}', modifyDate = '${(date)}'`;
-    var condition = `QuoteID = '${values.id}'`;
+    const tableName = 'quotes';
+    const columnsAndValues = `QuoteTotal = '${values.total}', notesCustomers = '${values.customer_notes}', notesInstallers = '${values.installer_notes}', modifyDate = '${(date)}'`;
+    const condition = `QuoteID = '${values.id}'`;
     const quoteUpdate = await ajax(
         `${baseURL}/updateValues`,
         {tableName, columnsAndValues, condition},
@@ -67,9 +67,9 @@ export async function updateQuote(values){
 }
 
 export async function updateDetail(values){
-    var tableName = 'subtotallines';
-    var columnsAndValues = `subtotalLines = '${values.details}', subtotalAmount = '${values.total}'`;
-    var condition = `subtotalID = '${values.id}'`;
+    const tableName = 'subtotallines';
+    const columnsAndValues = `subtotalLines = '${values.details}', subtotalAmount = '${values.total}'`;
+    const condition = `subtotalID = '${values.id}'`;
     const detailUpdate = await ajax(
         `${baseURL}/updateValues`,
         {tableName, columnsAndValues, condition},
@@ -80,9 +80,9 @@ export async function updateDetail(values){
 }
 
 export async function updateProduct(values){
-    var tableName = 'quotelines';
-    var columnsAndValues = `Product = '${values.product}', Notes = '${values.notes}', Subtotal='${values.price}'`;
-    var condition = `QuoteLineID = '${values.id}'`;
+    const tableName = 'quotelines';
+    const columnsAndValues = `Product = '${values.product}', Notes = '${values.notes}', Subtotal='${values.price}'`;
+    const condition = `QuoteLineID = '${values.id}'`;
     const productUpdate = await ajax(
         `${baseURL}/updateValues`,
         {tableName, columnsAndValues, condition},
@@ -94,7 +94,7 @@ export async function updateProduct(values){
 }
 
 export async function getAllInfo(){
-    var sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID
+    const sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID
     `;
     const info = await ajax(
         `${baseURL}/processCustomQuery`,
@@ -106,7 +106,7 @@ export async function getAllInfo(){
 }
 
 export async function getAllInfoID(id){
-    var sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID WHERE quotes.QuoteID = '${id}'
+    const sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID WHERE quotes.QuoteID = '${id}'
     `;
     const info = await ajax(
         `${baseURL}/processCustomQuery`,
@@ -118,7 +118,7 @@ export async function getAllInfoID(id){
 }
 
 export async function getDetails(){
-    var sql = `SELECT * FROM subtotallines`;
+    const sql = `SELECT * FROM subtotallines`;
     const details = await ajax(
         `${baseURL}/processCustomQuery`,
         {sql},
@@ -129,7 +129,7 @@ export async function getDetails(){
 }
 
 export async function getProducts(){
-    var sql = `SELECT * FROM quotelines`;
+    const sql = `SELECT * FROM quotelines`;
     const prods = await ajax (
         `${baseURL}/processCustomQuery`,
         {sql},
@@ -140,7 +140,7 @@ export async function getProducts(){
 }
 
 export async function SearchAllInfo(value) {
-    var sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID 
+    const sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID 
     WHERE CustFirstName LIKE '%${value}%' OR CustLastName LIKE '%${value}%' OR Address LIKE '%${value}%'`;
     const info = await ajax(
         `${baseURL}/processCustomQuery`,
@@ -152,8 +152,8 @@ export async function SearchAllInfo(value) {
 }
 
 export async function deleteProduct(id) {
-    var tableName = 'quotelines';
-    var condition = `QuoteLineID = '${id}'`;
+    const tableName = 'quotelines';
+    const condition = `QuoteLineID = '${id}'`;
     const confirm = await ajax(
         `${baseURL}/deleteValues`,
         {tableName, condition},
@@ -164,8 +164,8 @@ export async function deleteProduct(id) {
 }
 
 export async function deleteDetail(id) {
-    var tableName = 'subtotallines';
-    var condition = `subtotalID = '${id}'`;
+    const tableName = 'subtotallines';
+    const condition = `subtotalID = '${id}'`;
     const confirm = await ajax(
         `${baseURL}/deleteValues`,
         {tableName, condition},

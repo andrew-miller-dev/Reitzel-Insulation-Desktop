@@ -1,8 +1,9 @@
 import ajax from "./base";
 
 const baseURL = "https://reitzel-server.herokuapp.com";
-const {format} = require('date-fns-tz');
-let date = new Date();
+const {format, zonedTimeToUtc} = require('date-fns-tz');
+const date = new Date()
+const utcDate = format(zonedTimeToUtc(date, 'America/Toronto'),"yyyy-MM-dd");
 
 //Estimate Calendar APIs
 //
@@ -211,11 +212,12 @@ export async function getAddressList(id) {
 //
 //
 
-export async function getWorkOrders() {
+export async function getWorkOrderType(term) {
   const tableName = "workorders";
+  const condition = `WorkType = '${term}'`
   const estimatelist = await ajax(
     `${baseURL}/fetchValues`,
-    { tableName},
+    { tableName, condition},
     "post"
   );
   if (estimatelist !== []) return estimatelist;
@@ -308,8 +310,9 @@ export async function getQuoteProducts(id) {
 }
 
 export async function addNewOrder(info){
+  console.log(utcDate);
   const tableName = 'workorders';
-  const values = `${null},'${info.CustomerID}','${info.AddressID}','${info.TruckID}','${info.UserID}','${info.WorkType}','${info.total}','${format(new Date(info.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}','${format(new Date(info.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}'`;
+  const values = `${null},'${info.CustomerID}','${info.AddressID}','${info.TruckID}','${info.UserID}','${info.WorkType}','${info.total}','${info.startDate}','${info.endDate}','${utcDate}'`;
   
   const result = await ajax(
     `${baseURL}/insertValues`,
@@ -321,7 +324,7 @@ export async function addNewOrder(info){
 
 export async function markQuoteComplete(value) {
   var tableName = 'quotes';
-  var columnsAndValues  = `completed = '${new Date()}'`;
+  var columnsAndValues  = `completed = '${utcDate}'`;
   var condition = `QuoteID = '${value.QuoteID}'`;
   var updated = await ajax(
       `${baseURL}/updateValues`,
@@ -329,5 +332,16 @@ export async function markQuoteComplete(value) {
       "post"
   );
   if (updated !== []) return updated;
+  else return 0;
+}
+
+export async function sendEmail(customer, email, title, attach){
+  const to = customer;
+  const subject = title;
+  const html = email;
+  const file = attach
+
+  const completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html, file}, "post");
+  if (completed !== []) return completed;
   else return 0;
 }

@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import { Card, Table, Button, Modal, Input} from "antd";
+import { Card, Table, Button, Modal, Input, Popover} from "antd";
 import { useHistory } from "react-router-dom";
-import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quoteEditAPI";
+import { SearchAllInfo} from "../../api/quoteEditAPI";
+import { getAllInfoWO, getDetailsWO, getProductsWO } from '../../api/orders';
 import { getUser } from '../../util/storage';
 const {Search} = Input;
-const {format } = require('date-fns-tz')
+const {format, zonedTimeToUtc } = require('date-fns-tz')
 
   function OrderList() {
   let history = useHistory();
@@ -18,14 +19,14 @@ const {format } = require('date-fns-tz')
 
     useEffect(() => {
           const func = async () => {
-          await getAllInfo().then((result) => {
+          await getAllInfoWO().then((result) => {
             setTestData(result.data);
           });
         
-          await getDetails().then((item) => {
+          await getDetailsWO().then((item) => {
             setDetailData(item.data);
           });
-          await getProducts().then((item) => {
+          await getProductsWO().then((item) => {
             setProdData(item.data);
           })
         }
@@ -60,15 +61,6 @@ const {format } = require('date-fns-tz')
           }
         });
         return array;
-    }
-    const checkDate = (date) => {
-      let returnDate = "";
-      if(date === "December 31st, 1969"){
-      }
-      else{
-        returnDate = date;
-    }
-    return returnDate;
     }
     const getProductArr = (id) => {
       let array = [];
@@ -145,49 +137,39 @@ const {format } = require('date-fns-tz')
           </div>
          
         )
-        
       },
       {
-        title:"Show/Edit Work Order Info",
-        key:"OpenOrder",
-        render: (data) => 
-          (
-            <div>
-            <Button
-            onClick={() => {
-                
-                setFormData(getDetailsByID(data.QuoteID));
-                setShowForm(true);     
-                            }}>
-            View Quote</Button>
-            </div>)
-      },
-      {
-        title:"Creation Date",
-        key:"date",
-        render: (data) => (
-          <p>{format(new Date(data.creationDate),"MMMM do',' yyyy")}</p>
-        ),
-        sorter: (a,b) => new Date(a.creationDate) - new Date(b.creationDate)
-      },
-      {
-        title:"Last Modified",
-        key:"modDate",
-        render: (data) => (
-          <p>{checkDate(format(new Date(data.modifyDate), "MMMM do',' yyyy"))}</p>
-        ),
-        sorter: (a,b) => new Date(a.modifyDate) - new Date(b.modifyDate)
+        title:"Date Completed",
+        key:"completed",
+        render: (data) =>{
+            if(data.completeDate !== null) {
+              return <p>{format(zonedTimeToUtc(data.completeDate,"America/Toronto"),"MMMM do',' yyyy")}</p>
+            }
+            else return <p> </p>
+        }
       },
       {
         title:"Options",
         key:"options",
         render: (data) => (
-          <Button
+          <Popover content={
+            <div>
+             <Button
             onClick={() => {
-              history.push(`/orders/${data.QuoteID}/new`)
+              console.log("download")
             }}>
-              Create Work Order
+              Download Work Order
             </Button>
+            <br />
+            <br/>
+            <Button>
+              View Work Order
+            </Button>
+          </div>
+          }
+          trigger="clicked">
+          <Button>. . . </Button>
+          </Popover>
         )
       }   
     ]
@@ -201,10 +183,9 @@ const {format } = require('date-fns-tz')
                   style={{width:"40%"}}
                   className="searchbar"
                   size = "medium"
-                  enterButton="Find Quote"
+                  enterButton="Find Order"
                   onChange={(e) => {findQuote(e.target.value)}} />
           </div>
-          
 
         <h2>Active Work Orders</h2>
         <Table
@@ -218,7 +199,7 @@ const {format } = require('date-fns-tz')
 
         <Modal
         visible={showForm}
-        title="View Quote"
+        title="View Work Order"
         onCancel={() => {setShowForm(false)}}
         onOk={() => {history.push(`/quoteinfo/${formData[0].quoteID}`)}}
         okText="Edit Quote"

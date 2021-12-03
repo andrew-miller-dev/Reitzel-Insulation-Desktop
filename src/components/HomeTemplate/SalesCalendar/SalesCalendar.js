@@ -215,6 +215,7 @@ async onAppointmentForm (e) {
           this.setState({apptDates});
           this.setState({appointmentInfo});
           this.setState({clickedSalesman:e.appointmentData.UserID})
+          console.log(this.state.apptDates);
         } 
       },
     },

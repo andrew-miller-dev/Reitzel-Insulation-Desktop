@@ -1,18 +1,9 @@
 import ajax from "./base";
 const baseURL = "https://reitzel-server.herokuapp.com";
+const {format,zonedTimeToUtc} = require('date-fns-tz');
 
-export async function getAllInfoID(id){
-    var sql = `SELECT * FROM quotes LEFT JOIN address ON quotes.AddressID = address.AddressID LEFT JOIN users ON quotes.UserID = users.UserID LEFT JOIN customers ON quotes.CustomerID = customers.CustomerID
-    WHERE quotes.QuoteID = '${id}'
-    `;
-    const info = await ajax(
-        `${baseURL}/processCustomQuery`,
-        {sql},
-        "post"
-    );
-    if(info !== []) return info;
-    else return 0; 
-}
+const date = new Date();
+const utcDate = zonedTimeToUtc(date, 'America/Toronto');
 
 export async function getDetailsID(id){
     var sql = `SELECT * FROM subtotallines WHERE QuoteID = '${id}'`;
@@ -52,7 +43,7 @@ export async function getAvailableTrucks() {
 
 export async function addNewOrder(value, trucktype) {
     var tableName = 'workorders';
-    var values = `${null},'${value.allInfo.CustomerID}','${value.allInfo.AddressID}','${value.selectedTruck}','${value.allInfo.UserID}','${trucktype}','${value.total}','${value.startDate}','${value.endDate}'`;
+    var values = `${null},'${value.allInfo.CustomerID}','${value.allInfo.AddressID}','${value.selectedTruck}','${value.allInfo.UserID}','${trucktype}','${value.total}','${value.startDate}','${value.endDate}','${utcDate}'`;
     var newOrder = await ajax(
         `${baseURL}/insertValues`,
         {tableName, values},
@@ -88,7 +79,7 @@ export async function addNewOrderProduct(value, order, detail) {
 
 export async function updateQuoteOnComplete(value) {
     var tableName = 'quotes';
-    var columnsAndValues  = `completed = '${new Date()}'`;
+    var columnsAndValues  = `completed = '${utcDate}'`;
     var condition = `QuoteID = '${value.allInfo.QuoteID}'`;
     var updated = await ajax(
         `${baseURL}/updateValues`,
@@ -97,4 +88,48 @@ export async function updateQuoteOnComplete(value) {
     );
     if (updated !== []) return updated;
     else return 0;
+}
+
+export async function getAllInfoWO(){
+    var sql = `SELECT * FROM workorders LEFT JOIN address ON workorders.AddressID = address.AddressID LEFT JOIN users ON workorders.UserID = users.UserID LEFT JOIN customers ON workorders.CustomerID = customers.CustomerID
+    `;
+    const info = await ajax(
+        `${baseURL}/processCustomQuery`,
+        {sql},
+        "post"
+    );
+    if(info !== []) return info;
+    else return 0; 
+}
+
+export async function getAllInfoWOID(id){
+    var sql = `SELECT * FROM workorders LEFT JOIN address ON workorders.AddressID = address.AddressID LEFT JOIN users ON workorders.UserID = users.UserID LEFT JOIN customers ON workorders.CustomerID = customers.CustomerID WHERE workorders.WorkOrderID = '${id}'
+    `;
+    const info = await ajax(
+        `${baseURL}/processCustomQuery`,
+        {sql},
+        "post"
+    );
+    if(info !== []) return info;
+    else return 0; 
+}
+
+export async function getDetailsWO() {
+    const tableName = "workorderdetail"
+    const complete = await ajax(
+        `${baseURL}/fetchValues`,
+        {tableName},
+        "post"
+    );
+    return complete;
+}
+
+export async function getProductsWO() {
+    const tableName = "workorderprod"
+    const complete = await ajax(
+        `${baseURL}/fetchValues`,
+        {tableName},
+        "post"
+    );
+    return complete;
 }

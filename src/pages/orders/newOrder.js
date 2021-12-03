@@ -2,7 +2,8 @@ import React, {useState, useEffect} from 'react';
 import { useHistory } from 'react-router';
 import { Card, Checkbox, Row, Col, Form, DatePicker, Modal, Button, Select, message} from 'antd';
 import { useRouteMatch } from "react-router-dom";
-import { getAllInfoID, getDetailsID, getProductsID, getAvailableTrucks, addNewOrder, addNewOrderDetail, addNewOrderProduct, updateQuoteOnComplete } from '../../api/orders';
+import { getDetailsID, getProductsID, getAvailableTrucks, addNewOrder, addNewOrderDetail, addNewOrderProduct, updateQuoteOnComplete } from '../../api/orders';
+import { getAllInfoID } from '../../api/quoteEditAPI';
 
 const { RangePicker } = DatePicker;
 const { Item } = Form;
