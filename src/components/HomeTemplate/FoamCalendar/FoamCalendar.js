@@ -24,7 +24,7 @@ import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import ConfirmWorkOrder from "../../Email_Templates/confirm_work.js";
 import UpdateWork from "../../Email_Templates/update_work.js";
-import { Autocomplete, Checkbox, Form, Popup, SelectBox, TextArea, TextBox, Button, List } from "devextreme-react";
+import { Form, Popup, Button, List } from "devextreme-react";
 import { Item } from "devextreme-react/form";
 import { getTrucksByType } from "../../../api/trucks.js";
 import { createDetails, getSelectedDetails, getSelectedTotal, getTruckType, renderList } from "../FillCalendar/FillFunctions";

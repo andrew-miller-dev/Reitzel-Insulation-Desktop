@@ -1,12 +1,16 @@
-import { findProps } from 'devextreme-react/core/template';
 import React from 'react';
 import Text from 'react';
 import { Email, Item, Box, Image} from 'react-html-email';
-import {Card} from 'antd';
 const header = "https://i.ibb.co/0snCVqq/header.png";
-const footer = "https://ibb.co/kHTHdfL";
+const footer = "https://i.ibb.co/tm6mdt0/footer.png";
 
-
+const getTotal = (array) => {
+    let gtotal = 0;
+    array.forEach((item) => {
+      gtotal = gtotal + parseFloat(item.total);
+    })
+    return gtotal;
+}
 
 function QuoteEmail (props) {
   let customer = props.info;
@@ -79,6 +83,19 @@ return (
             </table>
           )}
         </div>
+        <span>Notes: {customer.customer_notes}</span>
+        <br />
+        <span>Quote grand total: ${getTotal(customer.details)}</span>
+        <br />
+        <span>Please feel free to contact our office if you have any questions or concerns regarding this quotation. </span>
+        <br />
+        <span>Estimator:{customer.userInfo.FirstName + " " + customer.userInfo.LastName}</span>
+        <br/>
+        <span>Regards, Reitzel Insulation</span>
+
+  <Image src={footer} alt="Reitzel Insulation" width={875} height={100}>
+    </Image>
+
     </Box>
   </Email>
 )

@@ -18,7 +18,7 @@ import {getWorkOrderType,
         markQuoteComplete} from '../../../api/calendar';
 import { getCustomer } from "../../../api/customer.js";
 import CustomStore from 'devextreme/data/custom_store';
-import { message, Modal, Space, Card } from 'antd';
+import { message, Modal, Space } from 'antd';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';

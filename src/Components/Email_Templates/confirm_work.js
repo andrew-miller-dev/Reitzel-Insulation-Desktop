@@ -20,16 +20,16 @@ export default function ConfirmWorkOrder(props) {
                 <img src={header}></img>
             </Item>
             <Item>
-                <p>Hi {customer().CustFirstName} {customer().LastName},</p>
+                <p>Hi {customer().CustFirstName} {customer().CustLastName},</p>
             <br/>
-            <p>Thank you for choosing Reitzel Insulation! Here are the details for your upcoming job:</p>
+            <p>Thank you for choosing Reitzel Insulation! Here are the appointment details for your upcoming job:</p>
 
             <p>Date: {format(new Date(props.info.startDate),"MMMM do',' yyyy")}</p>
             <p> Approximate Arrival Time:  {format(new Date(props.info.startDate),"K:mm")}</p>
             <br />
             </Item>
             <Item>
-            Please find your invoice for the work scheduled attached to the email.
+            Please find the job details below.
             </Item>
             <Item>
                 <p>

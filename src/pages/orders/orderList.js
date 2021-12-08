@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { SearchAllInfo} from "../../api/quoteEditAPI";
 import { getAllInfoWO, getDetailsWO, getProductsWO } from '../../api/orders';
 import { getUser } from '../../util/storage';
+import WorkToPDFConvert from './workToPDFconvert';
 const {Search} = Input;
 const {format, zonedTimeToUtc } = require('date-fns-tz')
 
@@ -50,13 +51,13 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
     const getDetailsByID = (id) => {
         let array = [];
         detailData.map((item) => {
-          if(item.quoteID === id){
+          if(item.WODetailID === id){
             array.push({
-              quoteID:item.quoteID,
-              id:item.subtotalID,
+              WorkOrderID:item.WorkOrderID,
+              id:item.WODetailID,
               subtotalNotes:item.subtotalNotes,
               total:item.subtotalAmount,
-              arr:getProductArr(item.subtotalID)
+              arr:getProductArr(item.WODetailID)
             });
           }
         });
@@ -146,7 +147,8 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
               return <p>{format(zonedTimeToUtc(data.completeDate,"America/Toronto"),"MMMM do',' yyyy")}</p>
             }
             else return <p> </p>
-        }
+        },
+        sorter: (a,b) => new Date(a.completeDate) - new Date(b.completeDate)
       },
       {
         title:"Options",
@@ -156,13 +158,17 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
             <div>
              <Button
             onClick={() => {
-              console.log("download")
+              WorkToPDFConvert(data);
             }}>
               Download Work Order
             </Button>
             <br />
             <br/>
-            <Button>
+            <Button
+            onClick={() => { 
+              setFormData(getDetailsByID(data.QuoteID));
+              setShowForm(true);     
+                          }}>
               View Work Order
             </Button>
           </div>
@@ -202,7 +208,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
         title="View Work Order"
         onCancel={() => {setShowForm(false)}}
         onOk={() => {history.push(`/quoteinfo/${formData[0].quoteID}`)}}
-        okText="Edit Quote"
+        okText="Edit Work Order"
         >
          <div>
            {renderDetails()}
@@ -236,10 +242,10 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
 
         <Modal
         visible={showForm}
-        title="View Quote"
+        title="View Work Order"
         onCancel={() => {setShowForm(false)}}
         onOk={() => {history.push(`/quoteinfo/${formData[0].quoteID}`)}}
-        okText="Edit Quote"
+        okText="Edit Work Order"
         >
          <div>
            {renderDetails()}

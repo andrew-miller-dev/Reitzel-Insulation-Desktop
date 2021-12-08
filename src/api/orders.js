@@ -3,7 +3,7 @@ const baseURL = "https://reitzel-server.herokuapp.com";
 const {format,zonedTimeToUtc} = require('date-fns-tz');
 
 const date = new Date();
-const utcDate = zonedTimeToUtc(date, 'America/Toronto');
+const utcDate = format(zonedTimeToUtc(date, 'America/Toronto'),"yyyy-MM-dd");
 
 export async function getDetailsID(id){
     var sql = `SELECT * FROM subtotallines WHERE QuoteID = '${id}'`;
@@ -129,6 +129,17 @@ export async function getProductsWO() {
     const complete = await ajax(
         `${baseURL}/fetchValues`,
         {tableName},
+        "post"
+    );
+    return complete;
+}
+
+export async function getProductsFromOrderID(id) {
+    const tableName = 'workorderprod';
+    const condition = `OrderID = '${id}'`;
+    const complete = await ajax(
+        `${baseURL}/fetchValues`,
+        {tableName, condition},
         "post"
     );
     return complete;

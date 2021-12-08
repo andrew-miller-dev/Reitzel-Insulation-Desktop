@@ -60,7 +60,7 @@ const {format } = require('date-fns-tz')
       }
       const getUserQuotes = (list) => {
         let newList = [];
-        list.map((item) => {
+        list.forEach((item) => {
           if(item.UserID === user.UserID){
             newList.push(item);
           }
@@ -69,7 +69,7 @@ const {format } = require('date-fns-tz')
       }
     const getDetailsByID = (id) => {
         let array = [];
-        detailData.map((item) => {
+        detailData.forEach((item) => {
           if(item.quoteID === id){
             array.push({
               quoteID:item.quoteID,
@@ -93,7 +93,7 @@ const {format } = require('date-fns-tz')
     }
     const getProductArr = (id) => {
       let array = [];
-      prodData.map((item) => {
+      prodData.forEach((item) => {
              if(item.subtotalID === id){
                   array.push({
                     prodID:item.QuoteLineID,
@@ -107,7 +107,7 @@ const {format } = require('date-fns-tz')
     }
     const renderDetails = () => {
       let rows = [];
-      formData.map((item) => {
+      formData.forEach((item) => {
         rows.push(<Card title="Details" bordered={true} type="inner">
           <p>{item.subtotalLines}</p>
           <strong>Products</strong>
@@ -125,7 +125,7 @@ const {format } = require('date-fns-tz')
     }
     const renderProducts = (array) => {
       let rows = [];
-      array.map((item) => {
+      array.forEach((item) => {
         rows.push(
           <tr width="100px">
             <td>{item.product}</td>
@@ -152,7 +152,7 @@ const {format } = require('date-fns-tz')
         title:"Address",
         key:"address",
         render:(data) => (
-          <p>{data.Address  + "," + " " + data.City}</p>
+          <p>{data.Address  + ", " + data.City}</p>
         )
       },
       {},
@@ -206,8 +206,7 @@ const {format } = require('date-fns-tz')
             <br />
             <br />
             <Button
-            onClick={() => {
-                
+            onClick={() => { 
                 setFormData(getDetailsByID(data.QuoteID));
                 setShowForm(true);     
                             }}>
@@ -233,7 +232,7 @@ const {format } = require('date-fns-tz')
         title:"Address",
         key:"address",
         render:(data) => (
-          <p>{data.Address  + "," + " " + data.City}</p>
+          <p>{data.Address  + ", " + data.City}</p>
         )
       },
       {},

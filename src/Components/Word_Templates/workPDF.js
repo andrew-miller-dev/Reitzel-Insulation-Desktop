@@ -1,8 +1,6 @@
 import React from 'react';
 import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell } from 'docx';
 
-const header = "https://i.ibb.co/0snCVqq/header.png";
-const footer = 'https://i.ibb.co/tm6mdt0/footer.png';
 const docx = require("docx");
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(), "yyyy_MM_dd");
@@ -10,6 +8,7 @@ let formatDate = format(new Date(), "yyyy_MM_dd");
 
 
 let renderDetails = (info) => {
+    console.log(info);
     let rowArray = [];
     info.details.map((item) => {
         let newRow = new TableRow({
@@ -46,7 +45,6 @@ let renderDetails = (info) => {
                     ]
                 })
             ]
-            
         })
         rowArray.push(newRow);
         rowArray.push(newProdTable);
@@ -56,9 +54,9 @@ let renderDetails = (info) => {
 }
 
 let renderProds = (info) => {
-    console.log(info);
     let detailArr = [];
-    info.map((item) => {
+    if(info.length > 0){
+    info.forEach((item) => {
         let newRow = new TableRow({
             children:[
                 new TableCell({
@@ -85,13 +83,27 @@ let renderProds = (info) => {
             ]
     });
     detailArr.push(newRow);
-    return newRow;
     })
-    console.log(info);
+}
+    else {
+        let noProdRow = new TableRow({
+            children:[
+                new TableCell({
+                    children:[
+                        new Paragraph({
+                            text:"No products listed"
+                        })
+                    ]
+                })
+            ]
+        })
+        detailArr.push(noProdRow);
+    }
     return detailArr;
 }
 
-export default async function QuoteToWord(info) {
+export default async function WorkToPDF(info) {
+    console.log(info);
     const head = await fetch(
         "https://i.ibb.co/0snCVqq/header.png"
     ).then(r => r.blob());
@@ -209,7 +221,7 @@ export default async function QuoteToWord(info) {
                                         },
                                         children:[
                                             new Paragraph({
-                                                text:"Quote Details"
+                                                text:"Work Order Details"
                                             })
                                         ]
                                     })
@@ -221,22 +233,12 @@ export default async function QuoteToWord(info) {
                         rows: renderDetails(info)
                     }),
                     new Paragraph({
-                        text:`Quote total: ${info.total}`
+                        text:`Work total: ${info.total}`
                     }),
                     new Paragraph({
                         break:2
                     }),
-                    new Paragraph({
-                        children:[
-                            new TextRun({
-                                text:"Customer Notes: ",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.customer_notes
-                            })
-                        ]
-                    }),
+                    
                     new Paragraph({
                         children:[
                             new TextRun({
@@ -266,7 +268,7 @@ export default async function QuoteToWord(info) {
     const blob = new Blob([buffer], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.download = `${info.first_name}_${info.last_name}_${formatDate}_Quote.docx`;
+    link.download = `${info.first_name}_${info.last_name}_${formatDate}_WO.docx`;
     link.click();
     return (
         null

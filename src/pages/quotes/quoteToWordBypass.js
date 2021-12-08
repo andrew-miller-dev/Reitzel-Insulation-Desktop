@@ -1,6 +1,5 @@
 import QuoteToWord from "../../Components/Word_Templates/quoteWord";
 import {getQuoteDetails, getProductList} from '../../api/quoteEditAPI';
-import { useEffect, useState } from "react";
 
 
 
@@ -27,14 +26,13 @@ let createWordObject = () => {
         installer_notes:data.notesInstallers,
         total:data.QuoteTotal
     }
-    console.log(wordObj);
     return wordObj;
 }
 
 
 const getDetailsByID = (id) => {
     let array = [];
-    details.data.map((item) => {
+    details.data.forEach((item) => {
       if(item.quoteID === id){
         array.push({
           quoteID:item.quoteID,
@@ -49,7 +47,7 @@ const getDetailsByID = (id) => {
 }
 const getProductArr = (id) => {
   let array = [];
-  products.data.map((item) => {
+  products.data.forEach((item) => {
          if(item.subtotalID === id){
               array.push({
                 prodID:item.QuoteLineID,

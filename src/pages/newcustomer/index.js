@@ -23,7 +23,7 @@ export default function NewCustomer(props) {
     "Brantford, Paris, Burford, Waterford, Brant County, Haldmald, Caledonia",
   ];
   const [validEmail, setValidEmail] = useState('');
-  const [errorColor, setErrorColor] = ('red');
+  const [errorColor, setErrorColor] = useState('red');
   const options = regions.map((item, index) => (
     <Option key={index + 1}>{item}</Option>
   ));
