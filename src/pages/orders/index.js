@@ -28,7 +28,7 @@ export default function Orders() {
       <hr/>
       <Switch>
         <Route exact path={path} >
-          
+        <OrderList/>
           </Route>
         <Route path="/orders/:oid/new" >
           <NewOrder updateOrder = {updateOrderData} />

@@ -1,7 +1,9 @@
 import ajax from "./base";
+import { baseURL } from "../config/values";
+
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
-const baseURL = "https://reitzel-server.herokuapp.com";
+
 
 
   export async function getAddresses() {

@@ -1,6 +1,5 @@
 import ajax from "./base";
-
-const baseURL = "https://reitzel-server.herokuapp.com";
+import { baseURL } from "../config/values";
 
 export async function getTrucks() {
     const tableName = "trucks";

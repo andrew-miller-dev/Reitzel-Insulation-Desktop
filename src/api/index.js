@@ -1,6 +1,5 @@
 import ajax from "./base";
-
-const baseURL = "https://reitzel-server.herokuapp.com";
+import { baseURL } from "../config/values";
 
 //get the information from weather api
 export const reqWeather = async (city) => {

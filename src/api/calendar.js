@@ -1,6 +1,6 @@
 import ajax from "./base";
+import { baseURL } from "../config/values";
 
-const baseURL = "https://reitzel-server.herokuapp.com";
 const {format, zonedTimeToUtc} = require('date-fns-tz');
 const date = new Date()
 const utcDate = format(zonedTimeToUtc(date, 'America/Toronto'),"yyyy-MM-dd");
