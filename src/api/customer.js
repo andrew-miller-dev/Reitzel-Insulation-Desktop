@@ -47,7 +47,7 @@ let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' 
 
   export async function updateCustomer(id, firstName, lastName, email, phone, billing, city, postal, region){
     var tableName = "customers";
-    var columnsAndValues = `FirstName='${firstName}',LastName='${lastName}',Phone='${phone}',Email='${email}', BillingAddress='${billing}',City='${city}',PostalCode='${postal}',Region='${region}'`;
+    var columnsAndValues = `CustFirstName='${firstName}', CustLastName='${lastName}',Phone='${phone}',Email='${email}', BillingAddress='${billing}',CustCity='${city}',CustPostalCode='${postal}', CustRegion='${region}'`;
   var condition = `CustomerID=${id}`;
   const result = await ajax(
     `${baseURL}/updateValues`,

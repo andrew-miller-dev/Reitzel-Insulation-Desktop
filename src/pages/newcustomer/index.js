@@ -36,7 +36,6 @@ export default function NewCustomer(props) {
       LastName:values.LastName,
       Phone:values.Phone,
       PostalCode:values.PostalCode,
-      Prov:values.Prov,
       Region:values.Region
     }
     let customerInfo = await addCustomer(newVal);
@@ -109,18 +108,6 @@ export default function NewCustomer(props) {
           ]}
         >
           <Input placeholder="City" />
-        </Item>
-        <Item
-          label="Province"
-          name="Prov"
-          rules={[
-            {
-              required: true,
-              message: "Required Field",
-            },
-          ]}
-        >
-          <Input placeholder="Province" />
         </Item>
         <Item
           label="Postal Code"

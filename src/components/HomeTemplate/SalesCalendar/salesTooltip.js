@@ -28,6 +28,24 @@ export default function SalesTooltip (model) {
   const editClicked = async(data) => {
     setShowPop(true);
   }
+  const displayJobType = () => {
+    const jobArr = data.JobType.split(',');
+    return(
+      <div>
+        <b>Estimate Job Types</b>
+          {jobArr.map((item)=> {
+            return(
+              
+            <span>
+              <br />
+              {item}</span>
+            )
+          } ) }
+      </div>
+     
+    )
+   
+  }
   return (
     <div>
       <div style={{float:'right'}}>
@@ -37,12 +55,13 @@ export default function SalesTooltip (model) {
          {data.text}
       </b>
       <p>
-       {address.Address} {address.City}, {address.Province}
+       {address.Address}, {address.City}
        <br/>
        {address.PostalCode}
       </p>
       
       <p style={{color:'grey'}}>{`${format(new Date(data.startDate),"h':'mm aa")} - ${format(new Date(data.endDate),"h':'mm aa")}`}</p>
+      {displayJobType()}
     <Popup
     visible={showPop}
     showTitle={true}

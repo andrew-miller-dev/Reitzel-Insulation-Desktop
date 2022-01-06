@@ -13,6 +13,7 @@ import TextArea from "antd/lib/input/TextArea";
 import Confirmation from "../../Components/Email_Templates/confirmation"
 import {renderEmail} from 'react-html-email';
 import { customer_info_sheet } from "../../assets/paths";
+import { jobs } from "../../util/storedArrays";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
@@ -34,7 +35,6 @@ export default function NewEstimate(props) {
   const options = regions.map((item) => (
     <Option key={item.id}>{item.region}</Option>
   ));
-  const jobs = ["loosefill", "spray", "removal", 'fireproofing'];
   const options1 = jobs.map((item, index) => (
     <Option key={item}>{item}</Option>
   ));
@@ -84,14 +84,12 @@ export default function NewEstimate(props) {
       Email: values.Email,
       BillingAddress: values.BillingAddress || ' ',
       City: values.City || ' ',
-      Prov: values.Prov || ' ',
       PostalCode: values.PostalCode || ' ',
       Region: values.Region || ' ',
     };
     var siteAddress = {
       BillingAddress: values.siteAddress,
       City: values.siteCity,
-      Prov: values.siteProv,
       PostalCode: values.sitePostal,
       Region: values.siteRegion
     };
@@ -113,19 +111,8 @@ export default function NewEstimate(props) {
     let customerInfo = await addCustomer(customer);
     var latestCustomer = customerInfo.data.insertId;
     if(customer.BillingAddress !== ' ') {
-           let addressResult = await addAddress(latestCustomer, customer);
-           let addressID = addressResult.data.insertId;
-           var estimateResult = await addEstimate(
-            latestCustomer,
-            addressID,
-            estimate
-          );
-          if (estimateResult.status === 200) {
-            message.success("Added new estimate");
-          } 
-          else message.warn("Something went wrong");
+           await addAddress(latestCustomer, customer);
     }
-    if (siteAddress.BillingAddress !== ' ') {
           let addressResult = await addAddress(latestCustomer, siteAddress);
           let addressID = addressResult.data.insertId;
            var estimateResult = await addEstimate(
@@ -137,7 +124,6 @@ export default function NewEstimate(props) {
             message.success("Added new estimate");
           } 
           else message.warn("Something went wrong");
-    }
     if(validator.isEmail(customer.Email)){
       sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />), customer_info_sheet)
     }
@@ -227,6 +213,15 @@ export default function NewEstimate(props) {
             ]}>
               <Input placeholder="Address" />
             </Item>
+            <Item label="Site Postal Code" name="sitePostal"
+            rules={[
+              {
+                required:true,
+                message:"Required field"
+              }
+            ]}>
+              <Input placeholder="Postal Code" />
+            </Item>
             <Item label="Site City" name="siteCity"
             rules={[
               {
@@ -235,24 +230,6 @@ export default function NewEstimate(props) {
               },
             ]}>
               <Input placeholder="City" />
-            </Item>
-            <Item label="Site Province" name="siteProv"
-            rules={[
-              {
-                required: true,
-                message: "Required Field",
-              },
-            ]}>
-              <Input placeholder="Province" />
-            </Item>
-            <Item label="Postal Code" name="sitePostal"
-            rules={[
-              {
-                required: true,
-                message: "Required Field",
-              },
-            ]}>
-              <Input placeholder="Postal Code" />
             </Item>
             <Item name="siteRegion" label="Site Region"
             rules={[
@@ -276,12 +253,6 @@ export default function NewEstimate(props) {
               name="City"
             >
               <Input />
-            </Item>
-            <Item
-              label="Province"
-              name="Prov"
-            >
-              <Input  />
             </Item>
             <Item
               label="Postal Code"
@@ -327,7 +298,9 @@ export default function NewEstimate(props) {
                 },
               ]}
             >
-              <Select>{options1}</Select>
+              <Select
+              mode="multiple">{options1}</Select>
+              
             </Item>
             <Item
               label="Information"
@@ -351,7 +324,8 @@ export default function NewEstimate(props) {
                 },
               ]}
             >
-              <Select>{options2}</Select>
+              <Select
+              >{options2}</Select>
             </Item>
             <Item>
               <Button

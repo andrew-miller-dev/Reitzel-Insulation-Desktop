@@ -67,7 +67,7 @@ export async function addNewOrderDetail(value, order) {
 
 export async function addNewOrderProduct(value, order, detail) {
     var tableName = 'workorderprod';
-    var values = `${null},'${order}','${detail}','${value.id}','${value.product}','${value.notes}','${value.price}'`;
+    var values = `${null},'${order}','${detail}','${value.id}','${value.product}','${value.price}'`;
     var newProd = await ajax(
         `${baseURL}/insertValues`,
         {tableName, values},

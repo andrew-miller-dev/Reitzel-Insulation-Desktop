@@ -22,7 +22,7 @@ export default function SalesToolSnap (model) {
          {data.text}
         </b> 
       <p>
-       {address.Address} {address.City}, {address.Province}
+       {address.Address}, {address.City}
        <br/>
        {address.PostalCode}
       </p>

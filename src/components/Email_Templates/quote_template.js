@@ -33,7 +33,6 @@ return (
           <strong>Site Address</strong>
           <br /> Site Address: {customer.site_address}
           <br /> Site City: {customer.site_city}
-          <br /> Site Province: {customer.site_prov}
           <br /> Site Postal Code: {customer.site_postal}
 
       </Item>
@@ -61,9 +60,6 @@ return (
                             <tr key={prod.prodKey}>
                               <td>
                                 {prod.product}
-                              </td>
-                              <td>
-                                {prod.notes}
                               </td>
                                 <td>
                                   {prod.price}

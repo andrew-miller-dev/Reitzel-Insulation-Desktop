@@ -98,7 +98,6 @@ const {format } = require('date-fns-tz')
                   array.push({
                     prodID:item.QuoteLineID,
                     product:item.Product,
-                    notes:item.Notes,
                     price:item.Subtotal
                   })
               }
@@ -129,7 +128,6 @@ const {format } = require('date-fns-tz')
         rows.push(
           <tr width="100px">
             <td>{item.product}</td>
-            <td>{item.notes}</td>
             <td>{item.price}</td>
           </tr>
       )})
@@ -259,9 +257,9 @@ const {format } = require('date-fns-tz')
         title:"Completed Date",
         key:"completeDate",
         render: (data) => (
-          <p>{checkDate(format(new Date(data.modifyDate), "MMMM do',' yyyy"))}</p>
+          <p>{checkDate(format(new Date(data.completed), "MMMM do',' yyyy"))}</p>
         ),
-        sorter: (a,b) => new Date(a.modifyDate) - new Date(b.modifyDate)
+        sorter: (a,b) => new Date(a.completed) - new Date(b.completed)
       },
       {
         title:"Options",

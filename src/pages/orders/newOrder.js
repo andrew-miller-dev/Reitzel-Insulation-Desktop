@@ -71,7 +71,7 @@ function NewOrder (props) {
           "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
         ),
         selectedTruck:values.selectedTruck,
-      }
+      };
       let selectedTruckType = getTruckType(workOrderInfo.selectedTruck);
       let order = await addNewOrder(workOrderInfo, selectedTruckType);
       try {
@@ -104,8 +104,13 @@ function NewOrder (props) {
     }
 
     function getTruckType(id) {
+
+      let workType = "";
       trucks.forEach((truck) => {
-        if(truck.TruckID === id) return truck.TruckType;
+        if(truck.TruckID === id){
+          workType = truck.TruckType;
+        } 
+        return workType;
       });
     }
 

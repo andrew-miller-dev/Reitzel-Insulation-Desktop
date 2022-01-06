@@ -19,7 +19,6 @@ let createWordObject = () => {
         email:data.Email,
         site_address:data.Address,
         site_city:data.City,
-        site_prov:data.Province,
         site_postal:data.PostalCode,
         details:getDetailsByID(data.QuoteID),
         customer_notes:data.notesCustomers,
@@ -52,7 +51,6 @@ const getProductArr = (id) => {
               array.push({
                 prodID:item.QuoteLineID,
                 product:item.Product,
-                notes:item.Notes,
                 price:item.Subtotal
               })
           }

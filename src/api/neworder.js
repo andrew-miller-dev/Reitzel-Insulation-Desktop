@@ -26,7 +26,7 @@ export async function addEstimate(id, address, value) {
 
 export async function addAddress(id, value){
   var tableName = "address";
-  var values = `${null},'${id}','${value.BillingAddress}','${value.PostalCode}','${value.City}','${value.Prov}','${value.Region}'`;
+  var values = `${null},'${id}','${value.BillingAddress}','${value.PostalCode}','${value.City}','${value.Region}'`;
 
   var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("address", address);

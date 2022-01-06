@@ -39,7 +39,7 @@ let  qData = {
         },
         {
             id: "5",
-            name: "Form Template",
+            name: "Foam Template",
             details: "We will supply and install Insulthane Extreme, 2 lb medium density, closed cell, polyurethane spray foam thermal insulation. CCMC # 13697-L",
             customer_notes: "",
             account: "1941844",
@@ -56,18 +56,18 @@ let  qData = {
             wsib:""
         },
         {
-            id: "7",
-            name: "Fireproofing Template",
-            details: "We will supply and install Products!",
+            id: "8",
+            name: "Pour Foam Template",
+            details: "We will supply and install Wrapsulate 1100, 1 lb low density, open cell, polyurethane spray foam CCMC 14049-R. This process includes drilling 3-8 holes 5/8 inch sized holes per cavity. Reitzel Insulation cannot be held liable for poor wall make-up. Reitzel Insulation will apply the first layer of sheetrock 90 over the holes. It is the customer’s responsibility to refinish the wall as they see fit.",
             customer_notes: "",
             account: "1941844",
             firm: "245166V",
             wsib:""
         },
         {
-            id: "8",
-            name: "Pour Foam Template",
-            details: "We will supply and install Wrapsulate 1100, 1 lb low density, open cell, polyurethane spray foam CCMC 14049-R. This process includes drilling 3-8 holes 5/8 inch sized holes per cavity. Reitzel Insulation cannot be held liable for poor wall make-up. Reitzel Insulation will apply the first layer of sheetrock 90 over the holes. It is the customer’s responsibility to refinish the wall as they see fit.",
+            id: "9",
+            name: "Blank Template",
+            details: "",
             customer_notes: "",
             account: "1941844",
             firm: "245166V",

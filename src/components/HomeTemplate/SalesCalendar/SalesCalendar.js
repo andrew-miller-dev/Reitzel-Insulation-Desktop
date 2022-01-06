@@ -28,8 +28,9 @@ import { customer_info_sheet } from "../../../assets/paths.js";
 import Confirmation from "../../Email_Templates/confirmation.js";
 import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button } from "devextreme-react";
 import { Item } from "devextreme-react/form";
+import { jobs } from "../../../util/storedArrays.js";
 const { confirm } = Modal;
-const { format } = require("date-fns-tz");
+const { format, zonedTimeToUtc } = require("date-fns-tz");
 
 const dataSource = new CustomStore({
   key: "EstimateID",
@@ -70,6 +71,10 @@ const dataSource = new CustomStore({
   },
   insert: async (values) => {
     try{
+      console.log(values);
+      values.startDate = format(zonedTimeToUtc(values.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+      values.endDate = format(zonedTimeToUtc(values.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+      console.log(values);
       let customerInfo = await addNewCustomer(values);
       const customerID = customerInfo.data.insertId;
       let addressInfo = await addNewAddress(customerID, values);
@@ -197,6 +202,10 @@ async onAppointmentForm (e) {
   e.popup.option('showTitle', true);
   e.popup.option('title', 'Quick appointment creation');
   let user = e.appointmentData.UserID;
+  var apptDates = {...this.state.apptDates};
+          apptDates.start = format(new Date(e.appointmentData.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+          apptDates.end = format(new Date(e.appointmentData.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+          this.setState({apptDates});
   let newGroupItems =[
     {
       editorType:'dxButton',
@@ -209,10 +218,6 @@ async onAppointmentForm (e) {
           var appointmentInfo = {...this.state.appointmentInfo};
           appointmentInfo.startDate = format(new Date(e.appointmentData.startDate),"M/d/yyyy, hh:mm a");
           appointmentInfo.endDate = format(new Date(e.appointmentData.endDate),"M/d/yyyy, hh:mm a");
-          var apptDates = {...this.state.apptDates};
-          apptDates.start = e.appointmentData.startDate;
-          apptDates.end = e.appointmentData.endDate;
-          this.setState({apptDates});
           this.setState({appointmentInfo});
           this.setState({clickedSalesman:e.appointmentData.UserID})
           console.log(this.state.apptDates);
@@ -255,12 +260,6 @@ async onAppointmentForm (e) {
     isRequired:true,
     editorType:'dxTextBox',
     dataField:"siteCity"
-  },
-  {
-    label:{text:"Site Province"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"siteProv"
   },
   {
     label:{text:"Postal Code"},
@@ -314,9 +313,9 @@ async onAppointmentForm (e) {
     label:{text:"Job Type"},
     colSpan:2,
     isRequired:true,
-    editorType:'dxSelectBox',
+    editorType:'dxTagBox',
     editorOptions:{
-      items:['loosefill','spray', "fireproofing","removal"]
+      items:jobs
     },
     dataField:'jobType'
   }
@@ -493,7 +492,6 @@ getUserName(id, array){
             var siteInfo = {...this.state.siteInfo};
             siteInfo.siteAddress = address.Address;
             siteInfo.siteCity = address.City;
-            siteInfo.siteProv = address.Province;
             siteInfo.sitePostal = address.PostalCode;
             siteInfo.siteRegion = address.Region;
             this.setState({siteID:address.AddressID});
@@ -507,7 +505,6 @@ getUserName(id, array){
         >
         <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteAddress' />  
         <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteCity' />
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteProv' />
         <Item editorOptions={{readOnly:this.state.useExisting}} dataField="sitePostal" />
         <Item dataField="siteRegion" 
               editorType="dxSelectBox" 
@@ -532,7 +529,7 @@ getUserName(id, array){
         onValueChanged={(data) => {
           this.setState({jobType:data.value});
         }}
-        items={["fireproofing","removal","spray","loosefill"]}>
+        items={jobs}>
         </SelectBox>
         Assigned Salesman:
         <TextBox
@@ -541,7 +538,6 @@ getUserName(id, array){
         </TextBox>
         <br />
         <div style={{float:"right"}}>
-
         <Space>
         <Button
         style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}

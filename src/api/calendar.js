@@ -99,7 +99,7 @@ export async function deleteEstimate(id) {
 
   export async function sendConfirm(customer, email){
     const to = customer;
-    const subject = "Booking Confirmation - Rietzel Insulation";
+    const subject = "Booking Confirmation - Reitzel Insulation";
     const html = email;
 
     const completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html}, "post");
@@ -159,7 +159,7 @@ export async function addNewCustomer(value) {
 
 export async function addNewAddress(id, value){
   const tableName = "address";
-  const values = `${null},'${id}','${value.siteAddress}','${value.sitePostal}','${value.siteCity}','${value.siteProv}','${value.siteRegion}'`;
+  const values = `${null},'${id}','${value.siteAddress}','${value.sitePostal}','${value.siteCity}','${value.siteRegion}'`;
 
   const address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (address !== []) return address;
@@ -170,7 +170,7 @@ export async function addNewAddress(id, value){
 
 export async function addEstimate(id, address, value) {
   const tableName = "estimates";
-  const values = `${null},'${id}','${address}','${value.UserID}','${value.jobType}','${format(new Date(),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}','${value.apptInfo}','${value.siteRegion}','${value.startDate}','${value.endDate}'`;
+  const values = `${null},'${id}','${address}','${value.UserID}','${value.jobType}','${utcDate}','${value.apptInfo}','${value.siteRegion}','${value.startDate}','${value.endDate}'`;
 
   const estimate = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (estimate !== []) return estimate;
@@ -310,7 +310,6 @@ export async function getQuoteProducts(id) {
 }
 
 export async function addNewOrder(info){
-  console.log(utcDate);
   const tableName = 'workorders';
   const values = `${null},'${info.CustomerID}','${info.AddressID}','${info.TruckID}','${info.UserID}','${info.WorkType}','${info.total}','${info.startDate}','${info.endDate}','${utcDate}'`;
   

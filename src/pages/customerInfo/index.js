@@ -68,7 +68,6 @@ export function CustomerInfo() {
           address: item.Address,
           postalcode: item.PostalCode,
           city: item.City,
-          prov: item.Province,
           region: item.Region
         }));
         setAddressList(addresses);
@@ -120,14 +119,11 @@ export function CustomerInfo() {
         const validResult = await form1.validateFields();
         if (validResult.errorFields && validResult.errorFields.length > 0) return;
         const value = form1.getFieldsValue();
-        console.log(value);
-        //const { firstName, lastName, email, phone, billing, city, postal, region } = value;
         const id = customerInfo.id;
-        console.log("id", id);
         //update data in the backend
         const result = await updateCustomer(id, value.firstName, value.lastName, value.email, value.phone, value.billing, value.city, value.postal, value.region);
         setShowForm(false);
-        console.log(result);
+
         if (result.status === 200) {
           message.success("Successfully updated customer information");
         }
@@ -143,7 +139,6 @@ export function CustomerInfo() {
           onOk() {
             return new Promise((resolve, reject) => {
               const result = deleteCustomer(id);
-              console.log(result);
               message.success("Customer has been successfully deleted");
               resolve();
               
@@ -168,7 +163,6 @@ export function CustomerInfo() {
         }
         let id = customerInfo.id;
         var result = await addAddress(id, info);
-        console.log(result);
         if (result.status == 200){
           message.success("added new address");
         }
@@ -211,11 +205,6 @@ export function CustomerInfo() {
         title:"City",
         dataIndex:"city",
         key:"city"
-      },
-      {
-        title:"Province",
-        dataIndex:"prov",
-        key:"prov"
       },
       {
         title:"Region",
@@ -478,18 +467,6 @@ export function CustomerInfo() {
               <Item 
               label="City"
               name="city"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-              >
-                <Input />
-              </Item>
-              <Item 
-              label="Province"
-              name="prov"
               rules={[
                 {
                   required: true,

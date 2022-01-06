@@ -81,7 +81,7 @@ export async function updateDetail(values){
 
 export async function updateProduct(values){
     const tableName = 'quotelines';
-    const columnsAndValues = `Product = '${values.product}', Notes = '${values.notes}', Subtotal='${values.price}'`;
+    const columnsAndValues = `Product = '${values.product}', Subtotal='${values.price}'`;
     const condition = `QuoteLineID = '${values.id}'`;
     const productUpdate = await ajax(
         `${baseURL}/updateValues`,

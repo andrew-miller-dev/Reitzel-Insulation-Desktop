@@ -6,7 +6,7 @@ let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' 
 
 export async function sendQuote(customer, email){
     var to = customer;
-    var subject = "Your quote with Rietzel Insulation";
+    var subject = "Your quote with Reitzel Insulation";
     var html = email;
 
     var completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html}, "post");
@@ -50,7 +50,7 @@ export async function sendQuote(customer, email){
 
   export async function addNewProductLine(value, id, detailID){
     var tableName = "quotelines";
-    var values = `'${null}','${detailID}', '${id}','${value.product}','${value.notes}', '${value.price}'`;
+    var values = `'${null}','${detailID}', '${id}','${value.product}', '${value.price}'`;
     var product = await ajax(`${baseURL}/insertValues`, {tableName, values }, "post");
     if(product !== []) return product;
     else{

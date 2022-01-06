@@ -100,7 +100,6 @@ function QuotePrint(props) {
           <strong>Site Address</strong>
           <br /> Site Address: {quoteFormData.site_address}
           <br /> Site City: {quoteFormData.site_city}
-          <br /> Site Province: {quoteFormData.site_prov}
           <br /> Site Postal Code: {quoteFormData.site_postal}
         </Card>
         <div>
@@ -125,11 +124,8 @@ function QuotePrint(props) {
                       {item.productArr.map((prod) => {
                         return (
                             <tr key={prod.prodKey}>
-                              <td width="40%">
+                              <td width="80%">
                                 {prod.product}
-                              </td>
-                              <td width="40%">
-                                {prod.notes}
                               </td>
                                 <td width="20%">
                                   {prod.price}

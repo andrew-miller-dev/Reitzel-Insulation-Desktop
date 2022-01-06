@@ -61,7 +61,6 @@ function QuoteEdit (props) {
                         id:prod.QuoteLineID,
                         key:prodKey,
                         product:prod.Product,
-                        notes:prod.Notes,
                         price:prod.Subtotal
                     }
                     if(detailObj.productArr.length === 0){
@@ -93,7 +92,6 @@ function QuoteEdit (props) {
         assignSiteAddress(allInfo.Address);
         assignSiteCity(allInfo.City);
         assignSiteCode(allInfo.PostalCode);
-        assignSiteProv(allInfo.Province);
         assignCustomerNotes(allInfo.notesCustomers);
         assignInstallerNotes(allInfo.notesInstallers);
         assignUserFirstName(allInfo.FirstName);
@@ -113,7 +111,6 @@ function QuoteEdit (props) {
     const {value: siteAddress,  assignValue: assignSiteAddress} = useInput();
     const {value: siteCity,  assignValue: assignSiteCity} = useInput();
     const {value: siteCode, assignValue: assignSiteCode} = useInput();
-    const {value: siteProv,  assignValue: assignSiteProv} = useInput();
     
     const {value: customerNotes, bind: bindCustomerNotes, assignValue: assignCustomerNotes} = useInput();
     const {value: installerNotes, bind: bindInstallerNotes, assignValue: assignInstallerNotes} = useInput();
@@ -222,7 +219,6 @@ function QuoteEdit (props) {
                 id:null,
                 prodKey:prodKey,
                 product:"",
-                notes:"",
                 price:0.00
             }
         }
@@ -231,7 +227,6 @@ function QuoteEdit (props) {
                 id:null,
                 prodKey:prodKey,
                 product:"",
-                notes:"",
                 price:0.00
             }
         }
@@ -268,9 +263,6 @@ function QuoteEdit (props) {
     const handleProductDetails = (prod, e) => {
         prod.product = e.target.value;
     }
-    const handleProductNotes = (prod, e) => {
-        prod.notes = e.target.value;
-    }
     const handleProductPrice = (prod, e) => {
         if(e.target.value === ""){
             e.target.value = 0.00;
@@ -288,8 +280,8 @@ function QuoteEdit (props) {
                     rows.push(
                          <tr>
                              <td>
-                                 Product:
-                                 <input type="text" key={prod.prodKey}  defaultValue={prod.product}
+                                 Details:
+                                 <input type="text" key={prod.prodKey} size={50}  defaultValue={prod.product}
                                     onChange={(e) => {
                                         handleProductDetails(prod, e);
                                      }}
@@ -297,15 +289,6 @@ function QuoteEdit (props) {
                                      />
         
                              </td>
-                            <td>
-                                Details:
-                                <input type="text" key={prod.prodKey} defaultValue={prod.notes}
-                                    onChange={(e) => {
-                                        handleProductNotes(prod, e);
-                                     }}
-                                     className="ant-input"
-                                     />
-                            </td>
                             <td>
                                 Price:
                                 <input type="number" step=".01" key={prod.prodKey} defaultValue={prod.price}
@@ -427,8 +410,6 @@ function QuoteEdit (props) {
                     <p>{siteAddress}</p>
                     City:
                     <p>{siteCity}</p>
-                    Province:
-                    <p>{siteProv}</p>
                     Postal Code:
                     <p>{siteCode}</p>
                             </Card>

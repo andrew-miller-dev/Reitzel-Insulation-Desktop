@@ -8,7 +8,8 @@ import qData from './quoteData.js';
 import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
-import { AutoComplete, Card, Row, Col, Checkbox } from "antd";
+import { AutoComplete, Card, Row, Col, Checkbox, Select, } from "antd";
+const { Option } = Select;
 
 function QuoteOne(props) {
     const [isLoading, setLoading] = useState(true);
@@ -17,9 +18,16 @@ function QuoteOne(props) {
     let history = useHistory();
 
     
-    let  quotes = qData.quote_data;
+    let quotes = qData.quote_data;
     let selectedQuote  = (parseInt(qid)) ? quotes.find((d) => { return parseInt(d.id) === parseInt(qid) }): {};
-    
+    const quoteList = () => {
+        return (
+            quotes.map((item) => {
+                return(
+                <Option value={item.id}>{item.name}</Option>
+           ) })
+        )
+    }
     
     if(Object.keys(selectedQuote).length === 0){
         history.push(`/quotes`);
@@ -65,7 +73,6 @@ function QuoteOne(props) {
     const {value: siteAddress, bind: bindSiteAddress, assignValue: assignSiteAddress} = useInput();
     const {value: siteCity, bind: bindSiteCity, assignValue: assignSiteCity} = useInput();
     const {value: siteCode, bind: bindSiteCode, assignValue: assignSiteCode} = useInput();
-    const {value: siteProv, bind: bindSiteProv, assignValue: assignSiteProv} = useInput();
     
     const {value: customerNotes, bind: bindCustomerNotes,assignValue: assignCustomerNotes} = useInput();
     const {value: installerNotes, bind: bindInstallerNotes, assignValue: assignInstallerNotes} = useInput();
@@ -108,7 +115,6 @@ function QuoteOne(props) {
                     address:item.Address,
                     postal:item.PostalCode,
                     city:item.City,
-                    prov:item.Province,
                     region:item.Region
 
                 }
@@ -124,7 +130,6 @@ function QuoteOne(props) {
             assignAddressID(option.id)
             assignSiteAddress(option.address)
             assignSiteCity(option.city)
-            assignSiteProv(option.prov)
             assignSiteCode(option.postal)
         }
     }
@@ -145,7 +150,6 @@ function QuoteOne(props) {
             email: email,
             site_address: siteAddress,
             site_city: siteCity,
-            site_prov:siteProv,
             site_postal:siteCode,
             customer_notes: customerNotes,
             installer_notes: installerNotes,
@@ -171,14 +175,19 @@ function QuoteOne(props) {
             setTax(true);
         }
     }        
-    const addNewDetail = (e) => {
-        e.preventDefault();
+    const addNewDetail = (id) => {
+        let quote = {};
+        quotes.forEach((item) => {
+            if(item.id === id) {
+                quote=item;
+            }
+        })
         setcounter(counter +1);
         var temp = quotedetails;
         if(temp[temp.length] === 0){
             temp[0] = {
                 key:detailKey,
-                details:"",
+                details:quote.details,
                 total:0.00,
                 productArr:[]
             }
@@ -186,7 +195,7 @@ function QuoteOne(props) {
         else{
             temp[temp.length] = {
                 key:detailKey,
-                details:"",
+                details:quote.details,
                 total:0.00,
                 productArr:[]
             }
@@ -203,7 +212,6 @@ function QuoteOne(props) {
             temp[index].productArr[0] = {
                 prodKey:prodKey,
                 product:"",
-                notes:"",
                 price:0.00
             }
         }
@@ -211,7 +219,6 @@ function QuoteOne(props) {
             temp[index].productArr[temp[index].productArr.length] = {
                 prodKey:prodKey,
                 product:"",
-                notes:"",
                 price:0.00
             }
         }
@@ -242,9 +249,6 @@ function QuoteOne(props) {
     const handleProductDetails = (prod, e) => {
         prod.product = e.target.value;
     }
-    const handleProductNotes = (prod, e) => {
-        prod.notes = e.target.value;
-    }
     const handleProductPrice = (prod, e) => {
         if(e.target.value === ""){
             e.target.value = 0.00;
@@ -263,8 +267,8 @@ function QuoteOne(props) {
                     rows.push(
                          <tr>
                              <td>
-                                 Product:
-                                 <input type="text" key={prod.prodKey}  defaultValue={prod.product}
+                                 Product Details:
+                                 <input type="text" size={50} key={prod.prodKey}  defaultValue={prod.product}
                                     onChange={(e) => {
                                         handleProductDetails(prod, e);
                                      }}
@@ -272,15 +276,6 @@ function QuoteOne(props) {
                                      />
         
                              </td>
-                            <td>
-                                Details:
-                                <input type="text" key={prod.prodKey} defaultValue={prod.notes}
-                                    onChange={(e) => {
-                                        handleProductNotes(prod, e);
-                                     }}
-                                     className="ant-input"
-                                     />
-                            </td>
                             <td>
                                 Price:
                                 <input type="number" step=".01" key={prod.prodKey} defaultValue={prod.price}
@@ -346,14 +341,13 @@ function QuoteOne(props) {
                     <Button size="sm" variant="danger"  onClick={(e) => { handleRemoveDetail(detail,e)}} >Delete</Button>
                 </td>
             </tr>
-            Products:
             </tr>
                 <tr>
                     {renderProducts(detail)}
                 </tr>
         <tr>
             <td>
-                <Button size="sm" variant="primary" onClick={(e) => {handleAddProduct(detail,e)}}>Add Product</Button>
+                <Button size="sm" variant="primary" onClick={(e) => {handleAddProduct(detail,e)}}>Add Detail</Button>
             </td>
               
         </tr>
@@ -445,10 +439,6 @@ function QuoteOne(props) {
                     <input type="text" className="ant-input" name="site_city"
                             placeholder="Site City" {...bindSiteCity} />
                     <br/>
-                    Province:
-                    <input type="text" className="ant-input" name="site_prov"
-                            placeholder="Site Province" {...bindSiteProv} />
-                            < br/>
                     Postal Code:
                     <input type="text" className="ant-input" name="site_code"
                             placeholder="Site Postal Code" {...bindSiteCode} />
@@ -460,7 +450,7 @@ function QuoteOne(props) {
                     <table style={{width:"100%"}}>
                         <thead>
                         <tr>
-                            <td>Quote Details and Products:</td>
+                            <td>Quote Products:</td>
                             
                         </tr>
                         </thead>
@@ -468,7 +458,13 @@ function QuoteOne(props) {
                         {renderRows()}
                         <tr>
                             <td>
-                                <Button onClick={(e) => {addNewDetail(e)}}>Add Details</Button>
+                               Add New Product:<Select
+                               style={{width:200}}
+                               size="small"
+                               defaultValue="Select a template"
+                               onSelect={addNewDetail}>
+                                   {quoteList()}
+                               </Select>
                             </td>
                         </tr>
                         
