@@ -4,7 +4,7 @@ import { getUser } from '../../util/storage';
 const header = "https://i.ibb.co/0snCVqq/header.png";
 const user = getUser();
 
-const { format} = require("date-fns-tz");
+const {format, UtcToZonedTime} = require("date-fns-tz");
 
 function Confirmation(props){
     
@@ -17,8 +17,8 @@ function Confirmation(props){
             <br />
             <p>There has been a change in your appointment time. Here are the new details for your booking:</p>
             <p>Job Type: {props.estimateInfo.JobType}</p>
-            <p>Date: {format(new Date(props.estimateInfo.startDate),"MMMM do',' yyyy")}</p>
-            <p> Approximate Arrival Time:  {format(new Date(props.estimateInfo.startDate),"K:mm")}</p>
+            <p>Date: {format(props.estimateInfo.startDate,"MMMM do',' yyyy")}</p>
+            <p> Approximate Arrival Time:  {format(props.estimateInfo.startDate,"K:mm")}</p>
             <br />
             </Item>
             <Item>

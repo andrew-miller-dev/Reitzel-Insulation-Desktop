@@ -26,11 +26,11 @@ import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import { customer_info_sheet } from "../../../assets/paths.js";
 import Confirmation from "../../Email_Templates/confirmation.js";
-import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button } from "devextreme-react";
+import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button, TagBox } from "devextreme-react";
 import { Item } from "devextreme-react/form";
 import { jobs } from "../../../util/storedArrays.js";
 const { confirm } = Modal;
-const { format, zonedTimeToUtc } = require("date-fns-tz");
+const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 
 const dataSource = new CustomStore({
   key: "EstimateID",
@@ -45,8 +45,8 @@ const dataSource = new CustomStore({
       text : item.EstimateInfo,
       JobType:item.JobType,
       RegionID : item.RegionID,
-      startDate : item.startDate,
-      endDate : item.endDate
+      startDate : utcToZonedTime(item.startDate),
+      endDate : utcToZonedTime(item.endDate)
     }));
     return formatData
   },
@@ -59,8 +59,8 @@ const dataSource = new CustomStore({
       CreationDate : values.CreationDate,
       EstimateInfo : values.EstimateInfo,
       RegionID : values.RegionID,
-      startDate : values.startDate,
-      endDate : values.endDate
+      startDate : format(zonedTimeToUtc(values.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+      endDate : format(zonedTimeToUtc(values.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
   }
     const check = await updateEstimate(key, formatData);
     return check;
@@ -71,10 +71,8 @@ const dataSource = new CustomStore({
   },
   insert: async (values) => {
     try{
-      console.log(values);
       values.startDate = format(zonedTimeToUtc(values.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
       values.endDate = format(zonedTimeToUtc(values.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-      console.log(values);
       let customerInfo = await addNewCustomer(values);
       const customerID = customerInfo.data.insertId;
       let addressInfo = await addNewAddress(customerID, values);
@@ -108,6 +106,7 @@ const sendEmailUpdate = async (values) => {
   let findCustomerEmail = await getCustomer(values.CustomerID);
   let customerEmail = findCustomerEmail.data[0];
   sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>), customer_info_sheet);
+  message.success("Email sent to customer");
 }
 
 const currentDate = new Date();
@@ -453,6 +452,7 @@ getUserName(id, array){
         <Form
         formData={this.state.basicInfo}
         colCount={3}
+
         >
         <Item editorOptions={{readOnly:true}} dataField='firstName' />  
         <Item editorOptions={{readOnly:true}} dataField='lastName' />
@@ -525,12 +525,12 @@ getUserName(id, array){
 
         </TextArea>
         Job Type:
-        <SelectBox
+        <TagBox
         onValueChanged={(data) => {
           this.setState({jobType:data.value});
         }}
         items={jobs}>
-        </SelectBox>
+        </TagBox>
         Assigned Salesman:
         <TextBox
         readOnly={true}
@@ -584,7 +584,8 @@ getUserName(id, array){
         >Done</Button>
         <Button
          style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
-         onClick={() => {this.setState({showForm:false})}}>
+         onClick={() => {
+           this.setState({showForm:false})}}>
           Cancel
         </Button>
         </Space>

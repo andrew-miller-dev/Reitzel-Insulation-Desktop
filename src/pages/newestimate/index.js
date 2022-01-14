@@ -14,6 +14,7 @@ import Confirmation from "../../Components/Email_Templates/confirmation"
 import {renderEmail} from 'react-html-email';
 import { customer_info_sheet } from "../../assets/paths";
 import { jobs } from "../../util/storedArrays";
+import { zonedTimeToUtc } from "date-fns-tz/fp";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
@@ -76,7 +77,9 @@ export default function NewEstimate(props) {
   ));
 
   const onFinish = async (values) => {
-
+    const start = format(values.selectedDate[0]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+    const end = format(values.selectedDate[1]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+    console.log(start,end);
     var customer = {
       FirstName: values.FirstName,
       LastName: values.LastName,
@@ -97,14 +100,8 @@ export default function NewEstimate(props) {
       UserID: values.salesman,
       JobType: values.JobType,
       Region: values.siteRegion,
-      startDate: format(
-        values.selectedDate[0]._d,
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
-      endDate: format(
-        values.selectedDate[1]._d,
-        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
-      ),
+      startDate: start,
+      endDate: end,
       estimateInfo: values.EstimateInfo,
     };
 
@@ -279,7 +276,6 @@ export default function NewEstimate(props) {
             >
               <RangePicker
                 showTime={{ format: "HH:mm" }}
-                format="YYYY-MM-DD HH:mm"
                 className="datepicker"
               />
               

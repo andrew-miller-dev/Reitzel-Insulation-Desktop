@@ -17,8 +17,8 @@ function UpdateWork(props){
             <br />
             <p>There has been a change in your appointment time. Here are the new details for your booking:</p>
 
-            <p>Date: {format(new Date(props.info.startDate),"MMMM do',' yyyy")}</p>
-            <p> Approximate Arrival Time:  {format(new Date(props.info.startDate),"K:mm")}</p>
+            <p>Date: {format(props.info.startDate,"MMMM do',' yyyy")}</p>
+            <p> Approximate Arrival Time:  {format(props.info.startDate,"K:mm")}</p>
             <br />
             </Item>
             <Item>
