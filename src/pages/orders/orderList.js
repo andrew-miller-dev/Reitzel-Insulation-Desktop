@@ -51,12 +51,12 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
     const getDetailsByID = (id) => {
         let array = [];
         detailData.forEach((item) => {
-          if(item.WODetailID === id){
+          if(item.OrderID === id){
             array.push({
-              WorkOrderID:item.WorkOrderID,
+              WorkOrderID:item.OrderID,
               id:item.WODetailID,
-              subtotalNotes:item.subtotalNotes,
-              total:item.subtotalAmount,
+              details:item.Details,
+              total:item.DetailTotal,
               arr:getProductArr(item.WODetailID)
             });
           }
@@ -64,24 +64,26 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
         return array;
     }
     const getProductArr = (id) => {
+      console.log(prodData);
       let array = [];
       prodData.forEach((item) => {
-             if(item.subtotalID === id){
+             if(item.WODetailID === id){
                   array.push({
-                    prodID:item.QuoteLineID,
+                    prodID:item.WOProdID,
                     product:item.Product,
-                    notes:item.Notes,
-                    price:item.Subtotal
+                    price:item.Price
                   })
               }
           });
           return array;
     }
     const renderDetails = () => {
+      console.log(formData);
       let rows = [];
       formData.forEach((item) => {
-        rows.push(<Card title="Details" bordered={true} type="inner">
-          <p>{item.subtotalNotes}</p>
+        rows.push(
+        <Card title="Details" bordered={true} type="inner">
+          <p>{item.details}</p>
           <strong>Products</strong>
           <table style={{width:'100%'}}>
             <tbody>
@@ -166,7 +168,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
             <br/>
             <Button
             onClick={() => { 
-              setFormData(getDetailsByID(data.QuoteID));
+              setFormData(getDetailsByID(data.WorkOrderID));
               setShowForm(true);     
                           }}>
               View Work Order
