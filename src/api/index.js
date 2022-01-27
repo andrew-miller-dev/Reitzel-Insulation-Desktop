@@ -20,7 +20,6 @@ export async function getLogin(loginId, loginPwd) {
     { tableName, columns, condition },
     "post"
   );
-  console.log("user", user);
   if (user !== []) return user;
   else {
     return 0;
@@ -32,7 +31,6 @@ export async function addUser(user) {
   var tableName = "users";
   var values = `${null},'${user.loginFirstName}','${user.loginLastName}','${user.email}','${user.loginPwd}','${user.role}'`;
   var users = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  console.log("user", users);
   if (users !== []) return users;
   else {
     return 0;

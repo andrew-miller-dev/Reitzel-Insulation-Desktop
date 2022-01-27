@@ -130,11 +130,11 @@ export default function NewEstimate(props) {
   useEffect(() => {
     getsalesmen();
     getregions();
-    if (salesmen != [] && regions != []) {
+    if (salesmen !== [] && regions !== []) {
       setInfo(true);
     }
   }, []);
-  if (info != true) {
+  if (info !== true) {
     return <p>Loading Information...</p>;
   } else {
     return (

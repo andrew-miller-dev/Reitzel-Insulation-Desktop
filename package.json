@@ -1,6 +1,12 @@
 {
+  "build":{
+    "nsis":{
+      "createDesktopShortcut":"always",
+      "shortcutName":"Reitzel Desktop Workflow"
+    }
+  },
   "name": "reitzel-desktop-workflow",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": "andrew-miller-dev",
   "description": "Reitzel Insulation office workflow application",
   "main": "public/electron.js",
@@ -19,7 +25,7 @@
     "devextreme-aspnet-data-nojquery": "^2.8.2",
     "devextreme-react": "^20.2.3",
     "docx": "^7.1.1",
-    "electron-is-dev": "^2.0.0",
+    "electron-is-dev": "^2.0.npm electron0",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "node-sass": "^5.0.0",

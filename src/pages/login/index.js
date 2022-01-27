@@ -3,7 +3,7 @@ import { Button, Form, Input, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "./index.css";
 import { getLogin, reqWeather, getMenuData } from "../../api/index";
-import { setUser, getUser, setMenu } from "../../util/storage";
+import { setUser, getUser, setMenu, getMenu } from "../../util/storage";
 import { Redirect } from "react-router-dom";
 
 const { Item } = Form;
@@ -16,8 +16,10 @@ export default function Login(props) {
       let menuData = await getMenuData(result.data[0]);
       setUser(result.data[0]);
       setMenu(menuData.data[0]);
-      props.history.replace("/");
+      if(getUser() && getMenu()){
+        props.history.replace("/");
       message.success("Login Success!");
+      }
     } else {
       message.info("Username or Password not correct!");
     }

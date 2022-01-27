@@ -41,7 +41,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
 
       const getUserQuotes = (list) => {
         let newList = [];
-        list.map((item) => {
+        list.forEach((item) => {
           if(item.UserID === user.UserID){
             newList.push(item);
           }
@@ -50,7 +50,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
       }
     const getDetailsByID = (id) => {
         let array = [];
-        detailData.map((item) => {
+        detailData.forEach((item) => {
           if(item.WODetailID === id){
             array.push({
               WorkOrderID:item.WorkOrderID,
@@ -65,7 +65,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
     }
     const getProductArr = (id) => {
       let array = [];
-      prodData.map((item) => {
+      prodData.forEach((item) => {
              if(item.subtotalID === id){
                   array.push({
                     prodID:item.QuoteLineID,
@@ -79,7 +79,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
     }
     const renderDetails = () => {
       let rows = [];
-      formData.map((item) => {
+      formData.forEach((item) => {
         rows.push(<Card title="Details" bordered={true} type="inner">
           <p>{item.subtotalNotes}</p>
           <strong>Products</strong>
@@ -97,7 +97,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
     }
     const renderProducts = (array) => {
       let rows = [];
-      array.map((item) => {
+      array.forEach((item) => {
         rows.push(
           <tr width="100px">
             <td>{item.product}</td>

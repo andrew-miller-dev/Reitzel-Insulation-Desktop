@@ -7,7 +7,6 @@ import "./index.css";
 import Leftnav from "../leftnav";
 import Head from "../head";
 import { getUser } from "../../util/storage";
-import jwt from "jsonwebtoken";
 import Searchbar from "../searchbar";
 import { datas } from "../../api/index";
 const { Header, Content, Footer, Sider } = Layout;
@@ -17,10 +16,13 @@ export default class Homepage extends React.Component {
     user: "",
   };
   componentDidMount = async () => {
-    const user = await getUser();
+    const user = getUser();
     this.setState({ user });
   };
   render() {
+    if(this.state.user !== ""){
+
+    
     const { user } = this.state;
     const SecurityLevel =
       (this.state.user && this.state.user.SecurityLevel) || "";
@@ -37,7 +39,7 @@ export default class Homepage extends React.Component {
           </Header>
 
           <Content className="content">
-            <Searchbar />
+            <Searchbar role={SecurityLevel} />
             <Main />
           </Content>
           <Footer style={{ textAlign: "center" }}>
@@ -47,4 +49,10 @@ export default class Homepage extends React.Component {
       </Layout>
     );
   }
+  else return (
+    <div>
+      Loading...
+      </div>
+  )
+}
 }

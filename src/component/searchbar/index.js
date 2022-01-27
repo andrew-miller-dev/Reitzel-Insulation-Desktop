@@ -2,7 +2,7 @@ import React from "react";
 import { Input, message, Button, Space, } from "antd";
 import "./index.css";
 import { withRouter } from "react-router";
-import { getUser } from "../../util/storage";
+import { getMenu, getUser } from "../../util/storage";
 
 const user = getUser();
 const { Search } = Input;
@@ -13,7 +13,7 @@ function Searchbar(props) {
   };
 
 const buttons = () => {
-  if (user.SecurityLevel === "salesman"){
+  if (props.role === "salesman"){
     return (
       <Space>
          <Button
@@ -44,7 +44,7 @@ const buttons = () => {
       </Space>
   )
 }
-
+if(getUser() && getMenu()) {
   return (
     <div className="content-searchbar">
       <Search
@@ -57,5 +57,11 @@ const buttons = () => {
       {buttons()}
     </div>
   );
+}
+else return (
+  <div>
+    Loading...
+  </div>
+)
 }
 export default withRouter(Searchbar);

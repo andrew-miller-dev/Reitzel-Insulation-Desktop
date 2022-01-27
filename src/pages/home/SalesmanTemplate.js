@@ -19,7 +19,6 @@ const dataSource = new CustomStore({
   load: async () => {
     let user = getUser();
     if(hourCheck < 18){
-      console.log(hourCheck);
     const data = await getEstimateByIDToday(user.UserID);
     let formatData = data.data.map((item) => ({
       EstimateID : item.EstimateID,
@@ -107,7 +106,6 @@ class SalesmanTemplate extends React.Component {
       region: item.Region,
       color: item.color
     }))
-    console.log(regionData);
     return regionData;
   }
 
@@ -118,7 +116,6 @@ class SalesmanTemplate extends React.Component {
       FirstName : item.FirstName,
       LastName: item.LastName
     }))
-    console.log(salesData);
     return salesData;
   }
   componentDidMount(){

@@ -45,7 +45,7 @@ function QuoteEdit (props) {
 
     const createDetails = (detlist, prodlist) => {
         let temp = quotedetails;
-        detlist.map((detail) => {
+        detlist.forEach((detail) => {
            let detailObj = {
                     id: detail.SubtotalID,
                     key:detailKey,
@@ -55,7 +55,7 @@ function QuoteEdit (props) {
                 
             }
             setDetailKey(detailKey + 1);
-            prodlist.map((prod) => {
+            prodlist.forEach((prod) => {
                 if(prod.subtotalID === detail.SubtotalID){
                     let prodObj = {
                         id:prod.QuoteLineID,
@@ -275,7 +275,7 @@ function QuoteEdit (props) {
     const renderProducts = (details) => {
         let rows = [];
             if(details.productArr.length !== 0){
-                details.productArr.map((prod) => {
+                details.productArr.forEach((prod) => {
 
                     rows.push(
                          <tr>
@@ -308,7 +308,7 @@ function QuoteEdit (props) {
     }
     const getTotal = (details) => {
         let total = 0.00;
-        details.productArr.map((item) => {
+        details.productArr.forEach((item) => {
             total = total + parseFloat(item.price);
         });
         if (tax === true){
@@ -320,7 +320,7 @@ function QuoteEdit (props) {
     }
     const getQuoteTotal = (detail) => {
         let total = 0.00;
-        detail.map((item) => {
+        detail.forEach((item) => {
             total = total + parseFloat(item.total);
         });
         total = total.toFixed(2);
@@ -330,7 +330,7 @@ function QuoteEdit (props) {
         let rows = [];
         if(quotedetails.length > 0){
             
-            quotedetails.map((detail) => {
+            quotedetails.forEach((detail) => {
             rows.push(
             <tr>
             <tr>

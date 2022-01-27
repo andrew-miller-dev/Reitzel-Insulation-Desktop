@@ -4,6 +4,7 @@ import { Menu } from "antd";
 import Avatar from "../avatar";
 import "./index.css";
 import { menuCreate } from "../../config/menucreate";
+import { getMenu, getUser } from "../../util/storage";
 
 const { SubMenu, Item } = Menu;
 class Leftnav extends Component {
@@ -26,6 +27,9 @@ class Leftnav extends Component {
     });
   };
   render() {
+    if(getUser() && getMenu()){
+
+    
     const menu = menuCreate();
     const imageUrl = this.props.imgUrl;
     const { pathname } = this.props.location;
@@ -48,7 +52,12 @@ class Leftnav extends Component {
         </Menu>
       </div>
     );
-  
+  }
+  else return (
+    <div>
+      Loading...
+    </div>
+  )
   }
   
 }
