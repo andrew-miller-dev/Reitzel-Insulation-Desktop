@@ -1,4 +1,3 @@
-import React from 'react';
 import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, Header, Footer } from 'docx';
 
 const header = "https://i.ibb.co/0snCVqq/header.png";

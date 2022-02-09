@@ -1,5 +1,5 @@
 
-import React, {useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Route, Switch,  Link,  useRouteMatch, useHistory } from "react-router-dom";
 import FormOne from "./FormOne";
 import QuoteOne from "./QuoteOne";
@@ -7,6 +7,7 @@ import QuotePrint from "./QuotePrint";
 import QuoteList from "./quoteList";
 import QuoteEdit from './quoteEdit';
 import {Space, Button} from "antd";
+import { getUser } from "../../util/storage";
 
 
 export default function Quotes() {
@@ -62,7 +63,7 @@ export default function Quotes() {
           <QuoteList/>
         </Route>
       </Switch>
-      
+      <Button onClick={() => {console.log(getUser())}}>Click here</Button>
       
     </div>
   )

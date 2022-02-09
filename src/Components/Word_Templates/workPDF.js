@@ -1,6 +1,7 @@
-import React from 'react';
-import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell } from 'docx';
+import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, Header, Footer } from 'docx';
 
+const header = "https://i.ibb.co/0snCVqq/header.png";
+const footer = 'https://i.ibb.co/tm6mdt0/footer.png';
 const docx = require("docx");
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(), "yyyy_MM_dd");
@@ -8,18 +9,11 @@ let formatDate = format(new Date(), "yyyy_MM_dd");
 
 
 let renderDetails = (info) => {
-    console.log(info);
     let rowArray = [];
     info.details.map((item) => {
         let newRow = new TableRow({
-            width:{
-                size:8000
-            },
             children:[
                 new TableCell({
-                    width:{
-                        size:8000
-                    },
                     children:[
                         new Paragraph({
                              text:item.details
@@ -37,14 +31,16 @@ let renderDetails = (info) => {
                 new TableCell({
                     children:[
                         new Table({
+                            columnWidths:[8000,2000],
                             rows:renderProds(item.productArr)
                         }),
                         new Paragraph({
-                            text:`Detail Total: ${item.total}`
+                            text:`Product Total: ${item.total}`
                         })
                     ]
                 })
             ]
+            
         })
         rowArray.push(newRow);
         rowArray.push(newProdTable);
@@ -55,55 +51,42 @@ let renderDetails = (info) => {
 
 let renderProds = (info) => {
     let detailArr = [];
-    if(info.length > 0){
-    info.forEach((item) => {
+    info.map((item) => {
         let newRow = new TableRow({
+
             children:[
                 new TableCell({
-                  children:[
+                    width:{
+                        size:8000,
+                        style:WidthType.DXA
+                    },
+                    children:[
                       new Paragraph({
                           text:item.product
                       })
                   ]  
                 }),
                 new TableCell({
+                    width:{
+                        size:2000,
+                        style:WidthType.DXA
+                    },
                     children:[
                         new Paragraph({
-                            text:item.notes
-                        })
-                    ]
-                }),
-                new TableCell({
-                    children:[
-                        new Paragraph({
-                            text:item.price
+                            text:item.price.toString()
                         })
                     ]  
                 })
             ]
     });
     detailArr.push(newRow);
+    return newRow;
     })
-}
-    else {
-        let noProdRow = new TableRow({
-            children:[
-                new TableCell({
-                    children:[
-                        new Paragraph({
-                            text:"No products listed"
-                        })
-                    ]
-                })
-            ]
-        })
-        detailArr.push(noProdRow);
-    }
+    console.log(info);
     return detailArr;
 }
 
 export default async function WorkToPDF(info) {
-    console.log(info);
     const head = await fetch(
         "https://i.ibb.co/0snCVqq/header.png"
     ).then(r => r.blob());
@@ -113,115 +96,217 @@ export default async function WorkToPDF(info) {
 
     const doc = new Document({
             sections: [{
-                properties: {},
-                children: [
-                    new Paragraph({
+                headers:{
+                    default: new Header({
                         children:[
-                            new ImageRun({
-                                data:head,
-                                transformation:{
-                                    width:600,
-                                    height:125
-                                }
+                            new Paragraph({
+                                children:[
+                                    
+                                    new ImageRun({
+                                        data:head,
+                                        transformation:{
+                                            width:600,
+                                            height:125
+                                        }
+                                    })
+                                ]
                             })
                         ]
-                    }),
-                    new Paragraph({
-                        children: [
-                            new TextRun({
-                                text: "Attention:",
-                                bold: true,
-                            }),
-                            new TextRun({
-                                text: info.first_name + " " + info.last_name
-                            }),
-                            new TextRun({
-                                text:"Address:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.billing_address
-                            }),
-                            new TextRun({
-                                text:"City:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.city
-                            }),
-                            new TextRun({
-                                text:"Postal Code:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.post_code
-                            }),
-                            new TextRun({
-                                text:"Phone:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.phone_number
-                            }),
-                            new TextRun({
-                                text:"Email:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.email
-                            }),
-                        ],
-                    }),
-                    new Paragraph({
+                    })
+                },
+                footers:{
+                    default: new Footer({
                         children:[
-                            new TextRun({
-                                text:"Site Information",
-                                bold:true
-                            }),
-                            new TextRun({
-                                text:"Site Address:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.site_address
-                            }),
-                            new TextRun({
-                                text:"Site City:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.site_city
-                            }),
-                            new TextRun({
-                                text:"Site Province",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.site_prov
-                            }),
-                            new TextRun({
-                                text:"Site Postal Code:",
-                                break:1
-                            }),
-                            new TextRun({
-                                text:info.site_postal
-                            }),
-                        ],
-                    }),
+                            new Paragraph({
+                                children:[
+                                    new TextRun({
+                                        text:`PLEASE BE AWARE THAT POLYURETHANE SPRAY FOAM INSULATION REQUIRES A THERMAL BARRIER I.E. DRYWALL, OR FIREPROOFING. ¼ INCH TOLERANCE DURING APPLICATION IS REQUIRED.`,
+                                        break:2,
+                                        size:13
+                                    }),
+                                    new TextRun({
+                                        text:`PAYMENT UPON COMPLETION OF WORK IS REQUIRED IN FULL BY CASH, CHEQUE, VISA, MASTERCARD, OR AMERICAN EXPRESS. REITZEL INSULATION DOES NOT GIVE TERMS UNLESS PRE-AUTHORIZED PRIOR TO PROJECT START DATE.`,
+                                        break:1,
+                                        size:13
+                                    }),
+                                    new ImageRun({
+                                        data:foot,
+                                        transformation:{
+                                            width:600,
+                                            height:80
+                                        }
+                                    })
+                                ]
+                            })
+                        ]
+                    })
+                },
+                children: [
                     new Table({
-                        width:{
-                            size:8000
+                        indent:{
+                            size:-500,
+                            type:WidthType.DXA
+                        },
+                        columnWidths:[5000,5000],
+                        borders: {
+                            top:{
+                                style:BorderStyle.NONE
+                            },
+                            bottom:{
+                                style:BorderStyle.NIL
+                            }
+
                         },
                         rows:[
                             new TableRow({
                                 children:[
                                     new TableCell({
+                                        borders:{
+                                            right:{
+                                                style:BorderStyle.NONE
+                                            },
+                                            left:{
+                                                style:BorderStyle.NONE
+                                            },
+                                            top:{
+                                                style:BorderStyle.NONE
+                                            },
+                                            bottom:{
+                                                style:BorderStyle.NONE
+                                            }
+                                        },
                                         width:{
-                                            size:8000
+                                            size:5000,
+                                            type:WidthType.DXA
                                         },
                                         children:[
                                             new Paragraph({
-                                                text:"Work Order Details"
+                                                children: [
+                                                    new TextRun({
+                                                        text: "Attention: ",
+                                                        bold: true,
+                                                    }),
+                                                    new TextRun({
+                                                        text: info.first_name + " " + info.last_name
+                                                    }),
+                                                    new TextRun({
+                                                        text:"Address: ",
+                                                        break:1
+                                                    }),
+                                                    new TextRun({
+                                                        text:info.billing_address
+                                                    }),
+                                                    new TextRun({
+                                                        text:"City: ",
+                                                        break:1
+                                                    }),
+                                                    new TextRun({
+                                                        text:info.city
+                                                    }),
+                                                    new TextRun({
+                                                        text:"Postal Code: ",
+                                                        break:1
+                                                    }),
+                                                    new TextRun({
+                                                        text:info.post_code
+                                                    }),
+                                                    new TextRun({
+                                                        text:"Phone: ",
+                                                        break:1
+                                                    }),
+                                                    new TextRun({
+                                                        text:info.phone_number
+                                                    }),
+                                                    new TextRun({
+                                                        text:"Email: ",
+                                                        break:1
+                                                    }),
+                                                    new TextRun({
+                                                        text:info.email
+                                                    }),
+                                        ]
+                                    }),
+                                ]
+                            }),
+                            new TableCell({
+                                borders:{
+                                    right:{
+                                        style:BorderStyle.NONE
+                                    },
+                                    left:{
+                                        style:BorderStyle.NONE
+                                    },
+                                    top:{
+                                        style:BorderStyle.NONE
+                                    },
+                                    bottom:{
+                                        style:BorderStyle.NONE
+                                    }
+                                },
+                                width:{
+                                    size:5000,
+                                    type:WidthType.DXA
+                                },
+                                children:[
+                                    new Paragraph({
+                                        children:[
+                                            new TextRun({
+                                                text:" ",
+                                            }),
+                                            new TextRun({
+                                                text:"Site Address: ",
+                                                break:1
+                                            }),
+                                            new TextRun({
+                                                text:info.site_address
+                                            }),
+                                            new TextRun({
+                                                text:"Site City: ",
+                                                break:1
+                                            }),
+                                            new TextRun({
+                                                text:info.site_city
+                                            })
+                                        ],
+                                    }),
+                                ]
+                            })
+                        ]
+                    })
+                ]}),
+                    new Paragraph({
+
+                    }),
+                    new Table({
+                        indent:{
+                            size:-500,
+                            type:WidthType.DXA
+                        },
+                        columnWidths:[10000],
+                        
+                        rows:[
+                            new TableRow({
+                                 
+                                children:[
+                                    new TableCell({
+                                        width:{
+                                            size:10000,
+                                            type:WidthType.DXA
+                                            },
+                                            borders:{
+                                                right:{
+                                                    style:BorderStyle.NONE
+                                                },
+                                                left:{
+                                                    style:BorderStyle.NONE
+                                                },
+                                                top:{
+                                                    style:BorderStyle.NONE
+                                                }
+                                            },
+                                        children:[
+                                            new Paragraph({
+                                                text:"Work Order Products"
                                             })
                                         ]
                                     })
@@ -230,36 +315,32 @@ export default async function WorkToPDF(info) {
                         ]
                     }),
                     new Table({
+                       width:{
+                           size:10000,
+                           type:WidthType.DXA
+                       },
                         rows: renderDetails(info)
-                    }),
-                    new Paragraph({
-                        text:`Work total: ${info.total}`
                     }),
                     new Paragraph({
                         break:2
                     }),
-                    
+                    new Paragraph({
+                        text:`Order total: ${info.total}`
+                    }),
+                    new Paragraph({
+                        break:2
+                    }),
                     new Paragraph({
                         children:[
                             new TextRun({
-                                text:`PLEASE BE AWARE THAT POLYURETHANE SPRAY FOAM INSULATION REQUIRES A THERMAL BARRIER I.E. DRYWALL, OR FIREPROOFING. ¼ INCH TOLERANCE DURING APPLICATION IS REQUIRED.`,
-                                break:2,
-                                size:13
+                                text:"Customer Notes: ",
+                                break:1
                             }),
                             new TextRun({
-                                text:`PAYMENT UPON COMPLETION OF WORK IS REQUIRED IN FULL BY CASH, CHEQUE, VISA, MASTERCARD, OR AMERICAN EXPRESS. REITZEL INSULATION DOES NOT GIVE TERMS UNLESS PRE-AUTHORIZED PRIOR TO PROJECT START DATE.`,
-                                break:1,
-                                size:13
-                            }),
-                            new ImageRun({
-                                data:foot,
-                                transformation:{
-                                    width:600,
-                                    height:80
-                                }
+                                text:info.customer_notes
                             })
                         ]
-                    })
+                    }),
                 ],
             }],
         });
