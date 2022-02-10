@@ -11,7 +11,7 @@
     }]
   },
   "name": "reitzel-desktop-workflow",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "andrew-miller-dev",
   "description": "Reitzel Insulation office workflow application",
   "main": "public/electron.js",
