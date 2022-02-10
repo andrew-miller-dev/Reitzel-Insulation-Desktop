@@ -18,9 +18,11 @@ export function menuCreate() {
             case '/orders':
                 menu.unshift(orders);
                 break;
+            /*
             case '/invoices':
                 menu.unshift(invoices);
                 break;
+            */
             case '/customers':
                 menu.unshift(customers);
                 break;

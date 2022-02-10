@@ -34,7 +34,7 @@ export const orders =
     path: "/orders",
     content: "Orders",
   }
-
+/*
 export const invoices =
   {
     key: "/invoices",
@@ -42,7 +42,7 @@ export const invoices =
     path: "/invoices",
     content: "Invoices",
   }
-
+*/
 export const customers =
   {
     key: "/customers",
