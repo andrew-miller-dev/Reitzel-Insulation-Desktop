@@ -10,7 +10,7 @@ const {format} = require('date-fns-tz');
 
 function Head(props) {
   const [date, setCurrendate] = useState();
-  const city = "Toronto";
+  const city = "Waterloo";
   const [icon, setIcon] = useState(`http://openweathermap.org/img/w/10d.png`);
   const [main, setMain] = useState();
   const timer = setInterval(() => {

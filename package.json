@@ -26,6 +26,7 @@
     "devextreme-react": "^20.2.3",
     "docx": "^7.1.1",
     "electron-is-dev": "^2.0.0",
+    "electron-updater": "^4.6.5",
     "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "node-sass": "^5.0.0",
@@ -43,9 +44,9 @@
     "web-vitals": "^0.2.4"
   },
   "repository": {
-      "type": "github",
-      "url": "https://github.com/andrew-miller-dev/Reitzel-Insulation-Desktop.git"
-    },
+    "type": "github",
+    "url": "https://github.com/andrew-miller-dev/Reitzel-Insulation-Desktop.git"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
