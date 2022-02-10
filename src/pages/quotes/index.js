@@ -63,7 +63,6 @@ export default function Quotes() {
           <QuoteList/>
         </Route>
       </Switch>
-      <Button onClick={() => {console.log(getUser())}}>Click here</Button>
       
     </div>
   )
