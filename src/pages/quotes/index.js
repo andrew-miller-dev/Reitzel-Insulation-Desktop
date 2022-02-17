@@ -7,7 +7,7 @@ import QuotePrint from "./QuotePrint";
 import QuoteList from "./quoteList";
 import QuoteEdit from './quoteEdit';
 import {Space, Button} from "antd";
-import { getUser } from "../../util/storage";
+import QuoteChange from "./quoteChange";
 
 
 export default function Quotes() {
@@ -29,16 +29,12 @@ export default function Quotes() {
   function onSetQuoteFormDataChange(data) {
     if (!(data === null || data  === "" || data === undefined)) {
         setQuoteFormData(data);
-        console.log(data);
         history.push(`${url}/${quoteDataId}/print/`)
     }else{
         setQuoteFormData({});
     }
   }
 
-  function onEditQuoteFormData(){
-      history.push(`/quotes/${quoteData.id}/edit/`)
-  }
 
   return (
     <div style={{padding: "10px", margin: "10px"}}>
@@ -57,10 +53,13 @@ export default function Quotes() {
           <QuoteEdit />
         </Route>
         <Route path="/quotes/:qid/print" >
-          <QuotePrint key={quoteData} quoteFormData={quoteFormData}  quoteData={quoteData} onEditQuoteFormData={onEditQuoteFormData} />
+          <QuotePrint key={quoteData} quoteFormData={quoteFormData}  quoteData={quoteData} />
         </Route>
         <Route path="/quotes/quoteList">
           <QuoteList/>
+        </Route>
+        <Route path="/quotes/change">
+          <QuoteChange quoteFormData={quoteFormData} onSetQuoteFormDataChange={onSetQuoteFormDataChange} />
         </Route>
       </Switch>
       

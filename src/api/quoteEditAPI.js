@@ -1,5 +1,6 @@
 import ajax from "./base";
 import { baseURL } from "../config/values";
+import { addEscapeChar } from "../config/checks";
 
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
@@ -55,7 +56,7 @@ export async function getQuoteID(id){
 
 export async function updateQuote(values){
     const tableName = 'quotes';
-    const columnsAndValues = `QuoteTotal = '${values.total}', notesCustomers = '${values.customer_notes}', notesInstallers = '${values.installer_notes}', modifyDate = '${(date)}'`;
+    const columnsAndValues = `QuoteTotal = '${values.total}', notesCustomers = '${addEscapeChar(values.customer_notes)}', notesInstallers = '${addEscapeChar(values.installer_notes)}', modifyDate = '${(date)}'`;
     const condition = `QuoteID = '${values.id}'`;
     const quoteUpdate = await ajax(
         `${baseURL}/updateValues`,
@@ -68,7 +69,7 @@ export async function updateQuote(values){
 
 export async function updateDetail(values){
     const tableName = 'subtotallines';
-    const columnsAndValues = `subtotalLines = '${values.details}', subtotalAmount = '${values.total}'`;
+    const columnsAndValues = `subtotalLines = '${addEscapeChar(values.details)}', subtotalAmount = '${values.total}'`;
     const condition = `subtotalID = '${values.id}'`;
     const detailUpdate = await ajax(
         `${baseURL}/updateValues`,
@@ -81,7 +82,7 @@ export async function updateDetail(values){
 
 export async function updateProduct(values){
     const tableName = 'quotelines';
-    const columnsAndValues = `Product = '${values.product}', Subtotal='${values.price}'`;
+    const columnsAndValues = `Product = '${addEscapeChar(values.product)}', Subtotal='${values.price}'`;
     const condition = `QuoteLineID = '${values.id}'`;
     const productUpdate = await ajax(
         `${baseURL}/updateValues`,

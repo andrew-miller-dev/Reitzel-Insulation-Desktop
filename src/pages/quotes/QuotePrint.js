@@ -4,12 +4,11 @@ import { useParams } from "react-router";
 import qData from "./quoteData.js";
 import Headerforquoto from "../headforquote";
 import Footerforquoto from "../footer";
-import { message, Card } from "antd";
+import { message, Card, Row, Col } from "antd";
 import {sendQuote, addNewQuote, addNewDetails, addNewProductLine} from '../../api/quotes';
 import QuoteEmail from "../../Components/Email_Templates/quote_template";
 import {renderEmail} from 'react-html-email';
 import QuoteToWord from '../../Components/Word_Templates/quoteWord';
-var Promise = require("bluebird");
 
 
 function printQuote() {
@@ -56,7 +55,6 @@ function downloadQuote(quote) {
 
 function QuotePrint(props) {
   let { qid } = useParams();
-
   let history = useHistory();
 
   let quotes = qData.quote_data;
@@ -76,7 +74,7 @@ function QuotePrint(props) {
     setQuoteData(selectedQuote);
   }, [selectedQuote]);
 
-  const [quoteFormData, setQuoteFormData] = useState(props.quoteFormData);
+  const [quoteFormData] = useState(props.quoteFormData);
 
   return (
     <div>
@@ -86,6 +84,9 @@ function QuotePrint(props) {
         style={{ width: "80%", margin: "auto" }}
       >
         <Headerforquoto />
+        <Row>
+        <Col>
+        
         <Card>
           <strong>Attention:</strong> {quoteFormData.first_name}{" "}
           {quoteFormData.last_name}
@@ -96,12 +97,16 @@ function QuotePrint(props) {
           <br /> Email: {quoteFormData.email}
           <br />
         </Card>
+        </Col>
+        <Col>
         <Card>
           <strong>Site Address</strong>
           <br /> Site Address: {quoteFormData.site_address}
           <br /> Site City: {quoteFormData.site_city}
           <br /> Site Postal Code: {quoteFormData.site_postal}
         </Card>
+         </Col>
+        </Row>
         <div>
           {quoteFormData.details.length > 0 && (
             <table width="100%" border="1" cellPadding="10px">
@@ -156,6 +161,7 @@ function QuotePrint(props) {
       <button onClick={printQuote}> Print this Quote</button>
       <button onClick={() => emailQuote(quoteFormData)}>Submit and send as Email</button>
       <button onClick={() => downloadQuote(quoteFormData)}> Download this Quote</button>
+      <button onClick={() => {history.push("/quotes/change")}}>Edit this Quote</button>
       <iframe
         id="ifmcontentstoprint"
         style={{ height: "0px", width: "0px", position: "absolute" }}

@@ -211,7 +211,7 @@ async onAppointmentForm (e) {
       colSpan:2,
       editorOptions:{
         text:'Existing Customer Lookup',
-        onClick:(evt) => {
+        onClick:() => {
           e.popup.hide();
           this.setState({showForm:true});
           var appointmentInfo = {...this.state.appointmentInfo};
@@ -380,7 +380,7 @@ getUserName(id, array){
       
       <div>
       <Scheduler
-        timeZone="America/Edmonton"
+        timeZone="America/Toronto"
         groups = {groups}
         groupByDate={this.state.groupByDate}
         resourceCellRender={renderResourceCell}

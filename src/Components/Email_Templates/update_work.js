@@ -23,7 +23,8 @@ function UpdateWork(props){
             </Item>
             <Item>
                 <p>
-                    This is an automated email. If you have any questions after reading this email, please reply to your rep at {user.Email} or call the office at 519-886-6100.
+                This is an automated email. If you have any questions after reading this document, please reply to your representative at {user.Email} or call the office at 519-886-6100 or
+                    toll free at 1-800-265-8869.
             Thank you for your business!
                 </p>
                 <br />

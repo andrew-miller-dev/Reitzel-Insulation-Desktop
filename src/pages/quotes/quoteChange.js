@@ -1,36 +1,31 @@
-import {getQuoteDetails, getProductList, updateQuote, updateDetail, updateProduct, deleteProduct, deleteDetail, getAllInfoID } from "../../api/quoteEditAPI";
-import {addNewDetails, addNewProductLine} from '../../api/quotes';
 import React, {useState, useEffect} from 'react';
 import Button from "../../component/quotes/Button";
 import {useInput} from '../../hooks/input-hook';
-import {Row, Col, Card, Checkbox, message, InputNumber} from 'antd';
-import { useHistory, useRouteMatch } from "react-router-dom";
+import {Row, Col, Card, Checkbox, InputNumber, Select} from 'antd';
+import qData from './quoteData.js';
+const { Option } = Select;
 
-function QuoteEdit (props) {
-    let quoteID = useRouteMatch('/quotes/:qid/edit').params.qid;
-    let history = useHistory();
+function QuoteChange (props) {
     const [isLoading, setLoading] = useState(true);
-
-    const [allData, setAllData] = useState([]);
-    const [quoteData, setQuoteData] = useState([]);
-    const [quoteDetail, setQuoteDetail] = useState([]);
-    const [productList, setProductList] = useState([]);
-    const [detailKey, setDetailKey] = useState(0);
+    const [quoteData, setQuoteData] = useState(props.quoteFormData);
+    const [detailKey, setDetailKey] = useState(props.quoteFormData.details.length);
     const [prodKey, setProdKey] = useState(0);
     const [taxRate, setTaxRate] = useState(13);
+    let quotes = qData.quote_data;
+
+    const quoteList = () => {
+        return (
+            quotes.map((item) => {
+                return(
+                <Option value={item.id}>{item.name}</Option>
+           ) })
+        )
+    }
 
     useEffect( () => {
-        let func = async() => {
-            let allInfo = await getAllInfoID(quoteID);
-            console.log(allInfo.data[0]);
-            setAllData(allInfo.data[0]);
-            
-            let detailList = await getQuoteDetails(quoteID);
-            setQuoteDetail(detailList.data);
-            let products = await getProductList(quoteID);
-            setProductList(products.data);
-            createDetails(detailList.data, products.data);
-            setText(allInfo.data[0]);
+        let func = () => {
+            setQuoteData(props.quoteFormData);
+            setText(props.quoteFormData);
         }
         try {
             func();
@@ -40,63 +35,23 @@ function QuoteEdit (props) {
         }
         setLoading(false);
         setcounter(counter + 1);
-        console.log(quotedetails);
         },[]);
  
-
-    const createDetails = (detlist, prodlist) => {
-        let temp = quotedetails;
-        detlist.forEach((detail) => {
-           let detailObj = {
-                    id: detail.SubtotalID,
-                    key:detailKey,
-                    details:detail.subtotalLines,
-                    total:detail.subtotalAmount,
-                    productArr:[]
-                
-            }
-            setDetailKey(detailKey + 1);
-            prodlist.forEach((prod) => {
-                if(prod.subtotalID === detail.SubtotalID){
-                    let prodObj = {
-                        id:prod.QuoteLineID,
-                        key:prodKey,
-                        product:prod.Product,
-                        price:prod.Subtotal
-                    }
-                    if(detailObj.productArr.length === 0){
-                        detailObj.productArr[0] =prodObj;
-                    }
-                    else{
-                        detailObj.productArr[detailObj.productArr.length] = prodObj;
-                    }
-                    setProdKey(prodKey + 1);
-                }
-            })
-            if(temp.length === 0){
-                temp[0] = detailObj;
-            }
-            else{
-                temp[temp.length] = detailObj;
-            }
-            setquotedetails(temp);
-        });        
-    }
     const setText = (allInfo) => {
-        assignFirstName(allInfo.CustFirstName);
-        assignLastName(allInfo.CustLastName);
-        assignPhoneNumber(allInfo.Phone);
-        assignEmail(allInfo.Email);
-        assignBillingAddress(allInfo.BillingAddress);
-        assignCity(allInfo.CustCity);
-        assignPostCode(allInfo.CustPostalCode);
-        assignSiteAddress(allInfo.Address);
-        assignSiteCity(allInfo.City);
-        assignSiteCode(allInfo.PostalCode);
-        assignCustomerNotes(allInfo.notesCustomers);
-        assignInstallerNotes(allInfo.notesInstallers);
-        assignUserFirstName(allInfo.FirstName);
-        assignUserLastName(allInfo.LastName);
+        assignFirstName(allInfo.first_name);
+        assignLastName(allInfo.last_name);
+        assignPhoneNumber(allInfo.phone_number);
+        assignEmail(allInfo.email);
+        assignBillingAddress(allInfo.billing_address);
+        assignCity(allInfo.city);
+        assignPostCode(allInfo.post_code);
+        assignSiteAddress(allInfo.site_address);
+        assignSiteCity(allInfo.site_city);
+        assignSiteCode(allInfo.site_postal);
+        assignCustomerNotes(allInfo.customer_notes);
+        assignInstallerNotes(allInfo.installer_notes);
+        assignUserFirstName(allInfo.userInfo.FirstName);
+        assignUserLastName(allInfo.userInfo.LastName);
 
     setcounter(counter + 1);
     }
@@ -121,59 +76,12 @@ function QuoteEdit (props) {
 
     const [tax, setTax] = useState(true);
     const [counter, setcounter] = useState(1);
-    const [quotedetails, setquotedetails] = useState([]);
     
     const handleSubmit = async (evt) => {
+        quoteData.customer_notes = customerNotes;
+        quoteData.installer_notes = installerNotes;
         evt.preventDefault();
-        var quoteInfo = 
-        {
-            id:quoteID,
-            customer_notes: customerNotes,
-            installer_notes: installerNotes,
-            
-            total: getQuoteTotal(quotedetails)
-        }
-        try{
-        await updateQuote(quoteInfo);
-        quotedetails.map(async (details) => {
-            if(details.id !== null){
-                await updateDetail(details).then(() => {
-                details.productArr.map(async (prod) => {
-                    if(prod.id !== null){
-                        
-                        await updateProduct(prod);
-                    } 
-                    else{
-                        
-                        await addNewProductLine(prod, quoteID, details.id);
-                    }
-                });
-            });
-                
-            }
-            else{
-                await addNewDetails(details, quoteID).then(() => {
-                     details.productArr.map(async (prod) => {
-                    if(prod.id !== null){
-                        await updateProduct(prod);
-                    } 
-                    else{
-                        await addNewProductLine(prod, quoteID, details.id);
-                    }
-                });
-                });
-               
-            }
-        });
-        message.success("Quote successfully updated");
-    }
-    catch(e){
-        message.error("Something went wrong. Try again in a bit")
-    }
-    finally{
-        history.push('/quotes/quoteList');
-    }
-        
+        props.onSetQuoteFormDataChange(quoteData);
     }
 
     const changeTax = () => {
@@ -184,39 +92,40 @@ function QuoteEdit (props) {
             setTax(true);
         }
     }        
-    const addNewDetail = (e) => {
-        e.preventDefault();
-        setcounter(counter +1);
-        var temp = quotedetails;
-        if(temp[temp.length] === 0){
+    const addNewDetail = (id) => {
+        let quote = {};
+        quotes.forEach((item) => {
+            if(item.id === id) {
+                quote=item;
+            }
+        });
+        var temp = quoteData;
+        if(temp.details[temp.details.length] === 0){
             temp[0] = {
-                id:null,
                 key:detailKey,
-                details:"",
+                details:quote.details,
                 total:0.00,
                 productArr:[]
             }
         }
         else{
-            temp[temp.length] = {
-                id:null,
+            temp.details[temp.details.length] = {
                 key:detailKey,
-                details:"",
+                details:quote.details,
                 total:0.00,
                 productArr:[]
             }
         }
         setDetailKey(detailKey + 1);
-        setquotedetails(temp);
-        console.log(quotedetails);
+        setQuoteData(temp);
+        setcounter(counter +1);
     }
-    const handleAddProduct = (details,e) => {
-        e.preventDefault();
+    const handleAddProduct = (details) => {
         setcounter(counter + 1);
-        var temp = quotedetails;
-        var index = temp.indexOf(details);
-        if(temp[index].productArr.length === 0){
-            temp[index].productArr[0] = {
+        var temp = quoteData;
+        var index = temp.details.indexOf(details);
+        if(temp.details[index].productArr.length === 0){
+            temp.details[index].productArr[0] = {
                 id:null,
                 prodKey:prodKey,
                 product:"",
@@ -224,7 +133,7 @@ function QuoteEdit (props) {
             }
         }
         else{
-            temp[index].productArr[temp[index].productArr.length] = {
+            temp.details[index].productArr[temp.details[index].productArr.length] = {
                 id:null,
                 prodKey:prodKey,
                 product:"",
@@ -232,30 +141,24 @@ function QuoteEdit (props) {
             }
         }
         setProdKey(prodKey + 1);
-        setquotedetails(temp);
+        setQuoteData(temp);
     }
-    const handleRemoveRow = async(details, prod ,e) => {
+    const handleRemoveRow = (details, prod ,e) => {
         e.preventDefault();
-        await deleteProduct(prod.id);
         setcounter(counter - 1);
-        var temp = quotedetails;
-        var index = temp.indexOf(details);
-        var prodIndex = temp[index].productArr.indexOf(prod);
-        temp[index].productArr.splice(prodIndex,1);
-        setquotedetails(temp);
+        var temp = quoteData;
+        var index = temp.details.indexOf(details);
+        var prodIndex = temp.details[index].productArr.indexOf(prod);
+        temp.details[index].productArr.splice(prodIndex,1);
+        setQuoteData(temp);
     }
-    const handleRemoveDetail = async(details,e) => {
+    const handleRemoveDetail = (details,e) => {
         e.preventDefault();
-        details.productArr.forEach(async element => {
-            console.log(element.id);
-            await deleteProduct(element.id);
-        });
-        await deleteDetail(details.id);
         setcounter(counter -1);
-        var temp = quotedetails;
-        var index = temp.indexOf(details);
+        var temp = quoteData;
+        var index = temp.details.indexOf(details);
         temp.splice(index,1);
-        setquotedetails(temp);
+        setQuoteData(temp);
     }
     const handleDetailChange = (details, e) => {
         details.details = e.target.value
@@ -330,9 +233,9 @@ function QuoteEdit (props) {
     }
     const renderRows = () => {
         let rows = [];
-        if(quotedetails.length > 0){
+        if(quoteData.details.length > 0){
             
-            quotedetails.forEach((detail) => {
+            quoteData.details.forEach((detail) => {
             rows.push(
             <tr>
             <tr>
@@ -362,7 +265,7 @@ function QuoteEdit (props) {
                 </tr>
         <tr>
             <td>
-                <Button size="sm" variant="primary" onClick={(e) => {handleAddProduct(detail,e)}}>Add Product</Button>
+                <Button size="sm" variant="primary" onClick={(e) => {handleAddProduct(detail,e)}}>Add Detail</Button>
             </td>
               
         </tr>
@@ -392,8 +295,7 @@ function QuoteEdit (props) {
                     <Row gutter={16}>
                         <Col span={10}>
                             <Card title="Customer and Billing" bordered={false}>
-                            Customer:<br />
-                    <p>{firstName} {lastName}</p>
+                           <p><b>Customer: </b> {firstName} {lastName}</p>
                     Address:
                     <p>{billingAddress}</p>
                     City:
@@ -430,7 +332,13 @@ function QuoteEdit (props) {
                         {renderRows()}
                         <tr>
                             <td>
-                                <Button onClick={(e) => {addNewDetail(e)}}>Add Details</Button>
+                               Add New Product:<Select
+                               style={{width:200}}
+                               size="small"
+                               defaultValue="Select a template"
+                               onSelect={addNewDetail}>
+                                   {quoteList()}
+                               </Select>
                             </td>
                         </tr>
                         
@@ -457,7 +365,7 @@ function QuoteEdit (props) {
                                 </tr>
                                 <tr>
                                 <td style={{textAlign:"right"}}>
-                                    Quote Total: ${getQuoteTotal(quotedetails)}
+                                    Quote Total: ${getQuoteTotal(quoteData.details)}
                                 </td>
                             </tr>
                         </tfoot>
@@ -469,7 +377,7 @@ function QuoteEdit (props) {
                     rows="3" 
                     className="ant-input"
                     name="customer_notes"
-                    defaultValue={quoteData.customer_notes}
+                    defaultValue={customerNotes}
                     onChange={(e) => {
                         assignCustomerNotes(e.target.value);
                     }  }
@@ -485,7 +393,7 @@ function QuoteEdit (props) {
                     rows="3" 
                     className="ant-input"
                     name="installer_notes"
-                    defaultValue={quoteData.installer_notes}
+                    defaultValue={installerNotes}
                     onChange={(e) => {
                         assignInstallerNotes(e.target.value);
                     }}
@@ -498,11 +406,11 @@ function QuoteEdit (props) {
                     <br/>
                     <br/>
                     
-                    <Button size="md" variant="primary" type="submit" className="ant-btn ant-btn-primary">Update Quote</Button>
+                    <Button size="md" variant="primary" type="submit" className="ant-btn ant-btn-primary">Finish Quote</Button>
                 </div>
             </div>
         </form>
     );
 }
 
-export default QuoteEdit;
+export default QuoteChange;

@@ -1,5 +1,5 @@
+import { Col, Row } from 'antd';
 import React from 'react';
-import Text from 'react';
 import { Email, Item, Box, Image} from 'react-html-email';
 const header = "https://i.ibb.co/0snCVqq/header.png";
 const footer = "https://i.ibb.co/tm6mdt0/footer.png";
@@ -20,7 +20,8 @@ return (
     <Image src={header} alt="Reitzel Insulation" width={875} height={100}>
     </Image>
       <Item align="left">
-     
+        <Row>
+          <Col>
           <strong>Attention:</strong> {customer.first_name}{" "}
           {customer.last_name}
           <br /> Address: {customer.billing_address}
@@ -29,11 +30,14 @@ return (
           <br /> Phone: {customer.phone_number}
           <br /> Email: {customer.email}
           <br />
-
-          <strong>Site Address</strong>
+          </Col>
+          <Col>
+           <strong>Site Address</strong>
           <br /> Site Address: {customer.site_address}
           <br /> Site City: {customer.site_city}
           <br /> Site Postal Code: {customer.site_postal}
+          </Col>
+        </Row>
 
       </Item>
       <div>
@@ -83,7 +87,8 @@ return (
         <br />
         <span>Quote grand total: ${getTotal(customer.details)}</span>
         <br />
-        <span>Please feel free to contact our office if you have any questions or concerns regarding this quotation. </span>
+        <span>This is an automated email. If you have any questions after reading this document, please call the office at 519-886-6100 or
+                    toll free at 1-800-265-8869. </span>
         <br />
         <span>Estimator:{customer.userInfo.FirstName + " " + customer.userInfo.LastName}</span>
         <br/>

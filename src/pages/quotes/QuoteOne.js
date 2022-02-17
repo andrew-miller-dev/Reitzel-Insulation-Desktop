@@ -8,7 +8,7 @@ import qData from './quoteData.js';
 import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
-import { AutoComplete, Card, Row, Col, Checkbox, Select, } from "antd";
+import { AutoComplete, Card, Row, Col, Checkbox, Select, InputNumber, } from "antd";
 const { Option } = Select;
 
 function QuoteOne(props) {
@@ -74,10 +74,11 @@ function QuoteOne(props) {
     const {value: siteCity, bind: bindSiteCity, assignValue: assignSiteCity} = useInput();
     const {value: siteCode, bind: bindSiteCode, assignValue: assignSiteCode} = useInput();
     
-    const {value: customerNotes, bind: bindCustomerNotes,assignValue: assignCustomerNotes} = useInput();
+    const {value: customerNotes, bind: bindCustomerNotes, assignValue: assignCustomerNotes} = useInput();
     const {value: installerNotes, bind: bindInstallerNotes, assignValue: assignInstallerNotes} = useInput();
 
     const [tax, setTax] = useState(true);
+    const [taxRate, setTaxRate] = useState(13);
         const [counter, setcounter] = useState(1);
         const [detailKey, setDetailKey] = useState(1);
         const [prodKey, setProdKey] = useState(1);
@@ -88,7 +89,6 @@ function QuoteOne(props) {
                     productArr:[{
                         prodKey:0,
                         product:"",
-                        notes:"",
                         price:0.00
                     }]
                 }]);
@@ -300,7 +300,8 @@ function QuoteOne(props) {
             total = total + parseFloat(item.price);
         });
         if (tax == true){
-            total = total * 1.13;
+            total = total * (1 + '.' + taxRate.toString().padStart(2,0));
+            total = parseFloat(total);
         }
         total = total.toFixed(2);
         details.total = total;
@@ -474,6 +475,20 @@ function QuoteOne(props) {
                                 <td style={{textAlign:"right"}}>
                                     Apply tax <Checkbox defaultChecked = {true} onChange={() => {changeTax()}}></Checkbox>
                                 </td>
+                                </tr>
+                                <tr>
+                                    <td style={{textAlign:"right"}}>
+                                    Tax rate: <InputNumber
+                                    style={{width:"55px"}}
+                                    size="small"
+                                    min={1}
+                                    max={99}
+                                    defaultValue={13}
+                                    step={1}
+                                    parser={value => Math.floor(value)}
+                                    onChange={value => {setTaxRate(value)}}
+                                    ></InputNumber> %
+                                    </td>
                                 </tr>
                                 <tr>
                                 <td style={{textAlign:"right"}}>

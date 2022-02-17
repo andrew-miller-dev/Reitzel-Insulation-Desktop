@@ -8,3 +8,10 @@ export function checkForUndefined(object) {
     console.log(object);
     return object;
 }
+
+export function addEscapeChar(string) {
+    let newstring = string.replace("'","''");
+    //newstring = newstring.replace('"','"');
+    console.log(newstring);
+    return newstring;
+}
