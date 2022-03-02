@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import {getRegion, updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addAddress, addNotes, getNotes} from '../../api/customer';
+import {getRegion, updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addAddress, addNotes, getNotes, deleteNote} from '../../api/customer';
 
 import { useRouteMatch } from "react-router-dom";
 import { withRouter } from "react-router";
@@ -10,7 +10,6 @@ import { getRegionAPI } from '../../api/calendar';
 const { Item } = Form;
 const { confirm } = Modal;
 const { Option } = Select;
-const {TextArea} = Input;
 const { format } = require('date-fns-tz')
 
 export function CustomerInfo() {
@@ -56,9 +55,6 @@ export function CustomerInfo() {
         func();
         getAddressList();
         getRegions();
-        document.getElementsByName("notes")[0].value = "";
-
-        
       }, [count]);
 
     const getAddressList = async () => {
@@ -167,7 +163,6 @@ export function CustomerInfo() {
           message.success("added new address");
         }
         setShowAddress(false);
-
       }
       const getNoteTable = () => {
         let rows = [];
@@ -182,6 +177,15 @@ export function CustomerInfo() {
               </td>
               <td>
                 {item.UserInitial}
+              </td>
+              <td>
+                <Button type="primary" danger
+                onClick={async() => {
+                  await deleteNote(item.custNotesID);
+                  message.success("Note deleted");
+                  setCount(count + 1);
+                }}
+                >X</Button>
               </td>
             </tr>
          
@@ -244,11 +248,14 @@ export function CustomerInfo() {
                       <strong>Notes</strong>
                     </td>
                     
-                    <td style={{position:"sticky", top:"0", width:"30%", backgroundColor:"white"}}>
+                    <td style={{position:"sticky", top:"0", width:"25%", backgroundColor:"white"}}>
                       <strong>Date Added</strong>
                     </td>
                     <td style={{position:"sticky", top:"0", width:"10%", backgroundColor:"white"}}>
                       <strong>User Initial</strong>
+                    </td>
+                    <td style={{position:"sticky", top:"0", width:"10%", backgroundColor:"lightgrey"}}>
+                      <strong>Delete</strong>
                     </td>
                   </tr>
                 </thead>
@@ -259,48 +266,26 @@ export function CustomerInfo() {
               </Item>
               
               <Item>
-                <TextArea
-                defaultValue=""
-                name="notes"
-                allowClear={true}
-                autoSize={{minRows: 2, maxRows: 3}}
-                onPressEnter={
-                  async() => {
-                    let box = document.getElementsByName("notes")[0];
-                    await addNotes(box.value, user, match)
-                    .then((item) => {
-                      setCount(count + 1);
-                      if(item.status === 200){
-                      message.success("added new note");
-                      box.value = " ";
-                    }
-                    else{
-                      message.error("Something went wrong. Please try again.");
-                      box.value = " ";
-                    }        });
-                  }
-                }
-                ></TextArea>
+                <textarea
+                id='notes2'
+                rows="3"
+                cols="75">
+                </textarea>
               </Item>
               <Item>
                 <Button
                 onClick={async() => {
-                  let box = document.getElementsByName("notes")[0];
-                  await addNotes(box.value, user, match)
-                  .then((item) => {
-                    setCount(count + 1);
+                  let box2 = document.getElementById("notes2");
+                  await addNotes(box2.value, user, match)
+                  .then(async(item) => {
+                    box2.value = "";
                     if(item.status === 200){
                     message.success("added new note");
-                    box.value = " ";
+                   setCount(count + 1);
                   }
                   else{
                     message.error("Something went wrong. Please try again.");
-                    box.value = " ";
                   }        });
-                  
-                  
-                  
-                  
                 }}>
                 Submit
                 </Button>

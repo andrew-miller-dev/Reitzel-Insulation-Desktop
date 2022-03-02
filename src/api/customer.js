@@ -119,3 +119,14 @@ export async function getNotes(id){
     if(notes !== []) return notes;
     else return 0;
 }
+
+export async function deleteNote(id){
+  var tableName = "customernotes";
+  var condition = `CustNotesID = '${id}'`;
+  const notes = await ajax(
+    `${baseURL}/deleteValues`,
+    {tableName, condition},
+    "post");
+    if(notes !== []) return notes;
+    else return 0;
+}

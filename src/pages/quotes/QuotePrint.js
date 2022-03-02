@@ -85,8 +85,7 @@ function QuotePrint(props) {
       >
         <Headerforquoto />
         <Row>
-        <Col>
-        
+        <Col> 
         <Card>
           <strong>Attention:</strong> {quoteFormData.first_name}{" "}
           {quoteFormData.last_name}
@@ -107,6 +106,9 @@ function QuotePrint(props) {
         </Card>
          </Col>
         </Row>
+        <div style={{float:"right"}}>
+          {quoteFormData.quoteDate}
+        </div>
         <div>
           {quoteFormData.details.length > 0 && (
             <table width="100%" border="1" cellPadding="10px">

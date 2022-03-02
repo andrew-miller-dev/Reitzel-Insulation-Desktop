@@ -34,7 +34,6 @@ const {format } = require('date-fns-tz')
         
         if(testData !== []){
           setLoaded(true);
-          console.log(testData);
         }
         
       },[]);

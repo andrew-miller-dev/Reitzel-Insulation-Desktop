@@ -71,8 +71,9 @@ const dataSource = new CustomStore({
   },
   insert: async (values) => {
     try{
-      values.startDate = format(zonedTimeToUtc(values.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-      values.endDate = format(zonedTimeToUtc(values.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+      console.log(values);
+      values.startDate = format(values.startDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+      values.endDate = format(values.endDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
       let customerInfo = await addNewCustomer(values);
       const customerID = customerInfo.data.insertId;
       let addressInfo = await addNewAddress(customerID, values);
@@ -202,8 +203,8 @@ async onAppointmentForm (e) {
   e.popup.option('title', 'Quick appointment creation');
   let user = e.appointmentData.UserID;
   var apptDates = {...this.state.apptDates};
-          apptDates.start = format(new Date(e.appointmentData.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-          apptDates.end = format(new Date(e.appointmentData.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+          apptDates.start = format(e.appointmentData.startDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+          apptDates.end = format(e.appointmentData.endDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
           this.setState({apptDates});
   let newGroupItems =[
     {
@@ -215,11 +216,10 @@ async onAppointmentForm (e) {
           e.popup.hide();
           this.setState({showForm:true});
           var appointmentInfo = {...this.state.appointmentInfo};
-          appointmentInfo.startDate = format(new Date(e.appointmentData.startDate),"M/d/yyyy, hh:mm a");
-          appointmentInfo.endDate = format(new Date(e.appointmentData.endDate),"M/d/yyyy, hh:mm a");
+          appointmentInfo.startDate = format(e.appointmentData.startDate,"M/d/yyyy, hh:mm a");
+          appointmentInfo.endDate = format(e.appointmentData.endDate,"M/d/yyyy, hh:mm a");
           this.setState({appointmentInfo});
           this.setState({clickedSalesman:e.appointmentData.UserID})
-          console.log(this.state.apptDates);
         } 
       },
     },

@@ -23,8 +23,10 @@ let createWordObject = () => {
         details:getDetailsByID(data.QuoteID),
         customer_notes:data.notesCustomers,
         installer_notes:data.notesInstallers,
-        total:data.QuoteTotal
+        total:data.QuoteTotal,
+        invoiceDate:data.creationDate
     }
+    console.log(wordObj.invoiceDate);
     return wordObj;
 }
 

@@ -1,7 +1,5 @@
 import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, Header, Footer } from 'docx';
 
-const header = "https://i.ibb.co/0snCVqq/header.png";
-const footer = 'https://i.ibb.co/tm6mdt0/footer.png';
 const docx = require("docx");
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(), "yyyy_MM_dd");
@@ -349,7 +347,7 @@ export default async function WorkToPDF(info) {
     const blob = new Blob([buffer], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.download = `${info.first_name}_${info.last_name}_${formatDate}_WO.docx`;
+    link.download = `Reitzel Insulation - ${info.first_name} ${info.last_name} - ${info.site_address}_Order.docx`;
     link.click();
     return (
         null

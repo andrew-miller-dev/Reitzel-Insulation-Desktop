@@ -3,6 +3,7 @@ import { Form, Input, Button, Select, message } from "antd";
 import { addCustomer, addAddress } from "../../api/neworder";
 import "./index.css";
 import validator from "validator";
+import { regions } from "../../util/storedArrays";
 const layout = {
   labelCol: { span: 2 },
   wrapperCol: { span: 16 },
@@ -11,17 +12,6 @@ const { Item } = Form;
 const { Option } = Select;
 export default function NewCustomer(props) {
   const [form] = Form.useForm();
-  const regions = [
-    "Elmira & area",
-    "Guelph & area",
-    "Cambridge & area",
-    "Hamilton & area",
-    "Stratford & area",
-    "Listowel area",
-    "Greater Toronto Area",
-    "Kitchener - Waterloo",
-    "Brantford, Paris, Burford, Waterford, Brant County, Haldmald, Caledonia",
-  ];
   const [validEmail, setValidEmail] = useState('');
   const [errorColor, setErrorColor] = useState('red');
   const options = regions.map((item, index) => (

@@ -1,12 +1,7 @@
-import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, Header, Footer } from 'docx';
-
-const header = "https://i.ibb.co/0snCVqq/header.png";
-const footer = 'https://i.ibb.co/tm6mdt0/footer.png';
+import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, Header, Footer, AlignmentType } from 'docx';
+import format from 'date-fns/format';
 const docx = require("docx");
-const {format } = require('date-fns-tz');
-let formatDate = format(new Date(), "yyyy_MM_dd");
-
-
+var parseISO = require('date-fns/parseISO');
 
 let renderDetails = (info) => {
     let rowArray = [];
@@ -82,7 +77,6 @@ let renderProds = (info) => {
     detailArr.push(newRow);
     return newRow;
     })
-    console.log(info);
     return detailArr;
 }
 
@@ -93,6 +87,7 @@ export default async function QuoteToWord(info) {
     const foot = await fetch(
         'https://i.ibb.co/tm6mdt0/footer.png'
     ).then(r => r.blob());
+    const invoiceDate = format(parseISO(info.invoiceDate),"MMMM do',' yyyy")
 
     const doc = new Document({
             sections: [{
@@ -142,6 +137,10 @@ export default async function QuoteToWord(info) {
                     })
                 },
                 children: [
+                    new Paragraph({
+                                text: invoiceDate,
+                                alignment: AlignmentType.RIGHT
+                    }),
                     new Table({
                         indent:{
                             size:-500,
@@ -349,7 +348,7 @@ export default async function QuoteToWord(info) {
     const blob = new Blob([buffer], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.download = `${info.first_name}_${info.last_name}_${formatDate}_Quote.docx`;
+    link.download = `Reitzel Insulation - ${info.first_name} ${info.last_name} - ${info.site_address}_Quote.docx`;
     link.click();
     return (
         null

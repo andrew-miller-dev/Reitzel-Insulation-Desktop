@@ -19,6 +19,9 @@ return (
     <Box>
     <Image src={header} alt="Reitzel Insulation" width={875} height={100}>
     </Image>
+      <Item align='right'>
+        {customer.quote_date}
+      </Item>
       <Item align="left">
         <Row>
           <Col>
