@@ -11,7 +11,7 @@ import {getUser} from '../../util/storage';
 import { AutoComplete, Card, Row, Col, Checkbox, Select, InputNumber, } from "antd";
 const { Option } = Select;
 const {format } = require('date-fns-tz');
-let formatDate = format(new Date(), "MMMM do',' yyyy");
+let formatDate = format(new Date(),"MMMM do',' yyyy");
 
 function QuoteOne(props) {
     const [isLoading, setLoading] = useState(true);

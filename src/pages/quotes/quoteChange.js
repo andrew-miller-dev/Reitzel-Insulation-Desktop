@@ -157,7 +157,7 @@ function QuoteChange (props) {
         setcounter(counter -1);
         var temp = quoteData;
         var index = temp.details.indexOf(details);
-        temp.splice(index,1);
+        temp.details.splice(index,1);
         setQuoteData(temp);
     }
     const handleDetailChange = (details, e) => {

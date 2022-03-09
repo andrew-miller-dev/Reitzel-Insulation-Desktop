@@ -1,7 +1,6 @@
 import { Document, ImageRun, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, Header, Footer, AlignmentType } from 'docx';
 import format from 'date-fns/format';
 const docx = require("docx");
-var parseISO = require('date-fns/parseISO');
 
 let renderDetails = (info) => {
     let rowArray = [];
@@ -87,7 +86,6 @@ export default async function QuoteToWord(info) {
     const foot = await fetch(
         'https://i.ibb.co/tm6mdt0/footer.png'
     ).then(r => r.blob());
-    const invoiceDate = format(parseISO(info.invoiceDate),"MMMM do',' yyyy")
 
     const doc = new Document({
             sections: [{
@@ -138,7 +136,7 @@ export default async function QuoteToWord(info) {
                 },
                 children: [
                     new Paragraph({
-                                text: invoiceDate,
+                                text: info.quoteDate,
                                 alignment: AlignmentType.RIGHT
                     }),
                     new Table({
@@ -337,6 +335,10 @@ export default async function QuoteToWord(info) {
                             }),
                             new TextRun({
                                 text:info.customer_notes
+                            }),
+                            new TextRun({
+                                text:"Quote is valid for 30 days from the date on the quote",
+                                break:1
                             })
                         ]
                     }),

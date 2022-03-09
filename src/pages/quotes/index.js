@@ -50,7 +50,7 @@ export default function Quotes() {
           <QuoteOne key={quoteData} quoteData={quoteData} onSetQuoteFormDataChange={onSetQuoteFormDataChange} />
         </Route>
         <Route path="/quotes/:qid/edit" >
-          <QuoteEdit />
+          <QuoteEdit quoteEditData = {quoteFormData} />
         </Route>
         <Route path="/quotes/:qid/print" >
           <QuotePrint key={quoteData} quoteFormData={quoteFormData}  quoteData={quoteData} />

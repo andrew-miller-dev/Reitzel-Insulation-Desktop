@@ -1,5 +1,7 @@
 import QuoteToWord from "../../Components/Word_Templates/quoteWord";
 import {getQuoteDetails, getProductList} from '../../api/quoteEditAPI';
+import { format } from "date-fns-tz";
+import { parseISO } from "date-fns";
 
 
 
@@ -7,6 +9,7 @@ export default async function GetWordDoc(info) {
 let details = await getQuoteDetails(info.QuoteID);
 let products = await getProductList(info.QuoteID);
 let data = info;
+let quoteFormattedDate = format(parseISO(data.creationDate),"MMMM do',' yyyy");
 
 let createWordObject = () => {
     let wordObj = {
@@ -24,9 +27,8 @@ let createWordObject = () => {
         customer_notes:data.notesCustomers,
         installer_notes:data.notesInstallers,
         total:data.QuoteTotal,
-        invoiceDate:data.creationDate
+        quoteDate:quoteFormattedDate
     }
-    console.log(wordObj.invoiceDate);
     return wordObj;
 }
 

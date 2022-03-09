@@ -1,4 +1,3 @@
-import { Col, Row } from 'antd';
 import React from 'react';
 import { Email, Item, Box, Image} from 'react-html-email';
 const header = "https://i.ibb.co/0snCVqq/header.png";
@@ -20,12 +19,11 @@ return (
     <Image src={header} alt="Reitzel Insulation" width={875} height={100}>
     </Image>
       <Item align='right'>
-        {customer.quote_date}
+        {customer.quoteDate}
       </Item>
-      <Item align="left">
-        <Row>
-          <Col>
-          <strong>Attention:</strong> {customer.first_name}{" "}
+        <div style={{display:"flex"}}>
+          <div>
+            <strong>Attention:</strong> {customer.first_name}{" "}
           {customer.last_name}
           <br /> Address: {customer.billing_address}
           <br /> City: {customer.city}
@@ -33,19 +31,17 @@ return (
           <br /> Phone: {customer.phone_number}
           <br /> Email: {customer.email}
           <br />
-          </Col>
-          <Col>
-           <strong>Site Address</strong>
+          </div>
+          <div>
+          <strong>Site Address</strong>
           <br /> Site Address: {customer.site_address}
           <br /> Site City: {customer.site_city}
           <br /> Site Postal Code: {customer.site_postal}
-          </Col>
-        </Row>
-
-      </Item>
+          </div>
+      </div>
       <div>
           {customer.details.length > 0 && (
-            <table width="100%" border="1" cellPadding="10px">
+            <table style={{border:"none"}} width="100%" cellPadding="10px">
               <thead>
                 <tr>
                   <td colSpan="3">Quote Details</td>
@@ -87,11 +83,12 @@ return (
           )}
         </div>
         <span>Notes: {customer.customer_notes}</span>
+        <p>Quote is valid for 30 days from the date on the quote</p>
         <br />
         <span>Quote grand total: ${getTotal(customer.details)}</span>
         <br />
         <span>This is an automated email. If you have any questions after reading this document, please call the office at 519-886-6100 or
-                    toll free at 1-800-265-8869. </span>
+              toll free at 1-800-265-8869. </span>
         <br />
         <span>Estimator:{customer.userInfo.FirstName + " " + customer.userInfo.LastName}</span>
         <br/>

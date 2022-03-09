@@ -78,7 +78,6 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
           return array;
     }
     const renderDetails = () => {
-      console.log(formData);
       let rows = [];
       formData.forEach((item) => {
         rows.push(

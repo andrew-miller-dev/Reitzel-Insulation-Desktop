@@ -153,8 +153,10 @@ function QuotePrint(props) {
           )}
         </div>
         <p>Notes to customer: {quoteFormData.customer_notes}</p>
+        <p>Quote is valid for 30 days from the date on the quote</p>
         <p>Notes to installers: {quoteFormData.installer_notes}</p>
         <p>Estimator: {quoteFormData.userInfo.FirstName + " " + quoteFormData.userInfo.LastName}</p>
+        
         <p>
         WSIB# Account #1941844 /  Firm # 245166V
         </p>
