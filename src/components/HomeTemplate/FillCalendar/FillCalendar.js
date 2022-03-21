@@ -190,8 +190,8 @@ async onAppointmentForm (e) {
   let form = e.form;
   this.setState({clickedTruck:e.appointmentData.TruckID});
   var dates = {...this.state.dates};
-          dates.start = format(e.appointmentData.startDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-          dates.end = format(e.appointmentData.endDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+          dates.start = e.appointmentData.startDate;
+          dates.end = e.appointmentData.endDate;
           this.setState({dates});
   e.popup.option('showTitle', true);
   e.popup.option('title', 'Quick work order creation');
