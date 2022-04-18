@@ -130,3 +130,13 @@ export async function deleteNote(id){
     if(notes !== []) return notes;
     else return 0;
 }
+
+export async function checkExisting(info){
+  const tableName = "customers";
+  const condition = `CustFirstName = '${info.firstName}' AND CustLastName = '${info.lastName}' AND BillingAddress = '${info.address}'`;
+  const check = await ajax(
+    `${baseURL}/fetchValues`,
+    {tableName, condition},
+    "post");
+    return check;
+}

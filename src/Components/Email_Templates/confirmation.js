@@ -19,7 +19,7 @@ function Confirmation(props){
             <p>Thank you for choosing Reitzel Insulation! Here are the details for your booking:</p>
             <p>Job Type: {props.estimateInfo.JobType}</p>
             <p>Date: {format(new Date(props.estimateInfo.startDate),"MMMM do',' yyyy")}</p>
-            <p> Approximate Arrival Time:  {format(new Date(props.estimateInfo.startDate),"K:mm")}</p>
+            <p> Approximate Arrival Time:  {format(new Date(props.estimateInfo.startDate),"K:mm b")}</p>
             <br />
             </Item>
             <Item>

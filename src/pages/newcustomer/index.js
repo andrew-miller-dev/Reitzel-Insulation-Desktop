@@ -4,6 +4,7 @@ import { addCustomer, addAddress } from "../../api/neworder";
 import "./index.css";
 import validator from "validator";
 import { regions } from "../../util/storedArrays";
+import { CheckForExisting } from "../../config/checks";
 const layout = {
   labelCol: { span: 2 },
   wrapperCol: { span: 16 },
@@ -28,14 +29,19 @@ export default function NewCustomer(props) {
       PostalCode:values.PostalCode,
       Region:values.Region
     }
+    const check = await CheckForExisting(newVal);
+    if(check.length > 0) {
+      message.warn("Customer already on file");
+    }
+    else{  
     let customerInfo = await addCustomer(newVal);
     var latestCustomer = customerInfo.data.insertId;
     var newAddress = await addAddress(latestCustomer, newVal);
-    console.log("new address",newAddress);
     if (newAddress.status == 200) {
       message.success("Added successfully");
       props.history.push("/customers");
     } else message.warn("Something went wrong");
+  }
   };
   const emailCheck = (value) => {
     let word = value.target.value;
@@ -48,6 +54,7 @@ export default function NewCustomer(props) {
       setErrorColor('red');
     }
   }
+
   return (
     <div className="neworder">
       <Form form={form} onFinish={onFinish} {...layout}>

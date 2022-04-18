@@ -281,7 +281,7 @@ function QuoteOne(props) {
                              </td>
                             <td>
                                 Price:
-                                <input type="number" step=".01" key={prod.prodKey} defaultValue={prod.price}
+                                <input type="number" step=".01" key={prod.prodKey}
                                     onChange={(e) => {
                                         handleProductPrice(prod, e);
                                      }}

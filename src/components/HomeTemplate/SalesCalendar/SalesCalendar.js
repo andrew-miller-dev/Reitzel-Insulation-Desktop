@@ -71,7 +71,6 @@ const dataSource = new CustomStore({
   },
   insert: async (values) => {
     try{
-      console.log(values);
       values.startDate = format(values.startDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
       values.endDate = format(values.endDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
       let customerInfo = await addNewCustomer(values);
@@ -553,7 +552,6 @@ getUserName(id, array){
                }
                if(this.state.useExisting){
               let result = await addEstimate(this.state.custID, this.state.siteID, info);
-              console.log(result);
               this.setState({showForm:false});
               if(result.status === 200){
                 message.success("Added new estimate");

@@ -1,12 +1,25 @@
-import React from 'react';
-
+import React,{useState, useEffect} from 'react';
+import { getAddress } from '../../../api/addresses';
 
 export default function SalesTemplate(model) {
-  const { appointmentData } = model.data;
+  const data = model.data.appointmentData;
+  const [address, setAddress] = useState([]);
+  useEffect(() => {
+    const func = async() => {
+      let result = await getAddress(data.AddressID)
+      setAddress(result.data[0]);
+    }
+    func();
+  },[address.length]);
   return (
-    <div>
+    <div
+    style={{
+      fontSize:11,
+      wordWrap:"break-word",
+      whiteSpace:"normal"
+    }}>
         <div>
-        {appointmentData.text}
+        {address.Address}
         </div>
     </div>
   );

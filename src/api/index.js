@@ -149,39 +149,5 @@ export const datas = {
       imgUrl:
         "https://img.icons8.com/ios-filled/50/000000/change-user-male.png",
     },
-  ],
-  role: [
-    {
-      id: "1",
-      authTime: "",
-      authAuthor: "",
-      menus: [""],
-      createAt: "",
-      rolename: "admin",
-    },
-    {
-      id: "2",
-      authTime: "",
-      authAuthor: "",
-      menus: [""],
-      createAt: "",
-      rolename: "salesman",
-    },
-    {
-      id: "3",
-      authTime: "",
-      authAuthor: "",
-      menus: [""],
-      createAt: "",
-      rolename: "trucklead",
-    },
-    {
-      id: "4",
-      authTime: "",
-      authAuthor: "",
-      menus: [""],
-      createAt: "",
-      rolename: "manager",
-    },
-  ],
+  ]
 };

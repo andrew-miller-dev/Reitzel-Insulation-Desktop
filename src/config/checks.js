@@ -1,3 +1,5 @@
+import { checkExisting } from "../api/customer";
+
 export function checkForUndefined(object) {
     for (let[key, value] of Object.entries(object)){
         if (value === undefined) {
@@ -14,4 +16,15 @@ export function addEscapeChar(string) {
     //newstring = newstring.replace('"','"');
     console.log(newstring);
     return newstring;
+}
+
+
+export async function CheckForExisting(data) {
+    let obj = {
+        firstName:data.FirstName,
+        lastName:data.LastName,
+        address:data.BillingAddress
+    }
+    const check = await checkExisting(obj);
+    return check.data;
 }

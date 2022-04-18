@@ -28,3 +28,15 @@ export async function getAddress(id) {
       return 0;
     }
   }
+
+  export async function getAddressByEstimateID(id) {
+    var tableName = "address";
+    var condition = `AddressID = '${id}'`;
+    const address = await ajax(
+      `${baseURL}/fetchValues`,
+      {tableName, condition},
+      "post"
+    );
+    return address;
+
+  }

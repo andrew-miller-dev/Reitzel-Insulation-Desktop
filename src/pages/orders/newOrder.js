@@ -54,20 +54,22 @@ function NewOrder (props) {
     const options = trucks.map((item) => (
       <Option key = {item.TruckID}>{item.TruckNumber + " " + item.TruckInfo} </Option> 
     ))
-
+    
     const createOrder = async(values) => {
     const validResult = await form.validateFields();
     if (validResult.errorFields && validResult.errorFields.length > 0) return;
+      const endDate = new Date(values.selectedDate._d);
+      const addedHours = endDate.setHours(endDate.getHours() + 3);
       const workOrderInfo = {
         allInfo:quoteData,
         selectedDetails:findSelectedDetails(),
         total:getSelectedTotal(findSelectedDetails()),
         startDate: format(
-          values.selectedDate[0]._d,
+          values.selectedDate._d,
           "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
         ),
-        endDate: format(
-          values.selectedDate[1]._d,
+        endDate:format(
+          addedHours,
           "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
         ),
         selectedTruck:values.selectedTruck,
@@ -104,14 +106,14 @@ function NewOrder (props) {
     }
 
     function getTruckType(id) {
-
       let workType = "";
       trucks.forEach((truck) => {
-        if(truck.TruckID === id){
+        console.log(truck);
+        if(truck.TruckID == id){
           workType = truck.TruckType;
-        } 
-        return workType;
-      });
+        }         
+      })
+      return workType;
     }
 
     function getSelectedTotal() {
@@ -280,7 +282,7 @@ function NewOrder (props) {
                 }
               ]}
             >
-              <RangePicker
+              <DatePicker
                 showTime={{ format: "HH:mm" }}
                 format="YYYY-MM-DD HH:mm"
                 className="datepicker"
@@ -306,7 +308,8 @@ function NewOrder (props) {
               }
             ]}>
               <Select
-              notFoundContent="No trucks available">{options}</Select>
+              notFoundContent="No trucks available">
+                {options}</Select>
             </Item>
             </Card>
             
@@ -321,6 +324,9 @@ function NewOrder (props) {
             onCancel={() => {setShowCalendar(false)}}
             width="90%"
             >
+            <div>
+              calendar goes here
+            </div>
             </Modal>
              
         </div>

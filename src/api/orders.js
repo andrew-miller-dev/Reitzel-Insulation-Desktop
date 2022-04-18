@@ -144,3 +144,15 @@ export async function getProductsFromOrderID(id) {
     );
     return complete;
 }
+
+export async function SearchAllInfoWO(value) {
+    const sql = `SELECT * FROM workorders LEFT JOIN address ON workorders.AddressID = address.AddressID LEFT JOIN users ON workorders.UserID = users.UserID LEFT JOIN customers ON workorders.CustomerID = customers.CustomerID 
+    WHERE CustFirstName LIKE '%${value}%' OR CustLastName LIKE '%${value}%' OR Address LIKE '%${value}%'`;
+    const info = await ajax(
+        `${baseURL}/processCustomQuery`,
+        {sql},
+        "post"
+    );
+    if(info !== []) return info;
+    else return 0; 
+}

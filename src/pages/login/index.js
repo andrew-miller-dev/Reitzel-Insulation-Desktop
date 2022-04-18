@@ -66,6 +66,8 @@ export default function Login(props) {
             >
               Login
             </Button>
+
+            <a style={{fontSize:12}} href="/lostLogin">Forgot your password?</a>
           </Item>
         </Form>
       </div>
