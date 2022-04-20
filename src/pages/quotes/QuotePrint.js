@@ -34,7 +34,7 @@ async function emailQuote (customer){
       })
       return details;
     })
-    message.success("Quote added");
+    message.success("Email sent");
   } catch (error) {
     message.error("Something went wrong - please try again");
     console.log(error);

@@ -116,7 +116,7 @@ const groups = ['UserID'];
 
 const renderResourceCell = (model) => {
   return (
-      <b>{model.data.FirstName}</b>
+      <b>{model.data.FirstName} {model.data.LastName[0]}</b>
   );
 }
 const onAppointmentDeleting = (e) => {

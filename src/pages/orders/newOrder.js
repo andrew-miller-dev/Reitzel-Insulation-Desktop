@@ -4,8 +4,12 @@ import { Card, Checkbox, Row, Col, Form, DatePicker, Modal, Button, Select, mess
 import { useRouteMatch } from "react-router-dom";
 import { getDetailsID, getProductsID, getAvailableTrucks, addNewOrder, addNewOrderDetail, addNewOrderProduct, updateQuoteOnComplete } from '../../api/orders';
 import { getAllInfoID } from '../../api/quoteEditAPI';
+import Tabs from '../../Components/HomeTemplate/Tabs';
+import FoamCalendar from '../../Components/HomeTemplate/FoamCalendar/FoamCalendar';
+import FillCalendar from '../../Components/HomeTemplate/FillCalendar/FillCalendar';
+import FoamSnapshot from '../../Components/HomeTemplate/FoamCalendar/FoamSnapshot';
+import FillSnapshot from '../../Components/HomeTemplate/FillCalendar/FillSnapshot';
 
-const { RangePicker } = DatePicker;
 const { Item } = Form;
 const {Option} = Select;
 const { format } = require("date-fns-tz");
@@ -75,7 +79,7 @@ function NewOrder (props) {
         selectedTruck:values.selectedTruck,
       };
       let selectedTruckType = getTruckType(workOrderInfo.selectedTruck);
-      let order = await addNewOrder(workOrderInfo, selectedTruckType);
+      let order = await addNewOrder(workOrderInfo, selectedTruckType, quoteID);
       try {
       let orderID = order.data.insertId;
       workOrderInfo.selectedDetails.forEach(async(item) => {
@@ -325,7 +329,14 @@ function NewOrder (props) {
             width="90%"
             >
             <div>
-              calendar goes here
+              <Tabs>
+                <div label="Foam">
+                  <FoamSnapshot />
+                </div>
+                <div label ="Fill">
+                <FillSnapshot />
+                </div>
+              </Tabs>
             </div>
             </Modal>
              

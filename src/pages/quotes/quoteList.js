@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Card, Table, Button, Modal, Input, Space, Popover} from "antd";
+import { Card, Table, Button, Modal, Input, Space, Popover, message} from "antd";
 import { useHistory } from "react-router-dom";
 import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quoteEditAPI";
 import { getUser } from '../../util/storage';
@@ -7,8 +7,10 @@ import getWordDoc from './quoteToWordBypass';
 import { sendQuote } from '../../api/quotes';
 import { renderEmail } from 'react-html-email';
 import QuoteEmail from '../../Components/Email_Templates/quote_template';
+import { GetOrderByQID } from '../../api/orders';
 const {Search} = Input;
-const {format } = require('date-fns-tz')
+const {format} = require('date-fns-tz')
+var parseISO = require('date-fns/parseISO')
 
   function QuoteList() {
   let history = useHistory();
@@ -41,26 +43,6 @@ const {format } = require('date-fns-tz')
         
       },[]);
 
-      const getCompleted = (array) => {
-        let newArr = [];
-        array.forEach((item) => {
-          if (item.completed) {
-            newArr.push(item);
-          }
-        });
-        if(newArr.length === 0) return null;
-        else return newArr;
-      }
-      const getNotCompleted = (array) => {
-        let newArr = [];
-        array.forEach((item) => {
-          if (!item.completed) {
-            newArr.push(item);
-          }
-        });
-        if(newArr === []) return null;
-        else return newArr;
-      }
       const getUserQuotes = (list) => {
         let newList = [];
         list.forEach((item) => {
@@ -191,8 +173,20 @@ const {format } = require('date-fns-tz')
           <Popover content={
           <div>
             <Button
-              onClick={() => {
-                history.push(`/orders/${data.QuoteID}/new`)
+              onClick={async() => {
+                if(data.completed !== null){
+                const order = await GetOrderByQID(data.QuoteID);
+                console.log(order);
+                Modal.info({
+                  title:"Appointment Information",
+                  content:`Work order already created. Appointment time is ${format(parseISO(order.data[0].startDate),"MMMM do',' yyyy h':'mm aa")}`
+                })
+                
+                }
+                else{
+                  history.push(`/orders/${data.QuoteID}/new`)
+                }
+                
               }}>
                 Create Work Order
               </Button>
@@ -220,78 +214,6 @@ const {format } = require('date-fns-tz')
       }   
     ];
 
-    const colComplete = [
-      {
-        title:"Customer Name",
-        key:"customer",
-        render:(data) => (
-          <p>{data.CustFirstName + " " + data.CustLastName}</p>
-        )
-      },
-      {
-        title:"Address",
-        key:"address",
-        render:(data) => (
-          <p>{data.Address  + ", " + data.City}</p>
-        )
-      },
-      {},
-
-      {
-        title:"Salesman",
-        key:"user",
-        render: (data) =>(
-          <div>
-             <p>{data.FirstName + " " + data.LastName}</p>
-          </div>
-         
-        )
-      },
-      {
-        title:"Creation Date",
-        key:"date",
-        render: (data) => (
-          <p>{format(new Date(data.creationDate),"MMMM do',' yyyy")}</p>
-        ),
-        sorter: (a,b) => new Date(a.creationDate) - new Date(b.creationDate)
-      },
-      {
-        title:"Completed Date",
-        key:"completeDate",
-        render: (data) => (
-          <p>{checkDate(format(new Date(data.completed), "MMMM do',' yyyy"))}</p>
-        ),
-        sorter: (a,b) => new Date(a.completed) - new Date(b.completed)
-      },
-      {
-        title:"Options",
-        key:"options",
-        render: (data) => (
-          <Popover content={
-          <div>
-            <Button
-            onClick={() => {
-              getWordDoc(data);
-            }}>
-              Download Quote
-            </Button>
-            <br />
-            <br />
-            <Button
-            onClick={() => {
-                
-                setFormData(getDetailsByID(data.QuoteID));
-                setShowForm(true);     
-                            }}>
-            View Quote</Button>
-            </div>}
-            trigger='clicked'>
-            <Button>. . .</Button>
-          </Popover>
-          
-        )
-      }   
-    ]
     if(loaded){
 
       if(user.SecurityLevel === 'admin'){
@@ -307,21 +229,12 @@ const {format } = require('date-fns-tz')
           </div>
           
 
-        <h2>Active Quotes</h2>
+        <h2>Quote List</h2>
         <Table
         style={{ width: "80%", margin: "0 auto" }}
         rowKey="id"
-        dataSource={getNotCompleted(testData)}
+        dataSource={testData}
         columns={columns}
-        tableLayout="auto"
-        pagination={{ pageSize: 10 }}>
-          </Table>
-        <h2>Completed Quotes</h2>
-        <Table
-        style={{ width: "80%", margin: "0 auto" }}
-        rowKey="id"
-        dataSource={getCompleted(testData)}
-        columns={colComplete}
         tableLayout="auto"
         pagination={{ pageSize: 10 }}>
           </Table>
@@ -352,20 +265,11 @@ const {format } = require('date-fns-tz')
           </div>
           
 
-        <h2>Your Active Quotes</h2>
+        <h2>Your Quotes</h2>
         <Table
         style={{ width: "80%", margin: "0 auto" }}
         rowKey="id"
-        dataSource={getUserQuotes(getNotCompleted(testData))}
-        columns={columns}
-        tableLayout="auto"
-        pagination={{ pageSize: 10 }}>
-          </Table>
-          <h2>Your Completed Quotes</h2>
-          <Table
-        style={{ width: "80%", margin: "0 auto" }}
-        rowKey="id"
-        dataSource={getUserQuotes(getCompleted(testData))}
+        dataSource={getUserQuotes(testData)}
         columns={columns}
         tableLayout="auto"
         pagination={{ pageSize: 10 }}>

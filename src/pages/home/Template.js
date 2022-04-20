@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Tabs from "../../Components/HomeTemplate/Tabs"; 
 import SalesCalendar from '../../Components/HomeTemplate/SalesCalendar/SalesCalendar';
 import FoamCalendar from '../../Components/HomeTemplate/FoamCalendar/FoamCalendar';

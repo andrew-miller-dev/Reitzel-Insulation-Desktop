@@ -313,7 +313,7 @@ async onAppointmentForm (e) {
         defaultCurrentView="workWeek"
         defaultCurrentDate={date}
         height={600}
-        startDayHour={7}
+        startDayHour={8}
         endDayHour={19}
         appointmentComponent={FillTemplate}
         appointmentTooltipComponent={FillTooltip}

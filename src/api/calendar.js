@@ -311,7 +311,7 @@ export async function getQuoteProducts(id) {
 
 export async function addNewOrder(info){
   const tableName = 'workorders';
-  const values = `${null},'${info.CustomerID}','${info.AddressID}','${info.TruckID}','${info.UserID}','${info.WorkType}','${info.total}','${info.startDate}','${info.endDate}','${utcDate}'`;
+  const values = `${null},'${info.QuoteID}','${info.CustomerID}','${info.AddressID}','${info.TruckID}','${info.UserID}','${info.WorkType}','${info.total}','${info.startDate}','${info.endDate}','${utcDate}'`;
   
   const result = await ajax(
     `${baseURL}/insertValues`,

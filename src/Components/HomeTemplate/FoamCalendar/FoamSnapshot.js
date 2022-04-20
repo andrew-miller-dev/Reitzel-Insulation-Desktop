@@ -3,68 +3,75 @@ import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 import Switch from 'devextreme-react/switch';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
-import SalesTemplate from './SalesTemplate.js'
-import {getEstimates, getUsers, getRegionAPI} from '../../../api/calendar';
+import FillTemplate from '../FillCalendar/FillTemplate';
+import FillTooltip from '../FillCalendar/FillTooltip';
+import {getWorkOrderType,
+        getRegionAPI, 
+        getCustomers,} from '../../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
-import SalesToolSnap from "./salesToolSnap.js";
+import 'devextreme-react/tag-box';
+import 'devextreme-react/autocomplete';
+import { getTrucksByType } from "../../../api/trucks.js";
 
 const dataSource = new CustomStore({
-  key: "EstimateID",
+  key: "WorkOrderID",
   load: async () => {
-    const data = await getEstimates();
+    const data = await getWorkOrderType("foam");
     let formatData = data.data.map((item) => ({
-      EstimateID : item.EstimateID,
-      CustomerID : item.CustomerID,
-      AddressID : item.AddressID,
-      UserID : item.UserID,
-      CreationDate : item.CreationDate,
-      text : item.EstimateInfo,
-      RegionID : item.RegionID,
-      startDate : item.startDate,
-      endDate : item.endDate
-    }));
-    return formatData
+      WorkOrderID:item.WorkOrderID,
+      CustomerID:item.CustomerID,
+      AddressID:item.AddressID,
+      TruckID:item.TruckID,
+      UserID:item.UserID,
+      RegionID:5,
+      type:item.WorkType,
+      total:item.TotalAmount,
+      startDate:item.startDate,
+      endDate:item.endDate,
+     }));
+    return formatData;
   }
 });
 
 const currentDate = new Date();
-let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
-const views = ['day','workWeek','month'];
-const groups = ['UserID'];
+const date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+const views = ['day','week', 'workWeek','month'];
+const groups = ['TruckID'];
 
 const renderResourceCell = (model) => {
   return (
-      <b>{model.data.FirstName}</b>
+      <b>Truck {model.data.TruckNumber} {model.data.TruckInfo}</b>
   );
 }
 
-class SalesCalendar extends React.Component {
+class FoamSnapshot extends React.Component {
   constructor(props) {
     super(props);
     this.state={
       groupByDate:false,
-      userList:"",
       regionList:"",
-      info:false
+      truckList:"",
+      info:false,
+      mounted:false
     };
     
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
-    this.onAppointmentForm = this.onAppointmentForm.bind(this);
-    this.salesmanSource = this.salesmanSource.bind(this);
+    this.truckSource = this.truckSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
   }
   async InfoIsHere() {
+    if(this.mounted === true){
+  let customerData = await getCustomers();
   let regionData = await this.regionSource();
-  let userData = await this.salesmanSource();
-  this.setState({userList:userData});
+  let truckData = await this.truckSource();
   this.setState({regionList:regionData});
+  this.setState({findCustomerList:customerData.data});
+  this.setState({truckList:truckData});
   this.setState({info:true});
-} 
-  
-  onAppointmentForm(args) {
-    args.cancel = true;
-  }
+    }
+}
+
   onGroupByDateChanged(args) {
     this.setState({
       groupByDate: args.value
@@ -77,25 +84,30 @@ class SalesCalendar extends React.Component {
       region: item.Region,
       color: item.color
     }))
-    console.log(regionData);
     return regionData;
   }
 
-  async salesmanSource() {
-    const data = await getUsers();
-    let salesData = data.data.map((item) => ({
-      id: item.UserID,
-      FirstName : item.FirstName,
-      LastName: item.LastName
+  async truckSource() {
+    const data = await getTrucksByType("foam");
+    let truckData = data.data.map((item) => ({
+      id:item.TruckID,
+      TruckInfo:item.TruckInfo,
+      LicensePlate:item.LicensePlate,
+      Available:item.Available,
+      TruckNumber:item.TruckNumber,
+      TruckType:item.TruckType
     }))
-    console.log(salesData);
-    return salesData;
+    return truckData;
   }
   componentDidMount(){
-    this.InfoIsHere();
-}
 
- 
+    this.mounted = true;
+    this.InfoIsHere();
+
+}
+  componentWillUnmount(){
+    this.mounted = false;
+  }  
   render() {
     if (this.state.info === false){
         return (
@@ -109,6 +121,7 @@ class SalesCalendar extends React.Component {
       
       <div>
       <Scheduler
+        cellDuration={60}
         timeZone="America/Edmonton"
         groups = {groups}
         groupByDate={this.state.groupByDate}
@@ -117,19 +130,19 @@ class SalesCalendar extends React.Component {
         views={views}
         defaultCurrentView="workWeek"
         defaultCurrentDate={date}
-        height={800}
-        startDayHour={7}
+        height={600}
+        startDayHour={8}
         endDayHour={19}
-        appointmentComponent={SalesTemplate}
-        appointmentTooltipComponent={SalesToolSnap}
+        appointmentComponent={FillTemplate}
+        appointmentTooltipComponent={FillTooltip}
         onAppointmentAdding={(e) => {e.cancel = true}}
         onAppointmentDeleting={(e) => {e.cancel = true}}
         onAppointmentFormOpening={(e) => {e.cancel = true}}
         onAppointmentUpdating={(e) => {e.cancel = true}}
         >
         <Resource
-          dataSource={this.state.userList}
-          fieldExpr="UserID"
+          dataSource={this.state.truckList}
+          fieldExpr="TruckID"
           >
         </Resource>
         <Resource
@@ -153,4 +166,4 @@ class SalesCalendar extends React.Component {
 }
 }
 
-export default SalesCalendar;
+export default FoamSnapshot;

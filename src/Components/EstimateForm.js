@@ -14,10 +14,12 @@ import {Email, renderEmail} from 'react-html-email';
 import { customer_info_sheet } from "../assets/paths";
 import { jobs } from "../util/storedArrays";
 import { CheckForExisting } from "../config/checks";
+import { useHistory } from "react-router-dom";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
 const { format } = require("date-fns-tz");
+
 
 
 export default function EstimateForm(props) {
@@ -32,8 +34,11 @@ export default function EstimateForm(props) {
   const [addressLookup, setAddressLookup] = useState(false);
   const [customerList, setCustomerList] = useState([]);
   const [addressList, setAddressList] = useState([]);
-  const [customerExist, setCustomerExist] = useState([]);
-  const [addressExist, setAddressExist] = useState([]);
+  const [customerSelect, setCustomerSelect] = useState([]);
+  const [addressSelect, setAddressSelect] = useState([]);
+  const [customerExist, setCustomerExist] = useState(false);
+  const [addressExist, setAddressExist] = useState(false);
+  const history = useHistory();
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 14 },
@@ -96,6 +101,16 @@ export default function EstimateForm(props) {
       setCustomerList(data.data);
   }
 
+  const getRegionByID = (id) => {
+    let regionName = "";
+    regions.forEach((item) => {
+      if(item.id == id) {
+        regionName = item.region
+      }
+    })
+    return regionName;
+  } 
+
   const onFinish = async (values) => {
     const start = format(values.selectedDate[0]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
     const end = format(values.selectedDate[1]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
@@ -124,19 +139,18 @@ export default function EstimateForm(props) {
       endDate: end,
       estimateInfo: values.EstimateInfo,
     };
-    if(customerExist !== []) {
-      if(addressExist !== []){
-        await addEstimate(customerExist.CustomerID, addressExist.AddressID, estimate);
+    if(customerExist) {
+      if(addressExist){
+        await addEstimate(customerSelect.CustomerID, addressSelect.AddressID, estimate);
         message.success("Added new estimate to customer");
       }
       else{
-      let addressAdded = await addAddress(customerExist.CustomerID, siteAddress);
+      let addressAdded = await addAddress(customerSelect.CustomerID, siteAddress);
       let addressID = addressAdded.data.insertId;
-      await addEstimate(customerExist.customerID, addressID, estimate);
+      await addEstimate(customerSelect.customerID, addressID, estimate);
       message.success("Added new address and estimate");
       }
     }
-
     else{
     const check = await CheckForExisting(customer);
     if (check.length > 0) {
@@ -164,7 +178,7 @@ export default function EstimateForm(props) {
     if(validator.isEmail(customer.Email)){
       sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />), customer_info_sheet)
     }
-    props.history.push("/home");
+    history.push("/home");
   };
 
   useEffect(() => {
@@ -412,7 +426,6 @@ export default function EstimateForm(props) {
             option.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
           }
           onSelect={async(value) => {
-            console.log(value);
             let customer = customerList.find((arr) => {
                 return arr.CustomerID == value;
             })
@@ -423,11 +436,13 @@ export default function EstimateForm(props) {
                 Email:customer.Email,
                 BillingAddress:customer.BillingAddress,
                 City:customer.CustCity,
-                PostalCode:customer.CustPostalCode
+                PostalCode:customer.CustPostalCode,
+                Region:getRegionByID(customer.CustRegion)
                 });
             const list = await getAddressList(customer.CustomerID);
             setAddressList(list.data);
-            setCustomerExist(customer);
+            setCustomerExist(true);
+            setCustomerSelect(customer);
             setLookup(false);
             
           }}
@@ -447,9 +462,11 @@ export default function EstimateForm(props) {
         form.setFieldsValue({
           siteAddress:address.Address,
           sitePostal:address.PostalCode,
-          siteCity:address.City
+          siteCity:address.City,
+          siteRegion:getRegionByID(address.Region)
         });
-        setAddressExist(address);
+        setAddressExist(true);
+        setAddressSelect(address);
         setAddressLookup(false);
       }}>{options4}
       </Select>

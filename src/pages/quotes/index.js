@@ -39,12 +39,12 @@ export default function Quotes() {
   return (
     <div style={{padding: "10px", margin: "10px"}}>
       <div>
-        <h2> Quotes<Space style={{float:"right"}}><Link to="/quotes/quoteList" ><Button>View All Quotes</Button></Link>  <Link to="/quotes"><Button> New Quote  </Button></Link></Space></h2>
+        <h2> Quotes<Space style={{paddingLeft:"25px"}}><Link to="/quotes" ><Button>View All Quotes</Button></Link>  <Link to="/quotes/quoteCreate"><Button> New Quote  </Button></Link></Space></h2>
       </div> 
       <hr/>
       <Switch>
         <Route exact path={path} >
-          <FormOne quoteDataId={quoteDataId} onSetQuoteDataChange={onSetQuoteDataChange} />
+          <QuoteList/>
           </Route>
         <Route path="/quotes/:qid/new" >
           <QuoteOne key={quoteData} quoteData={quoteData} onSetQuoteFormDataChange={onSetQuoteFormDataChange} />
@@ -55,8 +55,8 @@ export default function Quotes() {
         <Route path="/quotes/:qid/print" >
           <QuotePrint key={quoteData} quoteFormData={quoteFormData}  quoteData={quoteData} />
         </Route>
-        <Route path="/quotes/quoteList">
-          <QuoteList/>
+        <Route path="/quotes/quoteCreate">
+          <FormOne quoteDataId={quoteDataId} onSetQuoteDataChange={onSetQuoteDataChange} />
         </Route>
         <Route path="/quotes/change">
           <QuoteChange quoteFormData={quoteFormData} onSetQuoteFormDataChange={onSetQuoteFormDataChange} />

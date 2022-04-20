@@ -41,9 +41,9 @@ export async function getAvailableTrucks() {
     }
 }
 
-export async function addNewOrder(value, trucktype) {
+export async function addNewOrder(value, trucktype, quoteID) {
     var tableName = 'workorders';
-    var values = `${null},'${value.allInfo.CustomerID}','${value.allInfo.AddressID}','${value.selectedTruck}','${value.allInfo.UserID}','${trucktype}','${value.total}','${value.startDate}','${value.endDate}','${utcDate}'`;
+    var values = `${null},'${quoteID}','${value.allInfo.CustomerID}','${value.allInfo.AddressID}','${value.selectedTruck}','${value.allInfo.UserID}','${trucktype}','${value.total}','${value.startDate}','${value.endDate}','${utcDate}'`;
     var newOrder = await ajax(
         `${baseURL}/insertValues`,
         {tableName, values},
@@ -155,4 +155,15 @@ export async function SearchAllInfoWO(value) {
     );
     if(info !== []) return info;
     else return 0; 
+}
+
+export async function GetOrderByQID(id) {
+    const tableName = 'workorders';
+    const condition = `QuoteID = '${id}'`;
+    const complete = await ajax(
+        `${baseURL}/fetchValues`,
+        {tableName, condition},
+        "post"
+    );
+    return complete;
 }
