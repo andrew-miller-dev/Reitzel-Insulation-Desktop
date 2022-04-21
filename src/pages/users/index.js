@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
-import { Card, Table, Button, Modal, Form, Input, message, Select } from "antd";
+import { Card, Table, Button, Modal, Form, Input, message, Select, Switch } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { addUser, getUsers, updateUser, deleteUser, getRoles } from "../../api/index";
+import { addUser, getUsers, updateUser, deleteUser, getRoles, changeDisplay } from "../../api/index";
 const { Item } = Form;
 const { confirm } = Modal;
 const { Option } = Select;
@@ -95,6 +95,16 @@ export default function Users() {
         </div>
       ),
     },
+    {
+      title:"Display on Home",
+      render:(data) => (
+        <div>
+          <Switch
+          checked={data.display}
+          onChange={() => changeDisp(data)} />
+        </div>
+      )
+    }
   ];
   //handle adding form
   const handleAdd = async () => {
@@ -165,6 +175,7 @@ export default function Users() {
         loginPwd: item.Password,
         email: item.Email,
         role: item.SecurityLevel,
+        display:item.Display
       }));
       setusers(tables);
       var roles = await getRoles();
@@ -172,6 +183,20 @@ export default function Users() {
     };
     func();
   }, [users.length, count]);
+
+  const changeDisp = async(data) => {
+    let change = !data.display ? 1 : 0;
+    let changeNum = change ? 1:0;
+    data.display = changeNum;
+    let result = await changeDisplay(data);
+    if(result.status === 200) {
+      message.success("Home screen display changed");
+    }
+    else{
+      message.warning("Update failed")
+    }
+    setCount(count + 1);
+    }
   return (
     <div className="settings-user">
       <Card title={title} bordered>

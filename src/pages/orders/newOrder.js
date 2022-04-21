@@ -5,10 +5,9 @@ import { useRouteMatch } from "react-router-dom";
 import { getDetailsID, getProductsID, getAvailableTrucks, addNewOrder, addNewOrderDetail, addNewOrderProduct, updateQuoteOnComplete } from '../../api/orders';
 import { getAllInfoID } from '../../api/quoteEditAPI';
 import Tabs from '../../Components/HomeTemplate/Tabs';
-import FoamCalendar from '../../Components/HomeTemplate/FoamCalendar/FoamCalendar';
-import FillCalendar from '../../Components/HomeTemplate/FillCalendar/FillCalendar';
 import FoamSnapshot from '../../Components/HomeTemplate/FoamCalendar/FoamSnapshot';
 import FillSnapshot from '../../Components/HomeTemplate/FillCalendar/FillSnapshot';
+import { disabledMinuteArr, disabledHourArr } from '../../util/storedArrays';
 
 const { Item } = Form;
 const {Option} = Select;
@@ -287,7 +286,15 @@ function NewOrder (props) {
               ]}
             >
               <DatePicker
-                showTime={{ format: "HH:mm" }}
+                disabledTime={() => {
+                  return {
+                    disabledHours:() => disabledHourArr,
+                    disabledMinutes: () => disabledMinuteArr
+                  }
+                }}
+                showTime={{ 
+                  hideDisabledOptions:true,
+                  format: "HH:mm" }}
                 format="YYYY-MM-DD HH:mm"
                 className="datepicker"
               />

@@ -206,7 +206,7 @@ async onAppointmentForm (e) {
         dataSource:this.state.findCustomerList,
           valueExpr:"CustLastName",
           placeholder:"Look up by last name...",
-          itemRender:(data) => {
+          itemTemplate:(data) => {
             return (
               <span>{data.CustFirstName} {data.CustLastName}</span>
             )

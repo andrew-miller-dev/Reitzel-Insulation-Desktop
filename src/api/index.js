@@ -143,6 +143,18 @@ export async function getMenuData(data) {
   else return 0;
 }
 
+export async function changeDisplay(data) {
+  const tableName = "users";
+  const columnsAndValues = `Display = ${data.display}`;
+  const condition = `UserID = ${data.id}`;
+  const finish = await ajax(
+    `${baseURL}/updateValues`,
+    {tableName, columnsAndValues, condition},
+    "post"
+  );
+  return finish;
+}
+
 export const datas = {
   user: [
     {
@@ -151,3 +163,4 @@ export const datas = {
     },
   ]
 };
+

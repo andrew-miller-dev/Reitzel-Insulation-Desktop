@@ -2,12 +2,13 @@ import React from "react";
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 import Switch from 'devextreme-react/switch';
+import Legend from '../../Legend'
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
 import {getEstimates,
         deleteEstimate, 
-        getUsers, 
+        getUsersWithDisplay, 
         updateEstimate, 
         getRegionAPI, 
         sendUpdate, 
@@ -349,7 +350,7 @@ getUserName(id, array){
   }
 
   async salesmanSource() {
-    const data = await getUsers();
+    const data = await getUsersWithDisplay();
     let salesData = data.data.map((item) => ({
       id: item.UserID,
       FirstName : item.FirstName,
@@ -406,14 +407,28 @@ getUserName(id, array){
           useColorAsDefault={true}
         ></Resource>
         </Scheduler>
-        <div className="options">
-        <div className="caption">Group by Date First</div>
-        <div className="option">
-          <Switch
+        <div className="options" style={{display:'flex'}}>
+        <Space>
+          <div className="caption">Group by Date First <br/><Switch
             value={ this.state.groupByDate }
             onValueChanged={this.onGroupByDateChanged}
           />
         </div>
+        <div className="option">
+          Show Legend <br />
+          <Button
+          text="Show"
+          type="default"
+          height={25}
+          stylingMode="outlined"
+          onClick={() => {
+            Modal.info({
+              content:<Legend />
+            })
+          }} />
+        </div>
+        </Space>
+        
       </div>
       <Popup
       height='95%'

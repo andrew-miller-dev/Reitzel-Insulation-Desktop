@@ -45,6 +45,20 @@ export async function deleteEstimate(id) {
       return 0;
     }
   }
+  
+  export async function getUsersWithDisplay() {
+    const tableName = "users";
+    const condition = "SecurityLevel = 'salesman' AND Display = '1'"
+    const userlist = await ajax(
+      `${baseURL}/fetchValues`,
+      { tableName, condition},
+      "post"
+    );
+    if (userlist !== []) return userlist;
+    else {
+      return 0;
+    }
+  }
   export async function updateEstimate(id, values) {
     const tableName = "estimates";
     const columnsAndValues = `startDate='${values.startDate}',endDate='${values.endDate}', UserID='${values.UserID}'`;
