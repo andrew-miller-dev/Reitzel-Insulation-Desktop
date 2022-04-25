@@ -220,7 +220,8 @@ function QuoteEdit (props) {
                 id:null,
                 prodKey:prodKey,
                 product:"",
-                price:0.00
+                price:0.00,
+                tax:0.00
             }
         }
         else{
@@ -228,7 +229,8 @@ function QuoteEdit (props) {
                 id:null,
                 prodKey:prodKey,
                 product:"",
-                price:0.00
+                price:0.00,
+                tax:0.00
             }
         }
         setProdKey(prodKey + 1);

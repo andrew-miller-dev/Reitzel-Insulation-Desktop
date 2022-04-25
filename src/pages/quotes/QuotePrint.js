@@ -53,6 +53,27 @@ function downloadQuote(quote) {
   QuoteToWord(quote);
 }
 
+function getTotal(detail) {
+  console.log(detail);
+  let total = 0.00;
+        detail.details.forEach((item) => {
+            total = total + parseFloat(item.total);
+        });
+        total = total.toFixed(2);
+        return total;
+}
+
+function getTaxes(detail){
+  let taxesTotal = 0.00;
+  detail.details.map((item) => {
+      item.productArr.map((item) => {
+      taxesTotal = taxesTotal + parseFloat(item.tax);
+  })
+  })
+  taxesTotal = taxesTotal.toFixed(2);
+  return taxesTotal;
+}
+
 function QuotePrint(props) {
   let { qid } = useParams();
   let history = useHistory();
@@ -148,6 +169,12 @@ function QuotePrint(props) {
                       </tr>
                     );
                 })}
+                <tr>
+                  <td>
+                    Taxes: ${getTaxes(quoteFormData)}<br/>
+                    Grand Total: ${getTotal(quoteFormData)}
+                  </td>
+                </tr>
               </tbody>
             </table>
           )}

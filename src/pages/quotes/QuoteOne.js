@@ -91,7 +91,8 @@ function QuoteOne(props) {
                     productArr:[{
                         prodKey:0,
                         product:"",
-                        price:0.00
+                        price:0.00,
+                        tax:0.00
                     }]
                 }]);
 
@@ -215,14 +216,16 @@ function QuoteOne(props) {
             temp[index].productArr[0] = {
                 prodKey:prodKey,
                 product:"",
-                price:0.00
+                price:0.00,
+                tax:0.00
             }
         }
         else{
             temp[index].productArr[temp[index].productArr.length] = {
                 prodKey:prodKey,
                 product:"",
-                price:0.00
+                price:0.00,
+                tax:0.00
             }
         }
         setProdKey(prodKey + 1);
@@ -261,6 +264,18 @@ function QuoteOne(props) {
         prod.price = rounded;
         setcounter(counter + 1);
     }
+    const handleTax = (prod, e) => {
+        if(e.target.value === ""){
+            e.target.value = 0.00;
+        }
+        let number = parseFloat(e.target.value);
+        if (tax == true){
+            number = number * (0 + '.' + taxRate.toString().padStart(2,0));
+            number = parseFloat(number);
+        }
+        number = number.toFixed(2);
+        prod.tax = number;
+    }
 
     const renderProducts = (details) => {
         let rows = [];
@@ -284,6 +299,7 @@ function QuoteOne(props) {
                                 <input type="number" step=".01" key={prod.prodKey}
                                     onChange={(e) => {
                                         handleProductPrice(prod, e);
+                                        handleTax(prod, e);
                                      }}
                                      className="ant-input"
                                      defaultValue='0.00'
@@ -302,10 +318,6 @@ function QuoteOne(props) {
         details.productArr.map((item) => {
             total = total + parseFloat(item.price);
         });
-        if (tax == true){
-            total = total * (1 + '.' + taxRate.toString().padStart(2,0));
-            total = parseFloat(total);
-        }
         total = total.toFixed(2);
         details.total = total;
         return total;
@@ -317,6 +329,19 @@ function QuoteOne(props) {
         });
         total = total.toFixed(2);
         return total;
+    }
+
+    const getTaxes = (details) => {
+        let taxesTotal = 0.00;
+        if(tax){
+        details.forEach((item) => {
+            item.productArr.map((item) => {
+            taxesTotal = taxesTotal + parseFloat(item.tax);
+        })
+        })
+    }
+        taxesTotal = taxesTotal.toFixed(2);
+        return taxesTotal;
     }
     const renderRows = () => {
         let rows = [];
@@ -476,11 +501,14 @@ function QuoteOne(props) {
                         <tfoot>
                             <tr>
                                 <td style={{textAlign:"right"}}>
-                                    Apply tax <Checkbox defaultChecked = {true} onChange={() => {changeTax()}}></Checkbox>
+                                    Apply tax 
+                                </td>
+                                <td>
+                                    <Checkbox defaultChecked = {true} onChange={() => {changeTax()}}></Checkbox>
                                 </td>
                                 </tr>
                                 <tr>
-                                    <td style={{textAlign:"right"}}>
+                                    <td style={{textAlign:"right"}} colSpan={2}>
                                     Tax rate: <InputNumber
                                     style={{width:"55px"}}
                                     size="small"
@@ -494,8 +522,19 @@ function QuoteOne(props) {
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td style={{textAlign:"right"}}>
+                                        Taxes: 
+                                    </td>
+                                    <td>
+                                        ${getTaxes(quotedetails)}
+                                    </td>
+                                </tr>
+                                <tr>
                                 <td style={{textAlign:"right"}}>
-                                    Quote Total: ${getQuoteTotal(quotedetails)}
+                                    Grand Total:
+                                </td>
+                                <td>
+                                     ${getQuoteTotal(quotedetails)}
                                 </td>
                             </tr>
                         </tfoot>

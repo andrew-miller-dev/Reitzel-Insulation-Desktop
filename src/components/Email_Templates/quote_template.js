@@ -42,11 +42,6 @@ return (
       <div>
           {customer.details.length > 0 && (
             <table style={{border:"none"}} width="100%" cellPadding="10px">
-              <thead>
-                <tr>
-                  <td colSpan="3">Quote Details</td>
-                </tr>
-              </thead>
               <tbody>
                 {customer.details.map((item) => {
 
@@ -65,7 +60,7 @@ return (
                                 {prod.product}
                               </td>
                                 <td>
-                                  {prod.price}
+                                  $ {prod.price}
                                 </td>
                               </tr>
                           );

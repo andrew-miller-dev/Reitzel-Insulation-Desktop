@@ -50,7 +50,7 @@ export async function sendQuote(customer, email){
 
   export async function addNewProductLine(value, id, detailID){
     var tableName = "quotelines";
-    var values = `'${null}','${detailID}', '${id}','${value.product}', '${value.price}'`;
+    var values = `'${null}','${detailID}', '${id}','${value.product}', '${value.price}','${value.tax}'`;
     var product = await ajax(`${baseURL}/insertValues`, {tableName, values }, "post");
     if(product !== []) return product;
     else{
