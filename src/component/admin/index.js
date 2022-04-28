@@ -10,8 +10,6 @@ import { getUser } from "../../util/storage";
 import Searchbar from "../searchbar";
 import { datas } from "../../api/index";
 const { Header, Content, Footer, Sider } = Layout;
-//const { ipcRenderer } = require('electron');
-const {confirm} = Modal;
 
 export default class Homepage extends React.Component {
   state = {
@@ -22,16 +20,6 @@ export default class Homepage extends React.Component {
     this.setState({ user });
   };
   render() {
-    /*
-    ipcRenderer.on('update_available', () => {
-      ipcRenderer.removeAllListeners('update_available');
-      message("There is a new update. Downloading now.");
-    });
-    ipcRenderer.on('update_downloaded', () => {
-      ipcRenderer.removeAllListeners('update_downloaded');
-      confirm({title:'Update Downloaded. It will be installed on restart. Restart now?', })
-    });
-  */
     const SecurityLevel =
       (this.state.user && this.state.user.SecurityLevel) || "";
     const FirstName = (this.state.user && this.state.user.FirstName) || "";

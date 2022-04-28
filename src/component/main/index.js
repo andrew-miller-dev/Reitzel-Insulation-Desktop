@@ -14,7 +14,6 @@ import NewCusomter from "../../pages/newcustomer";
 import NewEstimate from "../../pages/newestimate";
 import "./index.css";
 
-const id = 0;
 export default function Main() {
   return (
     <div className="content-main">

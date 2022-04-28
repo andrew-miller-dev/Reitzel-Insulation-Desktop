@@ -1,6 +1,6 @@
 import React, { useState} from "react";
 import {useHistory} from "react-router-dom";
-import { Button, Space, AutoComplete, } from "antd";
+import { Button, Space, AutoComplete, Modal, } from "antd";
 import "./index.css";
 import { withRouter } from "react-router";
 import { getMenu, getUser } from "../../util/storage";
@@ -9,12 +9,21 @@ import { SearchAllInfo } from "../../api/quoteEditAPI";
 import { SearchAllInfoWO } from "../../api/orders";
 import { format } from "date-fns-tz";
 import { parseISO } from "date-fns";
+import Popup from "../../Components/popup";
+import Popup2 from "../../Components/popup2";
+import NewCustomerForm from "../../Components/Forms/newcustomerform";
 
 function Searchbar(props) {
  const history = useHistory();
   const [customerList, setCustomerList] = useState([]);
   const [quoteList, setQuoteList] = useState({});
   const [orderList, setOrderList] = useState({});
+  const [showForm, setShowForm] = useState(false);
+  const [formOption, setFormOption] = useState(null);
+
+const closeForm = () =>{
+  setShowForm(false);
+}
 
 const renderCustomer = (data) => {
     const newArr = [];
@@ -164,13 +173,17 @@ const buttons = () => {
 <Space>
          <Button
          onClick={() => {
+          setFormOption(<NewCustomerForm/>);
+          setShowForm(true);
           history.push('/newcustomer');
          }}>
         New Customer
       </Button>
       <Button
       onClick={() => {
-        history.push('/newestimate')
+        setFormOption(<Popup2 />);
+        setShowForm(true);
+        history.push('/newestimate');
       }}>
         New Estimate
       </Button>
@@ -192,6 +205,12 @@ if(getUser() && getMenu()) {
       onChange={onSearch}>
       </AutoComplete>
       {buttons()}
+
+      <Modal
+      visible={showForm}
+      onCancel={()=>{setShowForm(false)}}>
+        {formOption}
+      </Modal>
     </div>
   );
 }
