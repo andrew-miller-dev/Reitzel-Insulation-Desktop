@@ -12,6 +12,8 @@ import { parseISO } from "date-fns";
 import Popup from "../../Components/popup";
 import Popup2 from "../../Components/popup2";
 import NewCustomerForm from "../../Components/Forms/newcustomerform";
+import Refresh from "../../Components/Refresh";
+import NewEstimateForm from "../../Components/Forms/newestimateform";
 
 function Searchbar(props) {
  const history = useHistory();
@@ -173,7 +175,7 @@ const buttons = () => {
 <Space>
          <Button
          onClick={() => {
-          setFormOption(<NewCustomerForm/>);
+          setFormOption(<NewCustomerForm />);
           setShowForm(true);
           history.push('/newcustomer');
          }}>
@@ -181,12 +183,13 @@ const buttons = () => {
       </Button>
       <Button
       onClick={() => {
-        setFormOption(<Popup2 />);
+        setFormOption(<NewEstimateForm />);
         setShowForm(true);
         history.push('/newestimate');
       }}>
         New Estimate
       </Button>
+      <Refresh />
       </Space>
   )
 }

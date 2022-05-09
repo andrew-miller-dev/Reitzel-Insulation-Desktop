@@ -29,7 +29,7 @@ export async function getLogin(loginId, loginPwd) {
 //add user
 export async function addUser(user) {
   var tableName = "users";
-  var values = `${null},'${user.loginFirstName}','${user.loginLastName}','${user.email}','${user.loginPwd}','${user.role}'`;
+  var values = `${null},'${user.loginFirstName}','${user.loginLastName}','${user.email}','${user.loginPwd}','${user.role}','0'`;
   var users = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (users !== []) return users;
   else {
@@ -147,6 +147,18 @@ export async function changeDisplay(data) {
   const tableName = "users";
   const columnsAndValues = `Display = ${data.display}`;
   const condition = `UserID = ${data.id}`;
+  const finish = await ajax(
+    `${baseURL}/updateValues`,
+    {tableName, columnsAndValues, condition},
+    "post"
+  );
+  return finish;
+}
+
+export async function updatePassword(user, password) {
+  const tableName = 'users';
+  const columnsAndValues = `Password = '${password}'`;
+  const condition = `Email = '${user}'`;
   const finish = await ajax(
     `${baseURL}/updateValues`,
     {tableName, columnsAndValues, condition},

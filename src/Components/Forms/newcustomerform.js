@@ -1,4 +1,5 @@
 import { Card, Col, Form, Input, Row } from "antd";
+
 const { Item } = Form;
 
 export default function NewCustomerForm(props) {
@@ -32,10 +33,13 @@ export default function NewCustomerForm(props) {
                  </Row>
             </Card>
             <Card title="Addresses">
-
+                <Item
+                label="Address">
+                    <Input />
+                </Item>
             </Card>
             </Card>
 
-        </Form>
+        </Form> 
     )
 }

@@ -1,3 +1,4 @@
+import { Space } from 'antd';
 import React from 'react';
 import { Email, Item, Box, Image} from 'react-html-email';
 const header = "https://i.ibb.co/0snCVqq/header.png";
@@ -11,6 +12,16 @@ const getTotal = (array) => {
     return gtotal;
 }
 
+const getTaxes = (array) => {
+  let ttotal = 0.00;
+  array.forEach((item) => {
+    item.productArr.forEach((item) => {
+      ttotal = ttotal + item.tax;
+    })
+  })
+  return ttotal;
+}
+
 function QuoteEmail (props) {
   let customer = props.info;
 return (
@@ -22,7 +33,7 @@ return (
         {customer.quoteDate}
       </Item>
         <div style={{display:"flex"}}>
-          <div>
+          <div style={{margin:'5px'}}>
             <strong>Attention:</strong> {customer.first_name}{" "}
           {customer.last_name}
           <br /> Address: {customer.billing_address}
@@ -32,7 +43,7 @@ return (
           <br /> Email: {customer.email}
           <br />
           </div>
-          <div>
+          <div style={{margin:'5px'}}>
           <strong>Site Address</strong>
           <br /> Site Address: {customer.site_address}
           <br /> Site City: {customer.site_city}
@@ -67,7 +78,7 @@ return (
                           })}
                       <tr>
                         <td colSpan="3" style={{textAlign:"right"}}>
-                          Subtotal:${item.total}
+                          Subtotal:${item.total} + HST
                         </td>
                       </tr>
                       </tr>
@@ -80,6 +91,8 @@ return (
         <span>Notes: {customer.customer_notes}</span>
         <p>Quote is valid for 30 days from the date on the quote</p>
         <br />
+        Taxes: ${getTaxes(customer.details)}
+        <br/>
         <span>Quote grand total: ${getTotal(customer.details)}</span>
         <br />
         <span>This is an automated email. If you have any questions after reading this document, please call the office at 519-886-6100 or

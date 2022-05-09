@@ -9,6 +9,7 @@ import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
 import { AutoComplete, Card, Row, Col, Checkbox, Select, InputNumber, } from "antd";
+import NewCustomerForm from "../../Components/Forms/newcustomerform";
 const { Option } = Select;
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(),"MMMM do',' yyyy");
@@ -172,12 +173,28 @@ function QuoteOne(props) {
     }
 
     const changeTax = () => {
-        if (tax === true){
-            setTax(false);
-        }
-        else if (tax === false){
-            setTax(true);
-        }
+        setTax(!tax);
+        if(tax === true){
+
+        quotedetails.map((item) => {
+            item.productArr.map((item) => {
+                item.tax = 0.00;
+            })
+        })
+        
+    }
+        else {
+            quotedetails.map((item) => {
+                item.productArr.map((item) => {
+                    let number = item.price;
+                    number = number * (0 + '.' + taxRate.toString().padStart(2,0));
+                    number = parseFloat(number); 
+                    number = number.toFixed(2);
+                    item.tax = number;
+                })
+            })
+        }  
+    setcounter(counter + 1);
     }        
     const addNewDetail = (id) => {
         let quote = {};
@@ -271,10 +288,13 @@ function QuoteOne(props) {
         let number = parseFloat(e.target.value);
         if (tax == true){
             number = number * (0 + '.' + taxRate.toString().padStart(2,0));
-            number = parseFloat(number);
+            number = parseFloat(number); 
+            number = number.toFixed(2);
+            prod.tax = number;
         }
-        number = number.toFixed(2);
-        prod.tax = number;
+       else{
+           prod.tax = 0.00;
+       }
     }
 
     const renderProducts = (details) => {
@@ -403,6 +423,7 @@ function QuoteOne(props) {
         <form onSubmit={handleSubmit}>
             <div className="Quote" style={{width:"80%"}}>
                 <div>
+                    <NewCustomerForm />
                     Select Customer:
                     <AutoComplete 
                     onSelect={(e, option) => {onCustomerSelect(e, option)}}

@@ -7,7 +7,6 @@ const user = getUser();
 const { format, utcToZonedTime} = require("date-fns-tz");
 
 function Confirmation(props){
-    console.log(props);
     return(
         <Email title="Thank you for choosing Reitzel!">
             <Item>
@@ -23,7 +22,7 @@ function Confirmation(props){
             <br />
             </Item>
             <Item>
-            Please read the attached pdf for preparing your home.
+            Please read the attached PDF for preparing your home.
             </Item>
             <Item>
                 <p>

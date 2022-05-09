@@ -1,5 +1,5 @@
 import React from 'react';
-import { Email, Item, A} from 'react-html-email';
+import { Email, Item} from 'react-html-email';
 import { getUser } from '../../util/storage';
 const header = "https://i.ibb.co/0snCVqq/header.png";
 const user = getUser();
@@ -37,13 +37,7 @@ function Confirmation(props){
 
             The Reitzel Team 
                 </p>
-               
-            
             </Item>
-
-            
-
-
         </Email>
     )
 }
