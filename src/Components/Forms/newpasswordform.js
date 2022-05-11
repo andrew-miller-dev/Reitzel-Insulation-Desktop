@@ -1,19 +1,17 @@
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { sendEmail } from "../../api/calendar";
 import { renderEmail } from "react-html-email";
 import ResetPasswordEmail from "../Email_Templates/reset_password";
 import { updatePassword } from "../../api";
-import { scryRenderedComponentsWithType } from "react-dom/test-utils";
 const {Item} = Form;
 const crypto = require("crypto");
 
 export default function ResetPassword(props) {
     const CompleteReset = async(values) =>{
-        var token = crypto.randomBytes(5).toString('hex');
+       var token = crypto.randomBytes(5).toString('hex');
         try{
             let emailCheck = await updatePassword(values.email,token);
-            console.log(emailCheck);
             if(emailCheck.data.changedRows === 0){
                 message.warn("No email found");
             }
@@ -34,7 +32,8 @@ export default function ResetPassword(props) {
     <Form onFinish={CompleteReset}>
         <Item 
         name="email">
-            <Input placeholder="Email address"
+            <Input 
+                    placeholder="Email address"
                     prefix={<MailOutlined />} />
         </Item>
         <Item>

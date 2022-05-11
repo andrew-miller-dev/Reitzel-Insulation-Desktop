@@ -1,32 +1,24 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
-import { Card, Table, Button, Modal, Form, Input, message, Select, Switch } from "antd";
+import { Card, Table, Button, Modal, message, Switch } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { addUser, getUsers, updateUser, deleteUser, getRoles, changeDisplay } from "../../api/index";
-const { Item } = Form;
+import { getUsers, deleteUser, getRoles, changeDisplay } from "../../api/index";
+import NewUserForm from "../../Components/Forms/newuserform";
+import ModifyUser from "../../Components/Forms/modifyuserform";
 const { confirm } = Modal;
-const { Option } = Select;
+
 export default function Users() {
-  //form ref to control the adding form
-  const [form] = Form.useForm();
-  //form ref to control the updating form
-  const [form1] = Form.useForm();
   //control the status of adding form modal
   const [addShow, setAddShow] = useState(false);
-  //control the status of updating form modal
-  const [updateShow, setupdateShow] = useState(false);
-  const [, setForce] = useState();
   const [users, setusers] = useState([]);
   const [count, setCount] = useState(0);
   const [roles, setRoles] = useState([]);
+  const [currentForm, setCurrentForm] = useState([]);
 
-
-  //the selected to be updated or deleted data
-  const [selectedData, setselectedData] = useState({});
   const title = (
     <Button
       onClick={() => {
-        form.resetFields();
+        setCurrentForm(<NewUserForm count = {changeCount} roleList = {roles} closeForm = {closeModal} />);
         setAddShow(true);
       }}
       type="primary"
@@ -35,11 +27,7 @@ export default function Users() {
     </Button>
   );
 
-  const options = roles.map((item) => (
-    <Option key={item.RoleName}>{item.RoleName}</Option>
-  ));
-
-  //for table coloums
+  //for table coloumns
   const columns = [
     {
       title: "Name",
@@ -67,26 +55,16 @@ export default function Users() {
           <Button
             type="primary"
             onClick={() => {
-              setselectedData(data);
-              console.log(data);
-              setupdateShow(true);
-              form1.setFieldsValue({
-                key:data.id,
-                loginFirstName: data.loginFirstName,
-                loginLastName: data.loginLastName,
-                loginPwd: data.loginPwd,
-                loginPwdConfirm: data.loginPwdConfirm,
-                email: data.email,
-                role: data.role,
-              });
+              setCurrentForm(<ModifyUser count = {changeCount} roleList = {roles} data = {data} closeForm ={closeModal} />)
+              setAddShow(true);
             }}
+            
           >
             Modify
           </Button>
           <Button
             type="primary"
             onClick={() => {
-              setselectedData(data);
               showDeleteConfirm(data.id);
             }}
           >
@@ -106,41 +84,14 @@ export default function Users() {
       )
     }
   ];
-  //handle adding form
-  const handleAdd = async () => {
-    const validResult = await form.validateFields();
-    if (validResult.errorFields && validResult.errorFields.length > 0) return;
-    const value = form.getFieldsValue();
-    const { loginFirstName, loginLastName, loginPwd, email, role } = value;
-    const result = await addUser({loginFirstName, loginLastName, loginPwd, email, role});
-    if (result.data && result.data.affectedRows > 0) {
-      message.success("Added new user");
-      setAddShow(false);
-      setForce();
-      setCount(count + 1);
-    }
-  };
-  //handle updating form
-  const handleUpdate = async () => {
-    //validate first
-    const validResult = await form1.validateFields();
-    if (validResult.errorFields && validResult.errorFields.length > 0) return;
-    const value = form1.getFieldsValue();
-    const { loginFirstName, loginLastName, loginPwd, email, role } = value;
-    const id = selectedData.id;
-    //update data in the backend
-    const result = await updateUser(id, loginFirstName, loginLastName, loginPwd, email, role);
-    setupdateShow(false);
-    console.log(result);
-    if (result.status === 200) {
-      message.success("Updated user");
-    }
-  };
 
-  const handleCancel = () => {
+  //close modal form fuction
+  const closeModal = () => {
     setAddShow(false);
-    setupdateShow(false);
-  };
+  }
+  const changeCount =() =>{
+    setCount(count + 1);
+  }
   //handle delete user function
   const showDeleteConfirm = (id) => {
     confirm({
@@ -158,10 +109,7 @@ export default function Users() {
           resolve();
           setCount(count + 1);
         });
-      },
-      onCancel() {
-        console.log("Cancel");
-      },
+      }
     });
   };
 
@@ -211,187 +159,10 @@ export default function Users() {
         ></Table>
         <Modal
           visible={addShow}
-          title="Create A New User"
-          onOk={handleAdd}
-          onCancel={handleCancel}
+          onCancel={closeModal}
+          footer={null}
         >
-          <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
-            <Item
-              label="First Name"
-              name="loginFirstName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Last Name"
-              name="loginLastName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Password"
-              name="loginPwd"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input.Password />
-            </Item>
-            <Item
-              label="Confirm Password"
-              name="loginPwdConfirm"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue("loginPwd") === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      "Passwords must match"
-                    );
-                  },
-                }),
-              ]}
-            >
-              <Input.Password />
-            </Item>
-            <Item
-              label="Sign-in Email"
-              name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-
-            <Item
-              label="Role"
-              name="role"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Select>{options}</Select>
-            </Item>
-          </Form>
-        </Modal>
-        <Modal
-          visible={updateShow}
-          title="Update"
-          onOk={handleUpdate}
-          onCancel={handleCancel}
-        >
-          <Form form={form1} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
-          <Item
-              label="First Name"
-              name="loginFirstName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Last Name"
-              name="loginLastName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Password"
-              name="loginPwd"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input.Password />
-            </Item>
-            <Item
-              label="Confirm Password"
-              name="loginPwdConfirm"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue("loginPwd") === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      "Passwords must match"
-                    );
-                  },
-                }),
-              ]}
-            >
-              <Input.Password />
-            </Item>
-            <Item
-              label="Email"
-              name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-
-            <Item
-              label="Role"
-              name="role"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Select>{options}</Select>
-            </Item>
-          </Form>
+          {currentForm}
         </Modal>
       </Card>
     </div>

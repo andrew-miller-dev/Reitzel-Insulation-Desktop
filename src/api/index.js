@@ -37,9 +37,9 @@ export async function addUser(user) {
   }
 }
 //update user
-export async function updateUser(id, loginFirstName, loginLastName, loginPwd, email, role) {
+export async function updateUser(id, loginFirstName, loginLastName, email, role) {
   var tableName = "users";
-  var columnsAndValues = `FirstName='${loginFirstName}',LastName='${loginLastName}',Password='${loginPwd}',Email='${email}',SecurityLevel='${role}'`;
+  var columnsAndValues = `FirstName='${loginFirstName}',LastName='${loginLastName}',Email='${email}',SecurityLevel='${role}'`;
   var condition = `UserID='${id}'`;
   const result = await ajax(
     `${baseURL}/updateValues`,
@@ -74,7 +74,6 @@ export async function getUsers() {
     { tableName, columns, condition },
     "post"
   );
-  console.log("user", user);
   if (user !== []) return user;
   else {
     return 0;
