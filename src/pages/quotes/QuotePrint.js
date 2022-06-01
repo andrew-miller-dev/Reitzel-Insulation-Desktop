@@ -41,7 +41,15 @@ async function emailQuote (customer){
   }
   try {
     if(customer.email !== 'undefined'){
-      sendQuote(customer.email, renderEmail(<QuoteEmail info={customer}/>))
+      if(customer.billing_address === customer.site_address){
+        console.log("same");
+          sendQuote(customer.email, renderEmail(<QuoteEmail siteCard="none" info={customer}/>))
+      }
+      
+      else{
+        console.log("different");
+        sendQuote(customer.email, renderEmail(<QuoteEmail siteCard = "block" info={customer}/>))
+      }
     }
   } catch (error) {
     console.log(error);

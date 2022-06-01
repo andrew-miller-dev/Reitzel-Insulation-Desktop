@@ -12,6 +12,7 @@ import CustomerInfo from "../../pages/customerInfo";
 import AddressInfo from "../../pages/addressInfo";
 import NewCusomter from "../../pages/newcustomer";
 import NewEstimate from "../../pages/newestimate";
+import Profile from "../../pages/profile/profile";
 import "./index.css";
 
 export default function Main() {
@@ -30,6 +31,7 @@ export default function Main() {
         <Route path="/addressinfo/:address" component={AddressInfo} />
         <Route path="/newcustomer" component={NewCusomter} />
         <Route path="/newestimate" component={NewEstimate} />
+        <Route path='/profile' component={Profile} />
         <Redirect to="/home"></Redirect>
       </Switch>
     </div>

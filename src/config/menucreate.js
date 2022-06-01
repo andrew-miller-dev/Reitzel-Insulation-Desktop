@@ -1,5 +1,5 @@
 import { getMenu } from '../util/storage';
-import {home, quotes, orders, invoices, customers, settings, users, trucks, roles} from './leftnavitems';
+import {home, quotes, orders, invoices, customers, settings, users, trucks, roles, profile} from './leftnavitems';
 
 export function menuCreate() {
     settings.children = [];
@@ -39,5 +39,6 @@ export function menuCreate() {
                 break;
         }
     })
+    settings.children.push(profile);
     return menu;
 }

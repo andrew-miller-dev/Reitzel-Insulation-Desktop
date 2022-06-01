@@ -26,6 +26,16 @@ export async function getLogin(loginId, loginPwd) {
   }
 }
 
+export async function GetUserByID(id) {
+  var tableName = "users";
+  var condition = `UserID='${id}'`;
+  const result = await ajax(`${baseURL}/fetchValues`, { tableName, condition }, "post");
+  if (result !== []) return result;
+  else {
+    return 0;
+  }
+}
+
 //add user
 export async function addUser(user) {
   var tableName = "users";
@@ -46,7 +56,6 @@ export async function updateUser(id, loginFirstName, loginLastName, email, role)
     { tableName, columnsAndValues, condition },
     "post"
   );
-  console.log("result", result);
   if (result !== []) return result;
   else {
     return 0;
@@ -57,7 +66,6 @@ export async function deleteUser(id) {
   var tableName = "users";
   var condition = `UserID='${id}'`;
   const result = await ajax(`${baseURL}/deleteValues`, { tableName, condition }, "post");
-  console.log("result", result);
   if (result !== []) return result;
   else {
     return 0;
@@ -158,6 +166,18 @@ export async function updatePassword(user, password) {
   const tableName = 'users';
   const columnsAndValues = `Password = '${password}'`;
   const condition = `Email = '${user}'`;
+  const finish = await ajax(
+    `${baseURL}/updateValues`,
+    {tableName, columnsAndValues, condition},
+    "post"
+  );
+  return finish;
+}
+
+export async function updateEmail(user, email) {
+  const tableName = 'users';
+  const columnsAndValues = `Email = '${email}'`;
+  const condition = `UserID = '${user}'`;
   const finish = await ajax(
     `${baseURL}/updateValues`,
     {tableName, columnsAndValues, condition},

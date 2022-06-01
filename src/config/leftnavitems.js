@@ -7,7 +7,8 @@ import {
     HomeOutlined,
     UserOutlined,
     KeyOutlined,
-    ToolOutlined
+    ToolOutlined,
+    SkinOutlined
   } from "@ant-design/icons";
   import React from "react";
 
@@ -82,3 +83,10 @@ export const trucks =
         path: "/trucks",
         content: "Trucks"
       }
+export const profile = 
+      {
+        key: "/profile",
+        icon: <SkinOutlined />,
+        path: "/profile",
+        content: "Profile"
+}

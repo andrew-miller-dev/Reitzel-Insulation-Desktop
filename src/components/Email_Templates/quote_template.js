@@ -1,4 +1,3 @@
-import { Space } from 'antd';
 import React from 'react';
 import { Email, Item, Box, Image} from 'react-html-email';
 const header = "https://i.ibb.co/0snCVqq/header.png";
@@ -43,7 +42,7 @@ return (
           <br /> Email: {customer.email}
           <br />
           </div>
-          <div style={{margin:'5px'}}>
+          <div style={{margin:'5px', display:props.siteCard}}>
           <strong>Site Address</strong>
           <br /> Site Address: {customer.site_address}
           <br /> Site City: {customer.site_city}
