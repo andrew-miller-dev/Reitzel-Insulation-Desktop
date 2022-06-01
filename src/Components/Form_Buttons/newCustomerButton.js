@@ -9,6 +9,7 @@ export default function NewCustomerButton(props) {
     const [customerList, setCustomerList] = useState([]);
     const [regions, setRegions] = useState([]);
     const [addressList, setAddressList] = useState([]);
+    const [selectCustomer, setSelectCustomer] = useState([]);
 
     const options3 = customerList.map((item) => (
         {
@@ -39,9 +40,8 @@ export default function NewCustomerButton(props) {
   
     return (
         <div>
-            <Card title="Customer"
-            style={{width:'25%'}}>
-                <AutoComplete
+            <Card title="Customer">
+            <AutoComplete
           style={{width:'150px'}}
           options={options3}
           placeholder="Look up customer by name"
@@ -51,18 +51,20 @@ export default function NewCustomerButton(props) {
           onSelect={async(value) => {
             let customer = customerList.find((arr) => {
                 return arr.CustomerID == value;
-            })
+            });
+            setSelectCustomer(customer);
             const list = await getAddressList(customer.CustomerID);
             setAddressList(list.data);
             document.getElementById("CustomerInfo").style.display = "block";
         }}
 />
+<br/>
                 <Button onClick={()=>{setShowForm(true)}}>
                     New Customer
                 </Button>
                 <div id="CustomerInfo" style={{display:"none"}}>
-                    <Card>
-
+                    <Card title="Customer">
+                      {selectCustomer.CustFirstName}  {selectCustomer.CustLastName} 
                     </Card>
                 </div>
             </Card>

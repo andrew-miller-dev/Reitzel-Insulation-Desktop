@@ -423,7 +423,6 @@ function QuoteOne(props) {
         <form onSubmit={handleSubmit}>
             <div className="Quote" style={{width:"80%"}}>
                 <div>
-                    <NewCustomerForm />
                     Select Customer:
                     <AutoComplete 
                     onSelect={(e, option) => {onCustomerSelect(e, option)}}
