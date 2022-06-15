@@ -28,3 +28,12 @@ export async function CheckForExisting(data) {
     const check = await checkExisting(obj);
     return check.data;
 }
+
+export function checkForMultipleBilling(array) {
+    let count = 0;
+    array.forEach((item) => {
+       if(item.billing) count += 1; 
+    });
+    if(count > 1) return true;
+    else return false;
+}

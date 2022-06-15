@@ -210,8 +210,10 @@ if(getUser() && getMenu()) {
       {buttons()}
 
       <Modal
+      destroyOnClose={true}
       visible={showForm}
-      onCancel={()=>{setShowForm(false)}}>
+      onCancel={()=>{setShowForm(false)}}
+      width="75%">
         {formOption}
       </Modal>
     </div>

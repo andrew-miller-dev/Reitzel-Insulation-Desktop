@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import {getRegion, updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addAddress, addNotes, getNotes, deleteNote} from '../../api/customer';
-
+import {getRegion, updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote} from '../../api/customer';
+import { addAddress } from '../../api/neworder';
 import { useRouteMatch } from "react-router-dom";
 import { withRouter } from "react-router";
 import {getUser} from '../../util/storage';
@@ -154,7 +154,6 @@ export function CustomerInfo() {
           BillingAddress: value.address,
           PostalCode: value.postalCode,
           City: value.city,
-          Prov: value.prov,
           Region: value.region
         }
         let id = customerInfo.id;

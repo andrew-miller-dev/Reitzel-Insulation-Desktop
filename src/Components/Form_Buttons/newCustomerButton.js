@@ -70,6 +70,7 @@ export default function NewCustomerButton(props) {
             </Card>
        
     <Modal
+    width="90%"
     visible={showForm}
     onCancel={()=> {setShowForm(false)}}>
         <NewCustomerForm />
