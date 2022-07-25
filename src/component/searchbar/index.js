@@ -177,7 +177,7 @@ const buttons = () => {
          onClick={() => {
           setFormOption(<NewCustomerForm />);
           setShowForm(true);
-          history.push('/newcustomer');
+         // history.push('/newcustomer');
          }}>
         New Customer
       </Button>
@@ -185,7 +185,7 @@ const buttons = () => {
       onClick={() => {
         setFormOption(<NewEstimateForm />);
         setShowForm(true);
-        history.push('/newestimate');
+        //history.push('/newestimate');
       }}>
         New Estimate
       </Button>
@@ -210,6 +210,7 @@ if(getUser() && getMenu()) {
       {buttons()}
 
       <Modal
+      footer={false}
       destroyOnClose={true}
       visible={showForm}
       onCancel={()=>{setShowForm(false)}}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import validator from "validator";
+import { useSelector } from "react-redux";
 import { Form, DatePicker, Input, Button, Select, message, Card, Modal, AutoComplete } from "antd";
 import {
   addCustomer,
@@ -10,17 +11,15 @@ import SalesSnapshot from './HomeTemplate/SalesCalendar/SalesSnapshot';
 import { getRegionAPI, getUsers, sendConfirm, getAddressList, getCustomers } from "../api/calendar"
 import TextArea from "antd/lib/input/TextArea";
 import Confirmation from "./Email_Templates/confirmation"
-import {Email, renderEmail} from 'react-html-email';
+import {renderEmail} from 'react-html-email';
 import { customer_info_sheet } from "../assets/paths";
 import { jobs } from "../util/storedArrays";
-import { CheckForExisting } from "../config/checks";
 import { useHistory } from "react-router-dom";
+import { getAddress } from "../api/addresses";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
 const { format } = require("date-fns-tz");
-
-
 
 export default function EstimateForm(props) {
   const [info, setInfo] = useState(false);
@@ -28,24 +27,15 @@ export default function EstimateForm(props) {
   const [regions, setRegions] = useState([]);
   const [form] = Form.useForm();
   const [showCalendar, setShowCalendar] = useState(false);
-  const [validEmail, setValidEmail] = useState('');
-  const [errorColor, setErrorColor] = useState('red');
-  const [lookup, setLookup] = useState(false);
-  const [addressLookup, setAddressLookup] = useState(false);
-  const [customerList, setCustomerList] = useState([]);
-  const [addressList, setAddressList] = useState([]);
   const [customerSelect, setCustomerSelect] = useState([]);
   const [addressSelect, setAddressSelect] = useState([]);
-  const [customerExist, setCustomerExist] = useState(false);
-  const [addressExist, setAddressExist] = useState(false);
   const history = useHistory();
+  const selectCustomer = useSelector((state) => state.customerReducer.newEstimate);
+  const selectAddress = useSelector((state) => state.addressReducer.currentAddress);
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 14 },
   };
-  const options = regions.map((item) => (
-    <Option key={item.id}>{item.region}</Option>
-  ));
   const options1 = jobs.map((item) => (
     <Option key={item}>{item}</Option>
   ));
@@ -53,28 +43,6 @@ export default function EstimateForm(props) {
   const options2 = salesmen.map((item) => (
     <Option key={item.id}>{item.FirstName}</Option>
   ));
-  const options3 = customerList.map((item) => (
-      {
-        label:`${item.CustFirstName} ${item.CustLastName}`,
-        value:`${item.CustomerID}`
-      }
-  ));
-
-  const options4 = addressList.map((item) => (
-    <Option key={item.AddressID}>{item.Address}</Option>
-  ));
-
-  const emailCheck = (value) => {
-    let word = value.target.value;
-    if(validator.isEmail(word)){
-      setValidEmail('Valid email');
-      setErrorColor('green');
-    }
-    else {
-      setValidEmail('Not a valid email');
-      setErrorColor('red');
-    }
-  }
 
   const getregions = async () => {
     const data = await getRegionAPI();
@@ -96,41 +64,11 @@ export default function EstimateForm(props) {
     setSalesmen(salesData);
   };
 
-  const getCustomerList = async() => {
-      const data = await getCustomers();
-      setCustomerList(data.data);
-  }
-
-  const getRegionByID = (id) => {
-    let regionName = "";
-    regions.forEach((item) => {
-      if(item.id == id) {
-        regionName = item.region
-      }
-    })
-    return regionName;
-  } 
-
   const onFinish = async (values) => {
+    let customer = selectCustomer;
+    const addressInfo = await getAddress(selectAddress);
     const start = format(values.selectedDate[0]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
     const end = format(values.selectedDate[1]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-
-    var customer = {
-      FirstName: values.FirstName,
-      LastName: values.LastName,
-      Phone: values.Phone,
-      Email: values.Email,
-      BillingAddress: values.BillingAddress || ' ',
-      City: values.City || ' ',
-      PostalCode: values.PostalCode || ' ',
-      Region: values.Region || ' ',
-    };
-    var siteAddress = {
-      BillingAddress: values.siteAddress,
-      City: values.siteCity,
-      PostalCode: values.sitePostal,
-      Region: values.siteRegion
-    };
     var estimate = {
       UserID: values.salesman,
       JobType: values.JobType,
@@ -139,201 +77,40 @@ export default function EstimateForm(props) {
       endDate: end,
       estimateInfo: values.EstimateInfo,
     };
-    if(customerExist) {
-      if(addressExist){
-        await addEstimate(customerSelect.CustomerID, addressSelect.AddressID, estimate);
-        message.success("Added new estimate to customer");
-      }
-      else{
-      let addressAdded = await addAddress(customerSelect.CustomerID, siteAddress);
-      let addressID = addressAdded.data.insertId;
-      await addEstimate(customerSelect.customerID, addressID, estimate);
-      message.success("Added new address and estimate");
-      }
-    }
-    else{
-    const check = await CheckForExisting(customer);
-    if (check.length > 0) {
-      message.warn("Customer already on file. Estimate not added");
-    }
-    else{
-    let customerInfo = await addCustomer(customer);
-    var latestCustomer = customerInfo.data.insertId;
-    if(customer.BillingAddress !== ' ') {
-           await addAddress(latestCustomer, customer);
-    }
-          let addressResult = await addAddress(latestCustomer, siteAddress);
-          let addressID = addressResult.data.insertId;
-           var estimateResult = await addEstimate(
-            latestCustomer,
-            addressID,
+      var estimateResult = await addEstimate(
+            customer.CustomerID,
+           selectAddress,
             estimate
           );
           if (estimateResult.status === 200) {
             message.success("Added new estimate");
           } 
           else message.warn("Something went wrong");
-        }
-  }
+  /*
     if(validator.isEmail(customer.Email)){
-      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {siteAddress} estimateInfo = {estimate}  />), customer_info_sheet)
+      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo[0].data} estimateInfo = {estimate}  />), customer_info_sheet)
     }
+    */
     history.push("/home");
   };
 
   useEffect(() => {
+
     getsalesmen();
     getregions();
-    getCustomerList();
 
-    if (salesmen !== [] && regions !== [] && customerList !== []) {
+    if (salesmen !== [] && regions !== [] ) {
       setInfo(true);
     }
-  }, []);
+  }, [selectCustomer]);
   if (info !== true) {
     return <p>Loading Information...</p>;
   } else {
     return (
       <div className="neworder">
+        <h3>Estimate</h3>
         <Card>
           <Form form={form} onFinish={onFinish} {...layout}>
-            <Item>
-                <Button
-                onClick={()=>{setLookup(true)}}>
-                Existing Customer
-                </Button>
-            </Item>
-            <Item
-              label="First Name"
-              name="FirstName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required Field",
-                },
-              ]}
-            >
-              <Input placeholder="First Name" />
-            </Item>
-            <Item
-              label="Last Name"
-              name="LastName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required Field",
-                },
-              ]}
-            >
-              <Input placeholder="Last Name" />
-            </Item>
-            <Item
-              label="Phone"
-              name="Phone"
-              rules={[
-                {
-                  required: true,
-                  message: "Required Field",
-                },
-              ]}
-            >
-              <Input placeholder="Phone Number" />
-            </Item>
-            <Item
-             label="Email Address" 
-             name="Email"
-             rules={[
-              {
-                required: true,
-                message: "Required Field",
-              },
-            ]}
-             >
-              <Input
-              onChange={emailCheck} />
-              
-            </Item>
-            <Item
-            label="Email Check">
-              <span 
-              style={{
-                fontSize:12,
-                color:errorColor
-              }}>
-          {validEmail}
-          </span>
-            </Item>
-            <Item>
-                <Button
-                disabled={!customerExist}
-                onClick={()=>{setAddressLookup(true)}}
-                >
-                    Existing Address
-                </Button>
-            </Item>
-            <Item label="Site Address" name="siteAddress"
-            rules={[
-              {
-                required: true,
-                message: "Required Field",
-              },
-            ]}>
-              <Input placeholder="Address" />
-            </Item>
-            <Item label="Site Postal Code" name="sitePostal"
-            rules={[
-              {
-                required:true,
-                message:"Required field"
-              }
-            ]}>
-              <Input placeholder="Postal Code" />
-            </Item>
-            <Item label="Site City" name="siteCity"
-            rules={[
-              {
-                required: true,
-                message: "Required Field",
-              },
-            ]}>
-              <Input placeholder="City" />
-            </Item>
-            <Item name="siteRegion" label="Site Region"
-            rules={[
-              {
-                required: true,
-                message: "Required Field",
-              },
-            ]}>
-              <Select>{options}</Select>
-            </Item>
-            <i>optional billing address</i><br/>
-            <i>---</i>
-            <Item
-              label="Billing Address"
-              name="BillingAddress" 
-            >
-            <Input />
-            </Item>
-            <Item
-              label="City"
-              name="City"
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Postal Code"
-              name="PostalCode"
-            >
-              <Input />
-            </Item>
-            <Item
-              name="Region"
-              label="Region"
-            >
-              <Select>{options}</Select>
-            </Item>
-            <i>---</i>
             <Item
               name="selectedDate"
               label="Time"
@@ -356,7 +133,7 @@ export default function EstimateForm(props) {
             </Item>
             <Item
               name="JobType"
-              label="Type of Job"
+              label="Job Type"
               rules={[
                 {
                   required: true,
@@ -369,7 +146,7 @@ export default function EstimateForm(props) {
               
             </Item>
             <Item
-              label="Information"
+              label="Job Info"
               name="EstimateInfo"
               rules={[
                 {
@@ -382,7 +159,7 @@ export default function EstimateForm(props) {
             </Item>
             <Item
               name="salesman"
-              label="Assigned Salesman"
+              label="Salesman"
               rules={[
                 {
                   required: true,
@@ -412,64 +189,6 @@ export default function EstimateForm(props) {
         width="90%"
         >
         <SalesSnapshot />
-      </Modal>
-      <Modal
-      title="Customer Lookup"
-      
-      visible={lookup}
-      onCancel={()=>{setLookup(false)}}>
-          <AutoComplete
-          style={{width:'150px'}}
-          options={options3}
-          placeholder="Look up customer by name"
-          filterOption={(inputValue, option) =>
-            option.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-          }
-          onSelect={async(value) => {
-            let customer = customerList.find((arr) => {
-                return arr.CustomerID == value;
-            })
-           form.setFieldsValue(
-               {FirstName:customer.CustFirstName,
-                LastName:customer.CustLastName,
-                Phone:customer.Phone,
-                Email:customer.Email,
-                BillingAddress:customer.BillingAddress,
-                City:customer.CustCity,
-                PostalCode:customer.CustPostalCode,
-                Region:getRegionByID(customer.CustRegion)
-                });
-            const list = await getAddressList(customer.CustomerID);
-            setAddressList(list.data);
-            setCustomerExist(true);
-            setCustomerSelect(customer);
-            setLookup(false);
-            
-          }}
-          />
-      </Modal>
-      <Modal
-       title="Customer Address Lookup"
-      visible={addressLookup}
-      onCancel={()=>{setAddressLookup(false)}}
-      >
-      <Select 
-      style={{width:'200px'}}
-      onChange={(value) => {
-        let address = addressList.find((arr) => {
-          return arr.AddressID == value;
-        })
-        form.setFieldsValue({
-          siteAddress:address.Address,
-          sitePostal:address.PostalCode,
-          siteCity:address.City,
-          siteRegion:getRegionByID(address.Region)
-        });
-        setAddressExist(true);
-        setAddressSelect(address);
-        setAddressLookup(false);
-      }}>{options4}
-      </Select>
       </Modal>
       </div>
       

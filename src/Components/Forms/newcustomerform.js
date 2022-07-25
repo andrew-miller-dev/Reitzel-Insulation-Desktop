@@ -2,7 +2,7 @@ import { Card, Col, Form, Input, Row, Button, Select, Checkbox, Switch, message 
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { regions } from "../../util/storedArrays";
 import { CheckForExisting, checkForMultipleBilling } from "../../config/checks";
-import { addCustomer } from "../../api/neworder";
+import { addCustomer, addAddress } from "../../api/neworder";
 const {Option} = Select;
 const { Item } = Form;
 
@@ -19,13 +19,13 @@ export default function NewCustomerForm(props) {
         })
         }
        let newInfo = {
-        FirstName : values.firstName,
-        LastName:values.lastName,
+        CustFirstName : values.firstName,
+        CustLastName:values.lastName,
         Phone:values.phone,
         Email:values.email,
-        City:billing.city,
-        PostalCode:billing.postal,
-        Region:billing.region,
+        CustCity:billing.city,
+        CustPostalCode:billing.postal,
+        CustRegion:billing.region,
         BillingAddress:billing.address
        }
         const check = await CheckForExisting(newInfo);
@@ -36,7 +36,7 @@ export default function NewCustomerForm(props) {
         let customerInfo = await addCustomer(newInfo);
         var latestCustomer = customerInfo.data.insertId;
         if(values.addresses !== undefined){
-          values.addresses.forEach((item) => {
+          values.addresses.forEach(async(item) => {
             let addressInfo = {
               City:item.city,
               PostalCode:item.postal,
@@ -46,7 +46,18 @@ export default function NewCustomerForm(props) {
             var newAddress = await addAddress(latestCustomer, addressInfo);
           })
         }
-        
+        const customer = {
+        CustomerID: latestCustomer,
+        CustFirstName : values.firstName,
+        CustLastName:values.lastName,
+        Phone:values.phone,
+        Email:values.email,
+        CustCity:billing.city,
+        CustPostalCode:billing.postal,
+        CustRegion:billing.region,
+        BillingAddress:billing.address
+        }
+        props.setDisplay(customer);
         }
     }
 
@@ -202,7 +213,7 @@ export default function NewCustomerForm(props) {
             
             </Card>
         <Item>
-            <Button type="primary" htmlType="submit">Test</Button>
+            <Button type="primary" htmlType="submit">Add Customer</Button>
         </Item>
         </Form> 
     )

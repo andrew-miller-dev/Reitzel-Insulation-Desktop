@@ -1,8 +1,8 @@
-import { Card, Col, Form, Input, Row, Modal, Button, AutoComplete, Space } from "antd";
+import { Card, Modal, Button, AutoComplete, Select } from "antd";
 import { useEffect, useState } from "react";
 import { getAddressList, getCustomers, getRegionAPI } from "../../api/calendar";
 import NewCustomerForm from "../Forms/newcustomerform";
-const { Item } = Form;
+import { useDispatch, useSelector } from "react-redux";
 
 export default function NewCustomerButton(props) {
     const [showForm, setShowForm] = useState(false);
@@ -10,6 +10,8 @@ export default function NewCustomerButton(props) {
     const [regions, setRegions] = useState([]);
     const [addressList, setAddressList] = useState([]);
     const [selectCustomer, setSelectCustomer] = useState([]);
+    const dispatch = useDispatch();
+    const select = useSelector((state) => state);
 
     const options3 = customerList.map((item) => (
         {
@@ -17,6 +19,13 @@ export default function NewCustomerButton(props) {
           value:`${item.CustomerID}`
         }
     ));
+
+    const optionsAddress = addressList.map((item) => (
+      {
+        label:`${item.Address}`,
+        value:item.AddressID
+      }
+    ))
 
     const getregions = async () => {
         const data = await getRegionAPI();
@@ -31,6 +40,15 @@ export default function NewCustomerButton(props) {
       const getCustomerList = async() => {
           const data = await getCustomers();
           setCustomerList(data.data);
+      }
+
+      const setDisplay = async(customer) => {
+        setSelectCustomer(customer);
+        dispatch({type:"customerUpdate", payload:customer});
+        console.log(select);
+        const list = await getAddressList(customer.CustomerID);
+        setAddressList(list.data);
+        document.getElementById("CustomerInfo").style.display = "block";
       }
 
     useEffect(() => {
@@ -52,10 +70,7 @@ export default function NewCustomerButton(props) {
             let customer = customerList.find((arr) => {
                 return arr.CustomerID == value;
             });
-            setSelectCustomer(customer);
-            const list = await getAddressList(customer.CustomerID);
-            setAddressList(list.data);
-            document.getElementById("CustomerInfo").style.display = "block";
+            setDisplay(customer);
         }}
 />
 <br/>
@@ -63,8 +78,16 @@ export default function NewCustomerButton(props) {
                     New Customer
                 </Button>
                 <div id="CustomerInfo" style={{display:"none"}}>
-                    <Card title="Customer">
-                      {selectCustomer.CustFirstName}  {selectCustomer.CustLastName} 
+                    <Card title="Info">
+                      {selectCustomer.CustFirstName}  {selectCustomer.CustLastName} <br />
+                      {selectCustomer.BillingAddress} <br/>
+                      {selectCustomer.CustCity} {selectCustomer.CustPostalCode}
+                    </Card>
+                    <Card title="Address">
+                      <Select style={{width:'150px'}} 
+                      options={optionsAddress}
+                      onSelect={(value) => {dispatch({type:"addressUpdate",payload:value})}}>
+                      </Select>
                     </Card>
                 </div>
             </Card>
@@ -73,7 +96,7 @@ export default function NewCustomerButton(props) {
     width="90%"
     visible={showForm}
     onCancel={()=> {setShowForm(false)}}>
-        <NewCustomerForm />
+        <NewCustomerForm setDisplay = {setDisplay} />
     </Modal> 
     </div>
     )

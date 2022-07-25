@@ -3,7 +3,6 @@ import {useHistory } from "react-router-dom";
 import Button from "../../component/quotes/Button";
 import {useInput} from '../../hooks/input-hook';
 import { useParams } from "react-router";
-import { useDispatch} from "react-redux";
 import qData from './quoteData.js';
 import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
@@ -60,8 +59,6 @@ function QuoteOne(props) {
             setLoading(false);
             setUser(getUser());    
         },[selectedQuote]);
-
-    const dispatch = useDispatch();
 
     const {value: custID, assignValue: assignCustID} = useInput();
     const {value: firstName, bind: bindFirstName, assignValue: assignFirstName} = useInput();
@@ -161,12 +158,6 @@ function QuoteOne(props) {
             details: quotedetails,
             total: getQuoteTotal(quotedetails)
         }
-
-        dispatch({
-            type: "quote_one",
-            payload: payload
-        })
-
         props.onSetQuoteFormDataChange(payload);
         evt.preventDefault();
 

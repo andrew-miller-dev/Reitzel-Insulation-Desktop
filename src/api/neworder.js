@@ -4,7 +4,7 @@ const {format} = require('date-fns-tz');
 
 export async function addCustomer(order) {
   var tableName = "customers";
-  var values = `${null},'${order.FirstName}','${order.LastName}','${order.Phone}','${order.Email}','${order.BillingAddress}','${order.City}','${order.PostalCode}','${order.Region}'`;
+  var values = `${null},'${order.CustFirstName}','${order.CustLastName}','${order.Phone}','${order.Email}','${order.BillingAddress}','${order.CustCity}','${order.CustPostalCode}','${order.CustRegion}'`;
 
   var customer = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (customer !== []) return customer;
