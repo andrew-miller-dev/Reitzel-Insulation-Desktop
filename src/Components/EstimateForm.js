@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import validator from "validator";
 import { useSelector } from "react-redux";
-import { Form, DatePicker, Input, Button, Select, message, Card, Modal, AutoComplete } from "antd";
-import {
-  addCustomer,
-  addEstimate,
-  addAddress,
-} from "../api/neworder";
+import { Form,Button, Select, message, Card, Modal } from "antd";
+import DatePicker from './DatePicker.js';
+import {addEstimate} from "../api/neworder";
 import SalesSnapshot from './HomeTemplate/SalesCalendar/SalesSnapshot';
-import { getRegionAPI, getUsers, sendConfirm, getAddressList, getCustomers } from "../api/calendar"
+import { getRegionAPI, getUsers, sendConfirm } from "../api/calendar"
 import TextArea from "antd/lib/input/TextArea";
 import Confirmation from "./Email_Templates/confirmation"
 import {renderEmail} from 'react-html-email';
@@ -22,13 +19,12 @@ const { Option } = Select;
 const { format } = require("date-fns-tz");
 
 export default function EstimateForm(props) {
+  const [user, setUser] = useState({}); 
   const [info, setInfo] = useState(false);
   const [salesmen, setSalesmen] = useState([]);
   const [regions, setRegions] = useState([]);
   const [form] = Form.useForm();
   const [showCalendar, setShowCalendar] = useState(false);
-  const [customerSelect, setCustomerSelect] = useState([]);
-  const [addressSelect, setAddressSelect] = useState([]);
   const history = useHistory();
   const selectCustomer = useSelector((state) => state.customerReducer.newEstimate);
   const selectAddress = useSelector((state) => state.addressReducer.currentAddress);
@@ -56,7 +52,8 @@ export default function EstimateForm(props) {
 
   const getsalesmen = async () => {
     const data = await getUsers();
-    let salesData = data.data.map((item) => ({
+    let salesData = data.data.map((item) => (
+      {
       id: item.UserID,
       FirstName: item.FirstName,
       LastName: item.LastName,
@@ -65,12 +62,13 @@ export default function EstimateForm(props) {
   };
 
   const onFinish = async (values) => {
+    console.log(values)
     let customer = selectCustomer;
     const addressInfo = await getAddress(selectAddress);
-    const start = format(values.selectedDate[0]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-    const end = format(values.selectedDate[1]._d,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+    const start = format(values.selectedDate[0],"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+    const end = format(values.selectedDate[1],"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
     var estimate = {
-      UserID: values.salesman,
+      UserID: values.salesman[0].value,
       JobType: values.JobType,
       Region: values.siteRegion,
       startDate: start,
@@ -86,20 +84,20 @@ export default function EstimateForm(props) {
             message.success("Added new estimate");
           } 
           else message.warn("Something went wrong");
-  /*
+  
     if(validator.isEmail(customer.Email)){
-      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo[0].data} estimateInfo = {estimate}  />), customer_info_sheet)
+      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {estimate}  />), customer_info_sheet)
     }
-    */
+
     history.push("/home");
   };
 
   useEffect(() => {
-
+    
     getsalesmen();
     getregions();
 
-    if (salesmen !== [] && regions !== [] ) {
+    if (salesmen !== [] && regions !== []) {
       setInfo(true);
     }
   }, [selectCustomer]);
@@ -110,7 +108,11 @@ export default function EstimateForm(props) {
       <div className="neworder">
         <h3>Estimate</h3>
         <Card>
-          <Form form={form} onFinish={onFinish} {...layout}>
+          <Form form={form} onFinish={onFinish} {...layout}
+          initialValues={{
+            ["selectedDate"]:[props.start,props.end],
+            ["salesman"]:[{value:props.salesman.id,label:props.salesman.name}]
+          }}>
             <Item
               name="selectedDate"
               label="Time"
@@ -168,6 +170,7 @@ export default function EstimateForm(props) {
               ]}
             >
               <Select
+              labelInValue={true}
               >{options2}</Select>
             </Item>
             <Item>

@@ -183,7 +183,7 @@ const buttons = () => {
       </Button>
       <Button
       onClick={() => {
-        setFormOption(<NewEstimateForm />);
+        setFormOption(<NewEstimateForm salesman={{id:null,name:null}} />);
         setShowForm(true);
         //history.push('/newestimate');
       }}>

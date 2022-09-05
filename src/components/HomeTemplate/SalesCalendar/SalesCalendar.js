@@ -30,6 +30,7 @@ import Confirmation from "../../Email_Templates/confirmation.js";
 import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button, TagBox } from "devextreme-react";
 import { Item } from "devextreme-react/form";
 import { jobs } from "../../../util/storedArrays.js";
+import NewEstimateForm from "../../Forms/newestimateform";
 const { confirm } = Modal;
 const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 
@@ -169,6 +170,7 @@ class SalesCalendar extends React.Component {
        },
       description:"",
       jobType:"",
+      formOption:{}
     };
     
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
@@ -176,7 +178,7 @@ class SalesCalendar extends React.Component {
     this.salesmanSource = this.salesmanSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
-    this.getUserName = this.getUserName.bind(this);
+    this.createUserObj = this.createUserObj.bind(this);
   }
   async InfoIsHere() {
   if(this.mounted){
@@ -190,149 +192,24 @@ class SalesCalendar extends React.Component {
   }
   
 } 
-
 async onAppointmentForm (e) {
-  
-  if(e.appointmentData.CreationDate) {
-    e.cancel = true;
-  }
-  
-  else{
-  let form = e.form;
-  e.popup.option('showTitle', true);
-  e.popup.option('title', 'Quick appointment creation');
-  let user = e.appointmentData.UserID;
-  var apptDates = {...this.state.apptDates};
-          apptDates.start = format(e.appointmentData.startDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-          apptDates.end = format(e.appointmentData.endDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-          this.setState({apptDates});
-  let newGroupItems =[
-    {
-      editorType:'dxButton',
-      colSpan:2,
-      editorOptions:{
-        text:'Existing Customer Lookup',
-        onClick:() => {
-          e.popup.hide();
-          this.setState({showForm:true});
-          var appointmentInfo = {...this.state.appointmentInfo};
-          appointmentInfo.startDate = format(e.appointmentData.startDate,"M/d/yyyy, hh:mm a");
-          appointmentInfo.endDate = format(e.appointmentData.endDate,"M/d/yyyy, hh:mm a");
-          this.setState({appointmentInfo});
-          this.setState({clickedSalesman:e.appointmentData.UserID})
-        } 
-      },
-    },
-  {
-    label:{text: "First Name"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"firstName"
-  },
-  {
-    label:{text: "Last Name"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"lastName",
-  },
-  {
-    label:{text:'Phone'},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:'phone'
-  },
-  {
-    label:{text:"Email"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"email",
-  },
+  e.cancel = true;
+  //console.log(e.appointmentData)
+  this.setState({formOption:<NewEstimateForm start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
+  this.setState({showForm:true});
+}
 
-  {
-    label:{text:"Site Address"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"siteAddress"
-  },
-  {
-    label:{text:"Site City"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"siteCity"
-  },
-  {
-    label:{text:"Postal Code"},
-    isRequired:true,
-    editorType:'dxTextBox',
-    dataField:"sitePostal"
-  },
-  {
-    label:{text:"Region"},
-    isRequired:true,
-    editorType:'dxSelectBox',
-    editorOptions:{
-      displayExpr:"region",
-      valueExpr:"id",
-      dataSource: this.state.regionList,
-    },
-    dataField:'siteRegion'
-  },
-  {
-    label:{text:"Assigned Salesman"},
-    editorType: 'dxTextBox',
-    editorOptions:{
-      value:this.getUserName(user, this.state.userList),
-      readOnly:true
+createUserObj = (id) => {
+  let obj = {id:null,name:null}
+  this.state.userList.forEach(element => {
+    if(element.id == id) {
+      obj = {id:element.id,
+              name:element.FirstName}
     }
-  },
-  {
-    label:{text: "Start Date"},
-    colSpan:2,
-    editorType:'dxDateBox',
-    editorOptions:{type:'datetime', width:'100%'},
-    isRequired:true,
-    dataField:'startDate'
-  },
-  {
-    label:{text: "End Date"},
-    colSpan:2,
-    editorType:'dxDateBox',
-    editorOptions:{type:'datetime', width:'100%'},
-    isRequired:true,
-    dataField:'endDate'
-  },
-  {
-    label:{text:"Description"},
-    colSpan:2,
-    editorType:'dxTextArea',
-    isRequired:true,
-    dataField:'apptInfo'
-  },
-  {
-    label:{text:"Job Type"},
-    colSpan:2,
-    isRequired:true,
-    editorType:'dxTagBox',
-    editorOptions:{
-      items:jobs
-    },
-    dataField:'jobType'
-  }
-];
-
-  form.itemOption('mainGroup','items', newGroupItems);
-}
+  });
+  return obj;
 }
 
-getUserName(id, array){
-  let user = '';
-  array.map((item) => {
-    if(item.id === id) {
-      user = item.FirstName + " " + item.LastName;
-    }
-  })
-  return user;
-}
 
   onGroupByDateChanged(args) {
     this.setState({
@@ -427,184 +304,16 @@ getUserName(id, array){
             })
           }} />
         </div>
-        </Space>
-        
+        </Space> 
       </div>
-      <Popup
-      height='95%'
-      title="Existing Customer Appointment Creation"
+      <Modal
+      footer={false}
+      destroyOnClose={true}
       visible={this.state.showForm}
-      onHiding={() => {this.setState({showForm:false})}}
-      >
-          <Autocomplete
-          dataSource={this.state.findCustomerList}
-          valueExpr="CustLastName"
-          placeholder="Look up by last name..."
-          itemRender={(data) => {
-            return (
-              <span>{data.CustFirstName} {data.CustLastName}</span>
-            )
-          }}
-          onItemClick={async(data) => {
-            var customer = data.itemData
-            var basicInfo = {...this.state.basicInfo};
-            basicInfo.firstName = customer.CustFirstName;
-            basicInfo.lastName = customer.CustLastName;
-            basicInfo.phone = customer.Phone;
-            basicInfo.email = customer.Email;
-            basicInfo.billingAddress = customer.BillingAddress;
-            basicInfo.billingCity = customer.CustCity;
-            basicInfo.billingPostal = customer.CustPostalCode;
-            basicInfo.billingRegion = customer.CustRegion;
-            this.setState({basicInfo});
-            this.setState({custID:customer.CustomerID})
-            let result = await getAddressList(customer.CustomerID);
-            this.setState({customerAddresses:result.data});
-          }}
-          />
-          <br/>
-        <Form
-        formData={this.state.basicInfo}
-        colCount={3}
-
-        >
-        <Item editorOptions={{readOnly:true}} dataField='firstName' />  
-        <Item editorOptions={{readOnly:true}} dataField='lastName' />
-        <Item editorOptions={{readOnly:true}} dataField='phone' />
-        <Item editorOptions={{readOnly:true}} dataField='email' />  
-        <Item editorOptions={{readOnly:true}} dataField='billingAddress' />
-        <Item editorOptions={{readOnly:true}} dataField='billingCity' />
-        <Item editorOptions={{readOnly:true}} dataField="billingPostal" />
-        <Item dataField="billingRegion" 
-              editorType="dxSelectBox" 
-              editorOptions={{dataSource: this.state.regionList, value:this.state.basicInfo.billingRegion, displayExpr:"region", valueExpr:"id", readOnly:true}} />
-
-        </Form>
-        <br />
-        <CheckBox
-        text="Use Existing Address"
-        onValueChanged={() => {
-          if(this.state.useExisting === true){
-            this.setState({useExisting:false});
-          }
-          else {
-            this.setState({useExisting:true});
-          }
-          }}
-        ></CheckBox>
-        <br />
-        <SelectBox
-          visible={this.state.useExisting}
-          dataSource={this.state.customerAddresses}
-          itemRender={(data) => {
-            return (
-              <span>{data.Address}, {data.City} {data.PostalCode}</span>
-            )
-          }}
-          onItemClick={(data) => {
-            var address = data.itemData;
-            var siteInfo = {...this.state.siteInfo};
-            siteInfo.siteAddress = address.Address;
-            siteInfo.siteCity = address.City;
-            siteInfo.sitePostal = address.PostalCode;
-            siteInfo.siteRegion = address.Region;
-            this.setState({siteID:address.AddressID});
-            this.setState({siteInfo});
-          }}
-          />
-        <br />
-        <Form
-        colCount={3}
-        formData={this.state.siteInfo}
-        >
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteAddress' />  
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField='siteCity' />
-        <Item editorOptions={{readOnly:this.state.useExisting}} dataField="sitePostal" />
-        <Item dataField="siteRegion" 
-              editorType="dxSelectBox" 
-              editorOptions={{dataSource: this.state.regionList, value:this.state.siteInfo.siteRegion, displayExpr:"region", valueExpr:"id", readOnly:this.state.useExisting}} />
-        </Form>
-        
-        <br/>
-        <Form
-        col count={2}
-        formData={this.state.appointmentInfo}>
-        
-        </Form>
-        Description:
-        <TextArea
-        onValueChanged={(data) => {
-          this.setState({description:data.value});
-        }}>
-
-        </TextArea>
-        Job Type:
-        <TagBox
-        onValueChanged={(data) => {
-          this.setState({jobType:data.value});
-        }}
-        items={jobs}>
-        </TagBox>
-        Assigned Salesman:
-        <TextBox
-        readOnly={true}
-        value={this.getUserName(this.state.clickedSalesman, this.state.userList)}>
-        </TextBox>
-        <br />
-        <div style={{float:"right"}}>
-        <Space>
-        <Button
-        style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
-        onClick={(e) => {
-          let func = async() => {
-                let info = {
-                  UserID:this.state.clickedSalesman,
-                  jobType:this.state.jobType,
-                  apptInfo:this.state.description,
-                  siteRegion:this.state.siteInfo.siteRegion,
-                  startDate:this.state.apptDates.start,
-                  endDate:this.state.apptDates.end
-               }
-               if(this.state.useExisting){
-              let result = await addEstimate(this.state.custID, this.state.siteID, info);
-              this.setState({showForm:false});
-              if(result.status === 200){
-                message.success("Added new estimate");
-              }
-          }
-          
-          else {
-            let result = await addNewAddress(this.state.custID, this.state.siteInfo);
-            if(result.status === 200){
-              let address = result.data.insertId;
-              let final = await addEstimate(this.state.custID, address, info);
-              this.setState({showForm:false});
-              if(final.status === 200) {
-                message.success("Added new address and estimate");
-              }
-            }
-            else{
-              message.warn("Something went wrong");
-            }
-          }
-          
-          }
-        func().then(() => {
-          dataSource.load();
-        })
-        
-        }}
-        >Done</Button>
-        <Button
-         style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
-         onClick={() => {
-           this.setState({showForm:false})}}>
-          Cancel
-        </Button>
-        </Space>
-        </div>
-      </Popup>
-      
+      onCancel={() => {this.setState({showForm:false})}}
+      width="75%">
+        {this.state.formOption}
+      </Modal>
     </div>
     );
   }
