@@ -57,7 +57,11 @@ export default function NewCustomerForm(props) {
         CustRegion:billing.region,
         BillingAddress:billing.address
         }
-        props.setDisplay(customer);
+        if(props.setDisplay){
+          props.setDisplay(customer);
+        }
+        message.success("Customer added");
+        props.close();
         }
     }
 

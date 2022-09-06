@@ -14,6 +14,7 @@ import Popup2 from "../../Components/popup2";
 import NewCustomerForm from "../../Components/Forms/newcustomerform";
 import Refresh from "../../Components/Refresh";
 import NewEstimateForm from "../../Components/Forms/newestimateform";
+import NewCustomerButton from "../../Components/Form_Buttons/newCustomerButton";
 
 function Searchbar(props) {
  const history = useHistory();
@@ -175,7 +176,7 @@ const buttons = () => {
 <Space>
          <Button
          onClick={() => {
-          setFormOption(<NewCustomerForm />);
+          setFormOption(<NewCustomerForm close = {() => {setShowForm(false)}} />);
           setShowForm(true);
          // history.push('/newcustomer');
          }}>

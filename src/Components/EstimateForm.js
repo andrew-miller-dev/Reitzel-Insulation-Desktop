@@ -19,10 +19,8 @@ const { Option } = Select;
 const { format } = require("date-fns-tz");
 
 export default function EstimateForm(props) {
-  const [user, setUser] = useState({}); 
   const [info, setInfo] = useState(false);
   const [salesmen, setSalesmen] = useState([]);
-  const [regions, setRegions] = useState([]);
   const [form] = Form.useForm();
   const [showCalendar, setShowCalendar] = useState(false);
   const history = useHistory();
@@ -40,16 +38,6 @@ export default function EstimateForm(props) {
     <Option key={item.id}>{item.FirstName}</Option>
   ));
 
-  const getregions = async () => {
-    const data = await getRegionAPI();
-    let regionData = data.data.map((item) => ({
-      id: item.RegionID,
-      region: item.Region,
-      color: item.color,
-    }));
-    setRegions(regionData);
-  };
-
   const getsalesmen = async () => {
     const data = await getUsers();
     let salesData = data.data.map((item) => (
@@ -62,15 +50,15 @@ export default function EstimateForm(props) {
   };
 
   const onFinish = async (values) => {
-    console.log(values)
+    console.log(values);
     let customer = selectCustomer;
     const addressInfo = await getAddress(selectAddress);
     const start = format(values.selectedDate[0],"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
     const end = format(values.selectedDate[1],"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
     var estimate = {
-      UserID: values.salesman[0].value,
+      UserID: values.salesman.value,
       JobType: values.JobType,
-      Region: values.siteRegion,
+      Region: addressInfo.data[0].Region,
       startDate: start,
       endDate: end,
       estimateInfo: values.EstimateInfo,
@@ -95,9 +83,8 @@ export default function EstimateForm(props) {
   useEffect(() => {
     
     getsalesmen();
-    getregions();
 
-    if (salesmen !== [] && regions !== []) {
+    if (salesmen !== []) {
       setInfo(true);
     }
   }, [selectCustomer]);
@@ -111,7 +98,7 @@ export default function EstimateForm(props) {
           <Form form={form} onFinish={onFinish} {...layout}
           initialValues={{
             ["selectedDate"]:[props.start,props.end],
-            ["salesman"]:[{value:props.salesman.id,label:props.salesman.name}]
+            ["salesman"]:{value:props.salesman.id,label:props.salesman.name}
           }}>
             <Item
               name="selectedDate"

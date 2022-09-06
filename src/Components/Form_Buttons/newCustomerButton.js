@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 export default function NewCustomerButton(props) {
     const [showForm, setShowForm] = useState(false);
     const [customerList, setCustomerList] = useState([]);
-    const [regions, setRegions] = useState([]);
     const [addressList, setAddressList] = useState([]);
     const [selectCustomer, setSelectCustomer] = useState([]);
     const dispatch = useDispatch();
@@ -26,16 +25,9 @@ export default function NewCustomerButton(props) {
         value:item.AddressID
       }
     ))
-
-    const getregions = async () => {
-        const data = await getRegionAPI();
-        let regionData = data.data.map((item) => ({
-          id: item.RegionID,
-          region: item.Region,
-          color: item.color,
-        }));
-        setRegions(regionData);
-      };
+    const closeForm = () => {
+      setShowForm(false);
+    }
 
       const getCustomerList = async() => {
           const data = await getCustomers();
@@ -53,7 +45,6 @@ export default function NewCustomerButton(props) {
 
     useEffect(() => {
         getCustomerList();
-        getregions();
       }, []);
   
     return (
@@ -95,8 +86,9 @@ export default function NewCustomerButton(props) {
     <Modal
     width="90%"
     visible={showForm}
-    onCancel={()=> {setShowForm(false)}}>
-        <NewCustomerForm setDisplay = {setDisplay} />
+    onCancel={closeForm}
+    footer={false}>
+        <NewCustomerForm setDisplay = {setDisplay} close = {closeForm}/>
     </Modal> 
     </div>
     )
