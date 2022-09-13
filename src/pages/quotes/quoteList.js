@@ -4,9 +4,6 @@ import { useHistory } from "react-router-dom";
 import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quoteEditAPI";
 import { getUser } from '../../util/storage';
 import getWordDoc from './quoteToWordBypass';
-import { sendQuote } from '../../api/quotes';
-import { renderEmail } from 'react-html-email';
-import QuoteEmail from '../../Components/Email_Templates/quote_template';
 import { GetOrderByQID } from '../../api/orders';
 const {Search} = Input;
 const {format} = require('date-fns-tz')
@@ -176,7 +173,6 @@ var parseISO = require('date-fns/parseISO')
               onClick={async() => {
                 if(data.completed !== null){
                 const order = await GetOrderByQID(data.QuoteID);
-                console.log(order);
                 Modal.info({
                   title:"Appointment Information",
                   content:`Work order already created. Appointment time is ${format(parseISO(order.data[0].startDate),"MMMM do',' yyyy h':'mm aa")}`
