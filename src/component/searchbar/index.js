@@ -1,6 +1,6 @@
 import React, { useState} from "react";
 import {useHistory} from "react-router-dom";
-import { Button, Space, AutoComplete, Modal, } from "antd";
+import { Button, Space, Modal, Select, Input, } from "antd";
 import "./index.css";
 import { withRouter } from "react-router";
 import { getMenu, getUser } from "../../util/storage";
@@ -9,12 +9,10 @@ import { SearchAllInfo } from "../../api/quoteEditAPI";
 import { SearchAllInfoWO } from "../../api/orders";
 import { format } from "date-fns-tz";
 import { parseISO } from "date-fns";
-import Popup from "../../Components/popup";
-import Popup2 from "../../Components/popup2";
 import NewCustomerForm from "../../Components/Forms/newcustomerform";
 import Refresh from "../../Components/Refresh";
 import NewEstimateForm from "../../Components/Forms/newestimateform";
-import NewCustomerButton from "../../Components/Form_Buttons/newCustomerButton";
+const {Option} = Select;
 
 function Searchbar(props) {
  const history = useHistory();
@@ -28,11 +26,25 @@ const closeForm = () =>{
   setShowForm(false);
 }
 
+const testRender = (data) => {
+  let newArr = []
+  if(data.length > 0) {
+    data.forEach((item) => {
+      newArr.push(<Option value={`customer `+ item.CustomerID}>{item.CustFirstName} {item.CustLastName}</Option>)
+    })
+  }
+  return newArr;
+}
+
 const renderCustomer = (data) => {
-    const newArr = [];
+    const newArr = []
     if(data.length > 0) { 
     data.forEach(element => {
-    newArr.push(renderItem(element));
+        let obj = {
+          label:element.CustFirstName + " " + element.CustLastName + "   " + element.BillingAddress,
+          value:"customer" + " " + element.CustomerID
+        }
+    newArr.push(obj);
   })}
   return newArr
 };
@@ -54,22 +66,9 @@ const renderOrders = (data) => {
   })}
   return newArr
 }
+const renderItem = (data) => {
 
-  const renderItem = (data) => {
-    return {
-      value:"customer"+ " "+ data.CustomerID,
-    label:(
-      <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-      }}>
-        {data.CustFirstName} {data.CustLastName}
-      </div>
-    )
-    }
 }
-
 const renderItemQ = (data) => {
   return {
     value:"quote"+ " "+data.QuoteID,
@@ -108,18 +107,6 @@ const renderItemO = (data) => {
   }
 }
 
-  const options = [
-    {label:"Customers",
-    options:renderCustomer(customerList)},
-  
-    {label:"Quotes",
-  options:renderQuotes(quoteList)},
-
-    {label:"Work Orders",
-  options:renderOrders(orderList)}
- 
-]
-
   const onSearch = async (value) => {
     if(value.length >= 3) {
     let customerResults = await customerLookup(value);
@@ -138,13 +125,13 @@ const renderItemO = (data) => {
   };
 
  const checkAndLoad = (item) => {
-   let arr = item.split(" ");
+   let arr = item.value.split(" ");
    let category = arr[0];
    let id = arr[1];
 
    switch (category) {
      case "customer":
-       history.push(`/customerinfo/${id}`);
+       history.push(`/customers/${id}`);
        break;
      case "quote":
        
@@ -197,17 +184,33 @@ const buttons = () => {
 if(getUser() && getMenu()) {
   return (
     <div className="content-searchbar">
-      <AutoComplete
+      <Select
+      placeholder="Search"
+      filterOption={false}
       onSelect={(data) => {
         checkAndLoad(data);
-        
       }}
+      showSearch={true}
       dropdownMatchSelectWidth={500}
-      placeholder="Search"
+      labelInValue={true}
       style={{width:300}}
-      options={options}
-      onChange={onSearch}>
-      </AutoComplete>
+      onSearch={onSearch}
+      options={[
+        {
+          label:"Customers",
+          options:renderCustomer(customerList)
+        },
+        {
+          label:"Quotes",
+          options:renderQuotes(quoteList)
+        },
+        {
+          label:"Work Orders",
+          options:renderOrders(orderList)
+        }
+       
+      ]}>
+      </Select>
       {buttons()}
 
       <Modal

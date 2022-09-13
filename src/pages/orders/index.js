@@ -23,7 +23,7 @@ export default function Orders() {
   return (
     <div style={{padding: "10px", margin: "10px"}}>
       <div>
-        <h2> Orders<Space style={{float:"right"}}><Link to="/orders/orderList" ><Button>View All Work Orders</Button></Link></Space></h2>
+        <h2> Orders<Space style={{marginLeft:"25px"}}><Link to="/orders/orderList" ><Button>View All Work Orders</Button></Link><Link ><Button>New Work Order</Button></Link></Space></h2>
       </div> 
       <hr/>
       <Switch>

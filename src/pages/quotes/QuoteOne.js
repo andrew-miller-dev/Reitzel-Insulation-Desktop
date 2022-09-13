@@ -8,7 +8,6 @@ import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
 import { AutoComplete, Card, Row, Col, Checkbox, Select, InputNumber, } from "antd";
-import NewCustomerForm from "../../Components/Forms/newcustomerform";
 const { Option } = Select;
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(),"MMMM do',' yyyy");
@@ -42,7 +41,7 @@ function QuoteOne(props) {
         let result = await getCustomers();
             let cust = result.data.map((c) => (
                     {
-                    value : c.CustFirstName + " " + c.CustLastName + " " + c.CustomerID,
+                    value : c.CustFirstName + " " + c.CustLastName,
                     id : c.CustomerID,
                     name : c.CustFirstName + " " + c.CustLastName,
                     first_name : c.CustFirstName,
@@ -95,20 +94,27 @@ function QuoteOne(props) {
                 }]);
 
     
-    
+    const options = customers.map((item) => (
+        {
+            label:`${item.first_name} ${item.last_name}`,
+            value:`${item.id}`
+        }
+    ))
     async function onCustomerSelect(e, option) {
         if ((e === null || e === "" || e === undefined)) {
             
         } else {
-            assignCustID(option.id)
-            assignFirstName(option.first_name)
-            assignLastName(option.last_name)
-            assignPhoneNumber(option.phone)
-            assignEmail(option.email)
-            assignBillingAddress(option.address)
-            assignCity(option.city)
-            assignPostCode(option.postal_code)
-            let result = await getCustomerAddresses(option.id);
+            setAddresses([]);
+            let customer = customers.find(element => element.id == option.value);
+            assignCustID(option.value)
+            assignFirstName(customer.first_name)
+            assignLastName(customer.last_name)
+            assignPhoneNumber(customer.phone)
+            assignEmail(customer.email)
+            assignBillingAddress(customer.address)
+            assignCity(customer.city)
+            assignPostCode(customer.postal_code)
+            let result = await getCustomerAddresses(option.value);
             let addressList = result.data.map((item) => (
                 {
                     value : item.Address,
@@ -414,28 +420,44 @@ function QuoteOne(props) {
         <form onSubmit={handleSubmit}>
             <div className="Quote" style={{width:"80%"}}>
                 <div>
-                    Select Customer:
-                    <AutoComplete 
-                    onSelect={(e, option) => {onCustomerSelect(e, option)}}
-                    style={{ width: 200 }}
-                    options={customers}
-                    placeholder="Enter a customer"
-                    filterOption={(inputValue, option) =>
-                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                      }>    
-                    </AutoComplete>
+                    <table>
+                        <tr>
+                            <td>
+                                Select Customer:
+                            </td>
+                            <td>
+                                <Select 
+                                onSelect={(e, option) => {onCustomerSelect(e, option)}}
+                                style={{ width: 200 }}
+                                options={options}
+                                placeholder="Enter a customer"
+                                filterOption={(inputValue, option) =>
+                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                }>    
+                                </Select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Select Site Address:
+                            </td>
+                            <td>
+                                <Select
+                                onSelect={(e, option) => {onAddressSelect(e, option)}}
+                                style={{ width: 200 }}                
+                                options={addresses}               
+                                placeholder="Choose an address"                
+                                filterOption={(inputValue, option) =>                
+                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1                
+                                    }            
+                                notFoundContent="Choose a customer first or no addresses found"                
+                                ></Select>                                
+                            </td>
+                        </tr>
+                    </table>
                     <br/>
-                    Select Site Address:
-                    <AutoComplete
-                    onSelect={(e, option) => {onAddressSelect(e, option)}}
-                    style={{ width: 200 }}
-                    options={addresses}
-                    placeholder="Choose an address"
-                    filterOption={(inputValue, option) =>
-                        option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                      }
-                    notFoundContent="Choose a customer first or no addresses found"
-                    ></AutoComplete>
+                   
+                   
                     <br/>
                     <Row gutter={16}>
                         <Col span={10}>

@@ -4,17 +4,19 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import {getRegion, updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote} from '../../api/customer';
 import { addAddress } from '../../api/neworder';
 import { useRouteMatch } from "react-router-dom";
-import { withRouter } from "react-router";
+import { withRouter } from "react-router-dom";
 import {getUser} from '../../util/storage';
 import { getRegionAPI } from '../../api/calendar';
+
 const { Item } = Form;
 const { confirm } = Modal;
 const { Option } = Select;
 const { format } = require('date-fns-tz')
 
+
 export function CustomerInfo() {
 
-  let match = useRouteMatch('/customerinfo/:customer').params.customer;
+  let match = useRouteMatch('/customers/:customer').params.customer;
   const [showForm, setShowForm] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
   const [formAddress] = Form.useForm();
@@ -144,7 +146,7 @@ export function CustomerInfo() {
             console.log("Cancel");
           },
         });
-        
+
       }
       const handleNewAddress = async () =>{
         const validResult = await formAddress.validateFields();
@@ -224,16 +226,69 @@ export function CustomerInfo() {
             <div>
               <div style={{float:"left", width:"30%"}}>
               <Card title="Customer Information">
-            <p>First Name: {customerInfo.firstName}</p>
-            <p>Last Name: {customerInfo.lastName}</p>
-            <p>Email: {customerInfo.email}</p>
-            <p>Phone: {customerInfo.phone}</p>
+              <table>
+                <tr>
+                  <td>
+                    First Name:
+                  </td>
+                  <td>
+                    {customerInfo.firstName}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Last Name:
+                  </td>
+                  <td>
+                    {customerInfo.lastName}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Email:
+                  </td>
+                  <td>
+                    {customerInfo.email}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Phone:
+                  </td>
+                  <td>
+                    {customerInfo.phone}
+                  </td>
+                </tr>
+              </table>
             <br />      
         </Card>
         <Card title="Billing Address">
-          <p>Billing Address: {customerInfo.billing}</p>
-            <p>City: {customerInfo.city}</p>
-            <p>Postal Code: {customerInfo.postal}</p>
+          <table>
+            <tr>
+              <td>
+                Billing Address:
+              </td>
+              <td>
+                {customerInfo.billing}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                City:
+              </td>
+              <td>
+                {customerInfo.city}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Postal Code:
+              </td>
+              <td>
+                {customerInfo.postal}
+              </td>
+            </tr>
+          </table>
         </Card>
             </div>
             <div style={{float:"right", width:"50%"}}>

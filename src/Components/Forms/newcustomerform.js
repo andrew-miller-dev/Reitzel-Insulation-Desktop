@@ -12,7 +12,6 @@ export default function NewCustomerForm(props) {
     const sendInfo = async(values) => {
       let billing = "";
         form.validateFields();
-        console.log(values);
         if(values.addresses !== undefined){
            values.addresses.forEach((item) => {
           if(item.billing) billing = item;
@@ -29,6 +28,7 @@ export default function NewCustomerForm(props) {
         BillingAddress:billing.address
        }
         const check = await CheckForExisting(newInfo);
+        console.log(check);
         if(check.length > 0){
           message.warn("Customer already on file");
         }

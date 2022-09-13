@@ -50,7 +50,8 @@ export default function NewCustomerButton(props) {
     return (
         <div>
             <Card title="Customer">
-            <AutoComplete
+            <Select
+            showSearch={true}
           style={{width:'150px'}}
           options={options3}
           placeholder="Look up customer by name"

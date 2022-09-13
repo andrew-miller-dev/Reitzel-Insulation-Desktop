@@ -8,7 +8,6 @@ import Customers from "../../pages/customers";
 import Users from "../../pages/users";
 import Roles from "../../pages/roles";
 import Trucks from "../../pages/trucks";
-import CustomerInfo from "../../pages/customerInfo";
 import AddressInfo from "../../pages/addressInfo";
 import NewCusomter from "../../pages/newcustomer";
 import NewEstimate from "../../pages/newestimate";
@@ -27,7 +26,6 @@ export default function Main() {
         <Route path="/users" component={Users} />
         <Route path="/roles" component={Roles} />
         <Route path="/trucks" component={Trucks} />
-        <Route path="/customerinfo/:customer" component={CustomerInfo} />
         <Route path="/addressinfo/:address" component={AddressInfo} />
         <Route path="/newcustomer" component={NewCusomter} />
         <Route path="/newestimate" component={NewEstimate} />

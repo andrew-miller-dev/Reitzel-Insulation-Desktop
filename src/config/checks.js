@@ -20,9 +20,10 @@ export function addEscapeChar(string) {
 
 
 export async function CheckForExisting(data) {
+    console.log(data);
     let obj = {
-        firstName:data.FirstName,
-        lastName:data.LastName,
+        firstName:data.CustFirstName,
+        lastName:data.CustLastName,
         address:data.BillingAddress
     }
     const check = await checkExisting(obj);
