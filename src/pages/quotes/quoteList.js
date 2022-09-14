@@ -5,6 +5,7 @@ import {getAllInfo, getDetails, getProducts, SearchAllInfo} from "../../api/quot
 import { getUser } from '../../util/storage';
 import getWordDoc from './quoteToWordBypass';
 import { GetOrderByQID } from '../../api/orders';
+import ViewQuoteForm from '../../Components/Forms/viewquoteform';
 const {Search} = Input;
 const {format} = require('date-fns-tz')
 var parseISO = require('date-fns/parseISO')
@@ -198,7 +199,7 @@ var parseISO = require('date-fns/parseISO')
             <br />
             <Button
             onClick={() => { 
-                setFormData(getDetailsByID(data.QuoteID));
+                setFormData(data.QuoteID);
                 setShowForm(true);     
                             }}>
             View Quote</Button>
@@ -238,12 +239,10 @@ var parseISO = require('date-fns/parseISO')
         visible={showForm}
         title="View Quote"
         onCancel={() => {setShowForm(false)}}
-        onOk={() => {history.push(`/quotes/${formData[0].quoteID}/edit`)}}
+        onOk={() => {history.push(`/quotes/${formData}/edit`)}}
         okText="Edit Quote"
         >
-         <div>
-           {renderDetails()}
-         </div>
+         <ViewQuoteForm id={formData}/>
         </Modal>
           </div>
       )
@@ -274,12 +273,10 @@ var parseISO = require('date-fns/parseISO')
         visible={showForm}
         title="View Quote"
         onCancel={() => {setShowForm(false)}}
-        onOk={() => {history.push(`/quoteinfo/${formData[0].quoteID}`)}}
+        onOk={() => {history.push(`/quoteinfo/${formData}`)}}
         okText="Edit Quote"
         >
-         <div>
-           {renderDetails()}
-         </div>
+         <ViewQuoteForm id={formData}/>
         </Modal>
           </div>
         );

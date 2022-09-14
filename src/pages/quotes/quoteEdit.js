@@ -11,7 +11,7 @@ function QuoteEdit (props) {
     let history = useHistory();
     const [isLoading, setLoading] = useState(true);
 
-    const [allData, setAllData] = useState([]);
+    const [setAllData] = useState([]);
     const [quoteData, setQuoteData] = useState([]);
     const [quoteDetail, setQuoteDetail] = useState([]);
     const [productList, setProductList] = useState([]);

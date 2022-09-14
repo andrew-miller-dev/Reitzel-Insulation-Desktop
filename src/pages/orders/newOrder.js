@@ -18,8 +18,8 @@ function NewOrder (props) {
     let quoteID = useRouteMatch('/orders/:oid/new').params.oid;
     const history = useHistory();
     const [quoteData, setQuoteData] = useState([]);
-    const [detailData, setDetailData] = useState([]);
-    const [prodData, setProdData] = useState([]);
+    const [ setDetailData] = useState([]);
+    const [ setProdData] = useState([]);
     const [loaded, setLoaded] = useState(false);
     const [quoteDetails, setQuoteDetails] = useState([]);
     const [showCalendar, setShowCalendar] = useState(false);
@@ -141,7 +141,7 @@ function NewOrder (props) {
     const createDetails = (detlist, prodlist) => {
       if(quoteDetails !== []){
       let temp = quoteDetails;
-      detlist.map((detail) => {
+      detlist.forEach((detail) => {
          let detailObj = {
                   id: detail.SubtotalID,
                   details:detail.subtotalLines,
@@ -150,7 +150,7 @@ function NewOrder (props) {
                   productArr:[]
               
           }
-          prodlist.map((prod) => {
+          prodlist.forEach((prod) => {
               if(prod.subtotalID === detail.SubtotalID){
                   let prodObj = {
                       id:prod.QuoteLineID,
@@ -184,7 +184,7 @@ function NewOrder (props) {
     const renderList = () => {
       let rows = [];
       if(quoteDetails.length > 0){
-        quoteDetails.map((detail) => {
+        quoteDetails.forEach((detail) => {
           rows.push(
             <div>
               <tr>
@@ -216,7 +216,7 @@ function NewOrder (props) {
 
     const renderProducts = (products) => {
       let rows = [];
-      products.map((prod) => {
+      products.forEach((prod) => {
         rows.push(
           <tr>
             <td>

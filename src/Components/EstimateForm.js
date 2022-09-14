@@ -78,6 +78,7 @@ export default function EstimateForm(props) {
     }
 
     history.push("/home");
+    props.close();
   };
 
   useEffect(() => {

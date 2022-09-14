@@ -27,13 +27,14 @@ import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import { customer_info_sheet } from "../../../assets/paths.js";
 import Confirmation from "../../Email_Templates/confirmation.js";
-import { Autocomplete, CheckBox, Form, Popup, SelectBox, TextArea, TextBox, Button, TagBox } from "devextreme-react";
-import { Item } from "devextreme-react/form";
-import { jobs } from "../../../util/storedArrays.js";
+import { Button } from "devextreme-react";
 import NewEstimateForm from "../../Forms/newestimateform";
 const { confirm } = Modal;
 const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
-
+const currentDate = new Date();
+let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+const views = ['day','week', 'workWeek','month'];
+const groups = ['UserID'];
 const dataSource = new CustomStore({
   key: "EstimateID",
   load: async () => {
@@ -111,11 +112,6 @@ const sendEmailUpdate = async (values) => {
   message.success("Email sent to customer");
 }
 
-const currentDate = new Date();
-let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
-const views = ['day','week', 'workWeek','month'];
-const groups = ['UserID'];
-
 const renderResourceCell = (model) => {
   return (
       <b>{model.data.FirstName} {model.data.LastName[0]}</b>
@@ -179,6 +175,7 @@ class SalesCalendar extends React.Component {
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
     this.createUserObj = this.createUserObj.bind(this);
+    this.closeForm = this.closeForm.bind(this);
   }
   async InfoIsHere() {
   if(this.mounted){
@@ -190,12 +187,11 @@ class SalesCalendar extends React.Component {
   this.setState({findCustomerList:customerData.data});
   this.setState({info:true});
   }
-  
 } 
 async onAppointmentForm (e) {
   e.cancel = true;
-  //console.log(e.appointmentData)
-  this.setState({formOption:<NewEstimateForm start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
+  console.log(e)
+  this.setState({formOption:<NewEstimateForm close = {this.closeForm} start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
   this.setState({showForm:true});
 }
 
@@ -210,8 +206,12 @@ createUserObj = (id) => {
   return obj;
 }
 
+closeForm = () => {
+  this.setState({showForm:false});
+  window.location.reload();
+}
 
-  onGroupByDateChanged(args) {
+onGroupByDateChanged(args) {
     this.setState({
       groupByDate: args.value
     });

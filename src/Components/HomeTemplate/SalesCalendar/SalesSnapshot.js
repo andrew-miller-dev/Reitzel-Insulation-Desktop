@@ -23,6 +23,7 @@ const dataSource = new CustomStore({
       startDate : item.startDate,
       endDate : item.endDate
     }));
+    console.log(formatData);
     return formatData
   }
 });

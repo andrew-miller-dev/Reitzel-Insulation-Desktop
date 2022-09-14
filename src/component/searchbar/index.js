@@ -12,6 +12,8 @@ import { parseISO } from "date-fns";
 import NewCustomerForm from "../../Components/Forms/newcustomerform";
 import Refresh from "../../Components/Refresh";
 import NewEstimateForm from "../../Components/Forms/newestimateform";
+import ViewQuoteForm from "../../Components/Forms/viewquoteform";
+import ViewWorkForm from "../../Components/Forms/viewworkform";
 const {Option} = Select;
 
 function Searchbar(props) {
@@ -24,16 +26,6 @@ function Searchbar(props) {
 
 const closeForm = () =>{
   setShowForm(false);
-}
-
-const testRender = (data) => {
-  let newArr = []
-  if(data.length > 0) {
-    data.forEach((item) => {
-      newArr.push(<Option value={`customer `+ item.CustomerID}>{item.CustFirstName} {item.CustLastName}</Option>)
-    })
-  }
-  return newArr;
 }
 
 const renderCustomer = (data) => {
@@ -134,9 +126,12 @@ const renderItemO = (data) => {
        history.push(`/customers/${id}`);
        break;
      case "quote":
-       
+       setFormOption(<ViewQuoteForm id={id} />);
+       setShowForm(true);
        break;
      case "order":
+      setFormOption(<ViewWorkForm id={id} />);
+      setShowForm(true);
        break;
      default:
        console.log("something went very wrong");
@@ -171,7 +166,7 @@ const buttons = () => {
       </Button>
       <Button
       onClick={() => {
-        setFormOption(<NewEstimateForm salesman={{id:null,name:null}} />);
+        setFormOption(<NewEstimateForm close={closeForm} salesman={{id:null,name:null}} />);
         setShowForm(true);
         //history.push('/newestimate');
       }}>
@@ -185,6 +180,7 @@ if(getUser() && getMenu()) {
   return (
     <div className="content-searchbar">
       <Select
+      defaultValue={{label:"",value:""}}
       placeholder="Search"
       filterOption={false}
       onSelect={(data) => {

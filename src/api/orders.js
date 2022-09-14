@@ -167,3 +167,36 @@ export async function GetOrderByQID(id) {
     );
     return complete;
 }
+
+export async function GetOrderByID(id) {
+    const tableName = 'workorders';
+    const condition = `WorkOrderID = '${id}'`;
+    const complete = await ajax(
+        `${baseURL}/fetchValues`,
+        {tableName, condition},
+        "post"
+    );
+    return complete;
+}
+
+export async function GetDetailsByWID(id) {
+    const tableName = 'workorderdetail';
+    const condition = `OrderID = '${id}'`;
+    const complete = await ajax(
+        `${baseURL}/fetchValues`,
+        {tableName, condition},
+        "post"
+    );
+    return complete;
+}
+
+export async function GetProdsByWID(id) {
+    const tableName = 'workorderprod';
+    const condition = `OrderID = '${id}'`;
+    const complete = await ajax(
+        `${baseURL}/fetchValues`,
+        {tableName, condition},
+        "post"
+    );
+    return complete;
+}

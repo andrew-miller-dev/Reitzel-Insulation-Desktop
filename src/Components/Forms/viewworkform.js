@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react"
-import { getProductList, getQuoteDetails, getQuoteID } from "../../api/quoteEditAPI"
 import { Card } from "antd";
+import { GetDetailsByWID, GetOrderByID, GetProdsByWID } from "../../api/orders";
 
-export default function ViewQuoteForm (props) {
-    const [quoteInfo, setQuoteInfo] = useState([]);
+export default function ViewWorkForm (props) {
+    const [workInfo, setWorkInfo] = useState([]);
     const [detailInfo, setDetailInfo] = useState([]);
     const [prodInfo, setProdInfo] = useState([]);
 
     useEffect(() => {
         const func = async() => {
-            let quote = await getQuoteID(props.id);
-        setQuoteInfo(quote.data[0]);
-        let details = await getQuoteDetails(props.id);
-        let product = await getProductList(props.id);
-        setProdInfo(product.data);
-        let detailArr = getDetailsByID(details.data);
-        setDetailInfo(detailArr);
+            let work = await GetOrderByID(props.id);
+            setWorkInfo(work.data[0]);
+            let details = await GetDetailsByWID(props.id);
+            let product = await GetProdsByWID(props.id);
+            setProdInfo(product.data);
+            let detailArr = getDetailsByID(details.data);
+            setDetailInfo(detailArr);
         }
       func();  
         
@@ -26,11 +26,12 @@ export default function ViewQuoteForm (props) {
         let array = [];
         arr.forEach((item) => {
             array.push({
-              quoteID:item.quoteID,
-              id:item.subtotalID,
-              subtotalLines:item.subtotalLines,
-              total:item.subtotalAmount,
-              arr:getProductArr(item.SubtotalID)
+              workID:item.OrderID,
+              id:item.WODetailID,
+              quoteDetailID:item.SubtotalID,
+              details:item.Details,
+              total:item.DetailTotal,
+              arr:getProductArr(item.WODetailID)
             });
         });
         return array;
@@ -39,11 +40,11 @@ export default function ViewQuoteForm (props) {
     const getProductArr = (id) => {
         let array = [];
         prodInfo.forEach((item) => {
-               if(item.subtotalID === id){
+               if(item.WODetailID === id){
                     array.push({
-                      prodID:item.QuoteLineID,
+                      prodID:item.WOProdID,
                       product:item.Product,
-                      price:item.Subtotal
+                      price:item.Price
                     })
                 }
             });
@@ -54,7 +55,7 @@ export default function ViewQuoteForm (props) {
         let rows = [];
         detailInfo.forEach((item) => {
           rows.push(<Card title="Details" bordered={true} type="inner">
-            <p>{item.subtotalLines}</p>
+            <p>{item.details}</p>
             <strong>Products</strong>
             <table style={{width:'100%'}}>
               <tbody>
