@@ -13,10 +13,12 @@ import { customer_info_sheet } from "../assets/paths";
 import { jobs } from "../util/storedArrays";
 import { useHistory } from "react-router-dom";
 import { getAddress } from "../api/addresses";
+import { dataSource } from "./SalesDatasource.js";
 const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
 const { format } = require("date-fns-tz");
+
 
 export default function EstimateForm(props) {
   const [info, setInfo] = useState(false);
@@ -50,7 +52,6 @@ export default function EstimateForm(props) {
   };
 
   const onFinish = async (values) => {
-    console.log(values);
     let customer = selectCustomer;
     const addressInfo = await getAddress(selectAddress);
     const start = format(values.selectedDate[0],"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
@@ -62,8 +63,14 @@ export default function EstimateForm(props) {
       startDate: start,
       endDate: end,
       estimateInfo: values.EstimateInfo,
+      customerID: customer.CustomerID,
+      addressID:selectAddress,
+      customerInfo:customer,
+      addressInfo:addressInfo
+
     };
-      var estimateResult = await addEstimate(
+    /*
+    var estimateResult = await addEstimate(
             customer.CustomerID,
            selectAddress,
             estimate
@@ -76,9 +83,11 @@ export default function EstimateForm(props) {
     if(validator.isEmail(customer.Email)){
       sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {estimate}  />), customer_info_sheet)
     }
-
+    */
+    dataSource.insert(estimate);
     history.push("/home");
     props.close();
+   
   };
 
   useEffect(() => {

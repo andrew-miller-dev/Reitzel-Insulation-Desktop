@@ -6,111 +6,20 @@ import Legend from '../../Legend'
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
-import {getEstimates,
-        deleteEstimate, 
-        getUsersWithDisplay, 
-        updateEstimate, 
+import {getUsersWithDisplay, 
         getRegionAPI, 
-        sendUpdate, 
-        addNewCustomer, 
-        addNewAddress, 
-        addEstimate, 
-        sendConfirm, 
-        getCustomers,
-        getAddressList} from '../../../api/calendar';
-import { getCustomer } from "../../../api/customer.js";
-import CustomStore from 'devextreme/data/custom_store';
-import { message, Modal, Space } from 'antd';
-import UpdateConfirm from '../../Email_Templates/updateConfirm';
-import {renderEmail} from 'react-html-email';
+        getCustomers,} from '../../../api/calendar';
+import { Modal, Space } from 'antd';
 import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
-import { customer_info_sheet } from "../../../assets/paths.js";
-import Confirmation from "../../Email_Templates/confirmation.js";
 import { Button } from "devextreme-react";
 import NewEstimateForm from "../../Forms/newestimateform";
+import {dataSource} from '../../../Components/SalesDatasource'
 const { confirm } = Modal;
-const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 const views = ['day','week', 'workWeek','month'];
 const groups = ['UserID'];
-const dataSource = new CustomStore({
-  key: "EstimateID",
-  load: async () => {
-    const data = await getEstimates();
-    let formatData = data.data.map((item) => ({
-      EstimateID : item.EstimateID,
-      CustomerID : item.CustomerID,
-      AddressID : item.AddressID,
-      UserID : item.UserID,
-      CreationDate : item.CreationDate,
-      text : item.EstimateInfo,
-      JobType:item.JobType,
-      RegionID : item.RegionID,
-      startDate : utcToZonedTime(item.startDate),
-      endDate : utcToZonedTime(item.endDate)
-    }));
-    return formatData
-  },
-  update: async (key, values) => {
-    let formatData = {
-      EstimateID : values.EstimateID,
-      CustomerID : values.CustomerID,
-      AddressID : values.AddressID,
-      UserID : values.UserID,
-      CreationDate : values.CreationDate,
-      EstimateInfo : values.EstimateInfo,
-      RegionID : values.RegionID,
-      startDate : format(zonedTimeToUtc(values.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
-      endDate : format(zonedTimeToUtc(values.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
-  }
-    const check = await updateEstimate(key, formatData);
-    return check;
-  },
-  remove: async(key) => {
-    const data = await deleteEstimate(key);
-    return data
-  },
-  insert: async (values) => {
-    try{
-      values.startDate = format(values.startDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-      values.endDate = format(values.endDate,"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-      let customerInfo = await addNewCustomer(values);
-      const customerID = customerInfo.data.insertId;
-      let addressInfo = await addNewAddress(customerID, values);
-      const addressID = addressInfo.data.insertId;
-      const addEstimates = await addEstimate(
-        customerID,
-        addressID,
-        values);
-        message.success("New estimate added");
-        let customer = {
-          FirstName:values.firstName,
-          LastName:values.lastName
-        }
-        let estimate = {
-          JobType:values.jobType,
-          startDate:values.startDate
-        }
-      sendConfirm(values.email, renderEmail(<Confirmation customerInfo = {customer} estimateInfo = {estimate} />), customer_info_sheet);
-      return addEstimates;
-    }
-    catch(e){
-      console.log(e);
-    }
-  },
-  onUpdating: (key, values) => {
-    
-    confirm({title:"Send email update to customer?", onOk() {sendEmailUpdate(values)}, cancelText:"No"})
-  }
-});
-const sendEmailUpdate = async (values) => {
-  let findCustomerEmail = await getCustomer(values.CustomerID);
-  let customerEmail = findCustomerEmail.data[0];
-  sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>), customer_info_sheet);
-  message.success("Email sent to customer");
-}
 
 const renderResourceCell = (model) => {
   return (
@@ -189,10 +98,13 @@ class SalesCalendar extends React.Component {
   }
 } 
 async onAppointmentForm (e) {
+  
   e.cancel = true;
-  console.log(e)
-  this.setState({formOption:<NewEstimateForm close = {this.closeForm} start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
-  this.setState({showForm:true});
+  if(!e.appointmentData.CreationDate){
+    this.setState({formOption:<NewEstimateForm close = {this.closeForm} start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
+    this.setState({showForm:true});
+  }
+  
 }
 
 createUserObj = (id) => {

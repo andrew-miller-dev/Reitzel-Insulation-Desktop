@@ -1,6 +1,6 @@
 import React, { useState} from "react";
 import {useHistory} from "react-router-dom";
-import { Button, Space, Modal, Select, Input, } from "antd";
+import { Button, Space, Modal, Select } from "antd";
 import "./index.css";
 import { withRouter } from "react-router";
 import { getMenu, getUser } from "../../util/storage";
@@ -14,7 +14,6 @@ import Refresh from "../../Components/Refresh";
 import NewEstimateForm from "../../Components/Forms/newestimateform";
 import ViewQuoteForm from "../../Components/Forms/viewquoteform";
 import ViewWorkForm from "../../Components/Forms/viewworkform";
-const {Option} = Select;
 
 function Searchbar(props) {
  const history = useHistory();
@@ -26,6 +25,7 @@ function Searchbar(props) {
 
 const closeForm = () =>{
   setShowForm(false);
+  window.location.reload();
 }
 
 const renderCustomer = (data) => {
