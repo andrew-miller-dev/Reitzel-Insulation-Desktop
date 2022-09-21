@@ -104,7 +104,6 @@ async onAppointmentForm (e) {
     this.setState({formOption:<NewEstimateForm close = {this.closeForm} start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
     this.setState({showForm:true});
   }
-  
 }
 
 createUserObj = (id) => {
