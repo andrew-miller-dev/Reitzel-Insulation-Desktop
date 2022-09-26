@@ -18,8 +18,8 @@ function NewOrder (props) {
     let quoteID = useRouteMatch('/orders/:oid/new').params.oid;
     const history = useHistory();
     const [quoteData, setQuoteData] = useState([]);
-    const [ setDetailData] = useState([]);
-    const [ setProdData] = useState([]);
+    const [setDetailData] = useState([]);
+    const [setProdData] = useState([]);
     const [loaded, setLoaded] = useState(false);
     const [quoteDetails, setQuoteDetails] = useState([]);
     const [showCalendar, setShowCalendar] = useState(false);

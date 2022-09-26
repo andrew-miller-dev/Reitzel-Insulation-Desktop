@@ -64,7 +64,6 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
         return array;
     }
     const getProductArr = (id) => {
-      console.log(prodData);
       let array = [];
       prodData.forEach((item) => {
              if(item.WODetailID === id){

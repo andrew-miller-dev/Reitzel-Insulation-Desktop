@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
-import validator from "validator";
 import { useSelector } from "react-redux";
-import { Form,Button, Select, message, Card, Modal } from "antd";
+import { Form,Button, Select, Card, Modal } from "antd";
 import DatePicker from './DatePicker.js';
-import {addEstimate} from "../api/neworder";
 import SalesSnapshot from './HomeTemplate/SalesCalendar/SalesSnapshot';
-import { getRegionAPI, getUsers, sendConfirm } from "../api/calendar"
+import {getUsers } from "../api/calendar"
 import TextArea from "antd/lib/input/TextArea";
-import Confirmation from "./Email_Templates/confirmation"
-import {renderEmail} from 'react-html-email';
-import { customer_info_sheet } from "../assets/paths";
 import { jobs } from "../util/storedArrays";
 import { useHistory } from "react-router-dom";
 import { getAddress } from "../api/addresses";
@@ -69,21 +64,6 @@ export default function EstimateForm(props) {
       addressInfo:addressInfo
 
     };
-    /*
-    var estimateResult = await addEstimate(
-            customer.CustomerID,
-           selectAddress,
-            estimate
-          );
-          if (estimateResult.status === 200) {
-            message.success("Added new estimate");
-          } 
-          else message.warn("Something went wrong");
-  
-    if(validator.isEmail(customer.Email)){
-      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {estimate}  />), customer_info_sheet)
-    }
-    */
     dataSource.insert(estimate);
     history.push("/home");
     props.close();
