@@ -7,7 +7,7 @@ import qData from './quoteData.js';
 import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
-import { AutoComplete, Card, Row, Col, Checkbox, Select, InputNumber, } from "antd";
+import { Card, Row, Col, Checkbox, Select, InputNumber, } from "antd";
 const { Option } = Select;
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(),"MMMM do',' yyyy");

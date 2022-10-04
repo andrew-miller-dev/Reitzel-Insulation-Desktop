@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Form,Button, Select, Card, Modal } from "antd";
+import { Form,Button, Select, Card, Modal, message } from "antd";
 import DatePicker from './DatePicker.js';
 import SalesSnapshot from './HomeTemplate/SalesCalendar/SalesSnapshot';
 import {getUsers } from "../api/calendar"
@@ -13,7 +13,6 @@ const { RangePicker } = DatePicker;
 const { Item } = Form;
 const { Option } = Select;
 const { format } = require("date-fns-tz");
-
 
 export default function EstimateForm(props) {
   const [info, setInfo] = useState(false);
@@ -44,9 +43,13 @@ export default function EstimateForm(props) {
       LastName: item.LastName,
     }));
     setSalesmen(salesData);
-  };
-
+  }
   const onFinish = async (values) => {
+    console.log(selectAddress);
+    if(selectAddress.addressID === ""){
+      message.error("Select an address first");
+    }
+    else{
     let customer = selectCustomer;
     const addressInfo = await getAddress(selectAddress);
     const start = format(values.selectedDate[0],"yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
@@ -62,12 +65,11 @@ export default function EstimateForm(props) {
       addressID:selectAddress,
       customerInfo:customer,
       addressInfo:addressInfo
-
     };
     dataSource.insert(estimate);
     history.push("/home");
     props.close();
-   
+  }
   };
 
   useEffect(() => {
@@ -104,7 +106,6 @@ export default function EstimateForm(props) {
                 showTime={{ format: "HH:mm" }}
                 className="datepicker"
               />
-              
             </Item>
             <Item
             label="Calendar">

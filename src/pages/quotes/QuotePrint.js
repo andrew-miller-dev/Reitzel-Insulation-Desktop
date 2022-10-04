@@ -180,7 +180,7 @@ function QuotePrint(props) {
                 <tr>
                   <td>
                     Taxes: ${getTaxes(quoteFormData)}<br/>
-                    Grand Total: ${getTotal(quoteFormData)}
+                    Grand Total: ${Number(getTotal(quoteFormData)) + Number(getTaxes(quoteFormData))}
                   </td>
                 </tr>
               </tbody>

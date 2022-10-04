@@ -1,18 +1,15 @@
 import React from 'react';
 import { Email, Item} from 'react-html-email';
 import { getUser } from '../../util/storage';
-const header = "https://i.ibb.co/0snCVqq/header.png";
+import Header from "../../assets/header";
 const user = getUser();
 
-const {format, UtcToZonedTime} = require("date-fns-tz");
+const {format} = require("date-fns-tz");
 
 function Confirmation(props){
-    
     return(
         <Email title="">
-            <Item>
-            <img src={header}></img>
-            </Item>
+            {Header()}
             <Item>
             <br />
             <p>There has been a change in your appointment time. Here are the new details for your booking:</p>
