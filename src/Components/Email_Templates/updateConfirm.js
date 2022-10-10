@@ -1,7 +1,7 @@
 import React from 'react';
 import { Email, Item} from 'react-html-email';
 import { getUser } from '../../util/storage';
-import Header from "../../assets/header";
+import LogoHeader from "../../assets/header";
 const user = getUser();
 
 const {format} = require("date-fns-tz");
@@ -9,7 +9,7 @@ const {format} = require("date-fns-tz");
 function Confirmation(props){
     return(
         <Email title="">
-            {Header()}
+            {LogoHeader()}
             <Item>
             <br />
             <p>There has been a change in your appointment time. Here are the new details for your booking:</p>

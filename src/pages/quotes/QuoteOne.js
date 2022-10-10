@@ -427,12 +427,13 @@ function QuoteOne(props) {
                             </td>
                             <td>
                                 <Select 
+                                showSearch={true}
                                 onSelect={(e, option) => {onCustomerSelect(e, option)}}
                                 style={{ width: 200 }}
                                 options={options}
                                 placeholder="Enter a customer"
                                 filterOption={(inputValue, option) =>
-                                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                    option.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
                                 }>    
                                 </Select>
                             </td>

@@ -1,6 +1,6 @@
 const header = "https://i.ibb.co/wYqDcXp/logo.png";
 
-export default function Header(){
+export default function LogoHeader(){
     return(
     <div style={{display:"flex",justifyContent:"space-between"}}>
         <div style={{float:"left"}}>

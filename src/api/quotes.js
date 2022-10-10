@@ -4,15 +4,16 @@ import { baseURL } from "../config/values";
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
 
-export async function sendQuote(customer, email){
+export async function sendQuote(customer, email, attach){
     var to = customer;
     var subject = "Your quote with Reitzel Insulation";
     var html = email;
+    var file = attach
 
-    var completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html}, "post");
+    var completed = await ajax(`${baseURL}/sendEmailAttach`, {to, subject, html, file}, "post");
     if (completed !== []) return completed;
     else return 0;
- }
+ } 
 
   export async function getCustomerFiltered(filter){
     var tableName = "Customers";

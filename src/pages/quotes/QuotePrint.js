@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useParams } from "react-router";
 import qData from "./quoteData.js";
-import Headerforquoto from "../headforquote";
 import Footerforquoto from "../footer";
 import { message, Card, Row, Col } from "antd";
 import {sendQuote, addNewQuote, addNewDetails, addNewProductLine} from '../../api/quotes';
 import QuoteEmail from "../../Components/Email_Templates/quote_template";
 import {renderEmail} from 'react-html-email';
 import QuoteToWord from '../../Components/Word_Templates/quoteWord';
+import  html2pdf  from "html2pdf.js";
+import LogoHeader from "../../assets/header.js";
 
 
 function printQuote() {
@@ -34,23 +35,27 @@ async function emailQuote (customer){
       })
       return details;
     })
-    message.success("Email sent");
+    
   } catch (error) {
     message.error("Something went wrong - please try again");
     console.log(error);
   }
   try {
+    const pdf = document.getElementById("printContents");
+    const opt = {
+      filename: `${customer.first_name}_${customer.last_name}_Quote_${customer.quote_date}.pdf`
+    };
+    const worker = await html2pdf().set(opt).from(pdf).output("datauristring");
     if(customer.email !== 'undefined'){
       if(customer.billing_address === customer.site_address){
-        console.log("same");
-          sendQuote(customer.email, renderEmail(<QuoteEmail siteCard="none" info={customer}/>))
+          sendQuote(customer.email, renderEmail(<QuoteEmail siteCard="none" info={customer}/>),worker)
       }
       
       else{
-        console.log("different");
-        sendQuote(customer.email, renderEmail(<QuoteEmail siteCard = "block" info={customer}/>))
+        sendQuote(customer.email, renderEmail(<QuoteEmail siteCard = "block" info={customer}/>),worker)
       }
     }
+    message.success("Email sent");
   } catch (error) {
     console.log(error);
     message.error("Email failed to send");
@@ -62,7 +67,6 @@ function downloadQuote(quote) {
 }
 
 function getTotal(detail) {
-  console.log(detail);
   let total = 0.00;
         detail.details.forEach((item) => {
             total = total + parseFloat(item.total);
@@ -112,7 +116,7 @@ function QuotePrint(props) {
         className="Quote print-page"
         style={{ width: "80%", margin: "auto" }}
       >
-        <Headerforquoto />
+        {LogoHeader()}
         <Row>
         <Col> 
         <Card>

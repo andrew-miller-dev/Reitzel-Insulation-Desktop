@@ -12,7 +12,7 @@ axios.interceptors.response.use(null, (err) => {
   } else if (err.response && err.response.status === 401) {
     message.warn("Access Denied");
   } else if (expectedError) {
-    message.warn("Try another name please");
+    message.warn("Contact support with error code");
   }
   return Promise.reject(err);
 });

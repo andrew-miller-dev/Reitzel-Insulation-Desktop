@@ -3,8 +3,6 @@ import {getQuoteDetails, getProductList} from '../../api/quoteEditAPI';
 import { format } from "date-fns-tz";
 import { parseISO } from "date-fns";
 
-
-
 export default async function GetWordDoc(info) {
 let details = await getQuoteDetails(info.QuoteID);
 let products = await getProductList(info.QuoteID);
