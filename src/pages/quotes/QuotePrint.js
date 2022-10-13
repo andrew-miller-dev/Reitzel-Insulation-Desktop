@@ -114,7 +114,7 @@ function QuotePrint(props) {
       <div
         id="printContents"
         className="Quote print-page"
-        style={{ width: "80%", margin: "auto" }}
+        style={{ width: "80%", margin: "auto"}}
       >
         {LogoHeader()}
         <Row>
@@ -144,19 +144,16 @@ function QuotePrint(props) {
         </div>
         <div>
           {quoteFormData.details.length > 0 && (
-            <table width="100%" border="1" cellPadding="10px">
-              <thead>
-                <tr>
-                  <td colSpan="3">Quote Details</td>
-                </tr>
-              </thead>
+            <div>
+             <p>Quote Details</p>
+              <table width="100%" border="1" cellPadding="10px">
               <tbody>
                 {quoteFormData.details.map((item) => {
 
                     return (
-                      <tr key={item.key} >
-                      <tr >
-                        <td colSpan="3" style={{width:'100%', minWidth:"875px"}}>
+                      <>
+                      <tr>
+                        <td colSpan="3" >
                           {item.details}
                         </td>
                         
@@ -178,7 +175,7 @@ function QuotePrint(props) {
                           Subtotal:${item.total}
                         </td>
                       </tr>
-                      </tr>
+                      </>
                     );
                 })}
                 <tr>
@@ -188,7 +185,8 @@ function QuotePrint(props) {
                   </td>
                 </tr>
               </tbody>
-            </table>
+            </table> 
+            </div>
           )}
         </div>
         <p>Notes to customer: {quoteFormData.customer_notes}</p>
