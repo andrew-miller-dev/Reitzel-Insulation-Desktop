@@ -1,5 +1,5 @@
 import FindCustomer from "../Form_Buttons/findCustomerButton";
-import {Card, Row, Col, Select, Checkbox} from 'antd';
+import {Card, Row, Col, Select, Checkbox, Button} from 'antd';
 import { getCustomerQuotes } from "../../api/calendar";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +19,7 @@ export default function NewWorkOrderForm(props) {
 
     const setDisplay = async(customer) => {
         setSelectCustomer(customer);
+        setAddress([]);
         dispatch({type:"customerUpdate", payload:customer});
         const list = await getCustomerQuotes(customer.CustomerID);
         const addresses = await getCustomerAddresses(customer.CustomerID);
@@ -28,11 +29,11 @@ export default function NewWorkOrderForm(props) {
       }
 
     const getAddressName =(quote) => {
-      console.log(quote);
-      console.log(address);
-      
       const addressInfo = address.find(element => element.AddressID == quote.AddressID);
-      return addressInfo;
+      if(address.length > 0){
+      return addressInfo.Address;
+      }
+     else return [];
     }
       const optionsQuotes = quoteList.map((item) => (
         {
@@ -120,12 +121,13 @@ export default function NewWorkOrderForm(props) {
             </Card>
                 </Col>
                 <Col>
-                <Card title="Select Details">
+                <Card title="Select Details" >
                       {renderList(quoteDetails.detailArray)}
                 </Card>
                 </Col>
             </Row>
-            
+
+            <Button>Boop</Button>
         </div>
     )
 }
