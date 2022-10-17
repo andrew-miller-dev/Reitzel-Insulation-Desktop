@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import QuoteInfoCreate from "../QuoteInfoCreate";
 import { set } from "store";
+import { getAddress, getAddressByQuoteID } from "../../api/addresses";
+import { getCustomerAddresses } from "../../api/customer";
 
 export default function NewWorkOrderForm(props) {
     const dispatch = useDispatch();
@@ -12,19 +14,29 @@ export default function NewWorkOrderForm(props) {
     const [selectCustomer, setSelectCustomer] = useState([]);
     const [quoteList, setQuoteList] = useState([]);
     const [quoteDetails, setQuoteDetails] = useState({quote:null,detailArray:[]});
+    const [address, setAddress] = useState([]);
 
 
     const setDisplay = async(customer) => {
         setSelectCustomer(customer);
         dispatch({type:"customerUpdate", payload:customer});
         const list = await getCustomerQuotes(customer.CustomerID);
+        const addresses = await getCustomerAddresses(customer.CustomerID);
         setQuoteList(list.data);
+        setAddress(addresses.data);
         document.getElementById("CustomerInfo").style.display = "block";
       }
 
+    const getAddressName =(quote) => {
+      console.log(quote);
+      console.log(address);
+      
+      const addressInfo = address.find(element => element.AddressID == quote.AddressID);
+      return addressInfo;
+    }
       const optionsQuotes = quoteList.map((item) => (
         {
-          label:`${item.Address}`,
+          label:`${getAddressName(item)}  ${item.QuoteTotal}`,
           value:item.QuoteID
         }
       ))
@@ -34,7 +46,7 @@ export default function NewWorkOrderForm(props) {
         if(array.length > 0){
           array.forEach((detail) => {
             rows.push(
-              <div>
+              <>
                 <tr>
               <td>
                 <Checkbox onChange={() => {detail.selected = !detail.selected;}}></Checkbox>
@@ -52,10 +64,10 @@ export default function NewWorkOrderForm(props) {
                   <b>Total:</b>
                 </td>
                 <td>
-                  $ {detail.total}
+                   <b>$ {detail.total}</b>
                 </td>
               </tr>
-              </div>
+              </>
             )
           })
         }

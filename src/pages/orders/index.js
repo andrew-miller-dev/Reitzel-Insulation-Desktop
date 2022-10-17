@@ -58,6 +58,8 @@ function closeForm(){
       <Modal 
         visible={showForm}
         onCancel={closeForm}
+        width="75%"
+        destroyOnClose={true}
       >
         {formOption}
       </Modal>

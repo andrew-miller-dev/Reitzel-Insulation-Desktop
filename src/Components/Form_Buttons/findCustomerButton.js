@@ -1,4 +1,4 @@
-import { Card, Select } from "antd";
+import { Select } from "antd";
 import { useEffect, useState } from "react";
 import { getCustomers } from "../../api/calendar";
 
