@@ -162,7 +162,8 @@ function QuoteOne(props) {
             customer_notes: customerNotes,
             installer_notes: installerNotes,
             details: quotedetails,
-            total: getQuoteTotal(quotedetails)
+            total: getQuoteTotal(quotedetails),
+            tax: taxRate
         }
         props.onSetQuoteFormDataChange(payload);
         evt.preventDefault();

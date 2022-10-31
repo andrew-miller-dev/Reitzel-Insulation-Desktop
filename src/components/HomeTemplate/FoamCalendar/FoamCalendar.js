@@ -29,6 +29,7 @@ import { Item } from "devextreme-react/form";
 import { getTrucksByType } from "../../../api/trucks.js";
 import { createDetails, getSelectedDetails, getSelectedTotal, getTruckType, renderList } from "../FillCalendar/FillFunctions";
 import { addNewOrderDetail, addNewOrderProduct } from "../../../api/orders.js";
+import NewWorkOrderForm from "../../Forms/newworkorderform";
 const { confirm } = Modal;
 const { format } = require("date-fns-tz");
 
@@ -140,6 +141,7 @@ class FoamCalendar extends React.Component {
       selectQuote:[],
       selectQuoteDetails:[],
       mounted:false,
+      formOption:{}
     };
     
     this.createOrder = this.createOrder.bind(this);
@@ -178,84 +180,16 @@ createOrder () {
     this.setState({showQuote:false}); 
     this.setState({selectQuote:[]});
     this.setState({showForm:false});
-
 }
 
 async onAppointmentForm (e) {
-  console.log(e);
-  if(e.appointmentData.total) {
-    e.cancel = true;
+  e.cancel = true;
+  if(!e.appointmentData.total) {
+   this.setState({formOption:<NewWorkOrderForm/>});
+   this.setState({showForm:true});
   }
   
-  else{
-  let form = e.form;
-  this.setState({clickedTruck:e.appointmentData.TruckID});
-  var dates = {...this.state.dates};
-              dates.start = e.appointmentData.startDate;
-              dates.end = e.appointmentData.endDate;
-          this.setState({dates});
-
-  e.popup.option('showTitle', true);
-  e.popup.option('title', 'Quick work order creation');
-  let newGroupItems =[
-    {
-      label:{text:"Lookup by Customer"},
-      colSpan:2,
-      editorType:"dxAutocomplete",
-      editorOptions:{
-        dataSource:this.state.findCustomerList,
-          valueExpr:"CustLastName",
-          placeholder:"Look up by last name...",
-          itemTemplate:(data) => {
-            return (
-              <span>{data.CustFirstName} {data.CustLastName}</span>
-            )
-          },
-          onItemClick:async(data) => {
-            e.popup.hide();
-            this.setState({custInfo:data.itemData});
-            let listQuotes = await getCustomerQuotes(data.itemData.CustomerID);
-            let quoteList = listQuotes.data.map((item) => (
-              {
-                id:item.QuoteID,
-                AddressID:item.AddressID,
-                CustomerID:item.CustomerID,
-                UserID:item.UserID,
-                total:item.QuoteTotal,
-                customerNotes:item.notesCustomers,
-                installerNotes:item.notesInstallers,
-                creationDate:item.creationDate,
-                completed:item.completed,
-                
-            }));
-
-            this.setState({custQuotes:quoteList});
-            this.setState({showForm:true});
-          }
-      }
-    },
-  {
-    label:{text: "Start Date"},
-    colSpan:2,
-    editorType:'dxDateBox',
-    editorOptions:{type:'datetime', width:'100%'},
-    isRequired:true,
-    dataField:'startDate'
-  },
-  {
-    label:{text: "End Date"},
-    colSpan:2,
-    editorType:'dxDateBox',
-    editorOptions:{type:'datetime', width:'100%'},
-    isRequired:true,
-    dataField:'endDate'
-  }
-];
-
-  form.itemOption('mainGroup','items', newGroupItems);
-}
-}
-
+} 
   onGroupByDateChanged(args) {
     this.setState({
       groupByDate: args.value
@@ -342,65 +276,15 @@ async onAppointmentForm (e) {
           />
         </div>
       </div>
-      <Popup
-      height='75%'
-      title="Quote Lookup"
+      <Modal
+      width='75%'
+      footer={false}
+      destroyOnClose={true}
       visible={this.state.showForm}
-      onHiding={() => {this.setState({showForm:false})}}
+      onCancel={() => {this.setState({showForm:false})}}
       >
-          <h2>Customer Active Quotes</h2>
-          <List
-          noDataText="Customer has no active quotes"
-          dataSource={this.state.custQuotes}
-          itemRender={(data) => {
-          return (
-            <span>Quote Total: {data.total}  Date created: {format(new Date(data.creationDate),"MMMM do',' yyyy")} </span>
-          )
-          }}
-          onItemClick={async(data) => {
-            let detailList = await getQuoteDetails(data.itemData.id);
-            let prodList = await getQuoteProducts(data.itemData.id);
-            let quoteDetails = createDetails(detailList.data, prodList.data);
-            this.setState({selectQuoteDetails:quoteDetails});
-            this.setState({selectQuote:data.itemData});
-            this.setState({showQuote:true});
-          }
-
-          }>
-          </List>
-        <br/>
-        
-        <div style={{float:"right"}}>
-
-        <Space>
-        <Button
-         style={{fontSize:"14px",padding:"7px 15px 7px 15px"}}
-         onClick={() => {this.setState({showForm:false}); this.setState({selectQuote:[]}); this.setState({selectQuoteDetails:[]})}}>
-          Cancel
-        </Button>
-        </Space>
-        </div>
-      </Popup>
-      <Popup
-      visible={this.state.showQuote}
-      onHiding={()=>{this.setState({showQuote:false}); this.setState({selectQuote:[]})}}>
-        <Form
-        title="Work Order Creation">
-          <Item>
-           <h2> Select details</h2> 
-            </Item>        
-            <Item>
-              <table>
-                <tbody>
-                    {renderList(this.state.selectQuoteDetails)}
-                </tbody>
-              </table>
-            </Item>
-            <Item>
-              <Button onClick={() => {this.createOrder()}} text="Create Work Order"/>
-            </Item>      
-        </Form>
-      </Popup>
+          {this.state.formOption}
+      </Modal>
     </div>
     );
   }

@@ -25,7 +25,7 @@ function NewOrder (props) {
     const [showCalendar, setShowCalendar] = useState(false);
     const [form] = Form.useForm();
     const [trucks, setTrucks] = useState([]);
-
+    
     useEffect(async() => {
       try {
 

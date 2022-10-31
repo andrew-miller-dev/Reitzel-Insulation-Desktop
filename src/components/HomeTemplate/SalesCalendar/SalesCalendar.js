@@ -98,7 +98,6 @@ class SalesCalendar extends React.Component {
   }
 } 
 async onAppointmentForm (e) {
-  
   e.cancel = true;
   if(!e.appointmentData.CreationDate){
     this.setState({formOption:<NewEstimateForm close = {this.closeForm} start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});

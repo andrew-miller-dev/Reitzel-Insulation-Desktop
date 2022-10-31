@@ -26,7 +26,7 @@ export default function FindCustomer(props){
         <div>
             <Select
             showSearch={true}
-          style={{width:'150px'}}
+          style={{width:'200px'}}
           options={options3}
           placeholder="Look up customer by name"
           filterOption={(inputValue, option) =>

@@ -29,7 +29,8 @@ const getProductArr = (id) => {
                 array.push({
                   prodID:item.QuoteLineID,
                   product:item.Product,
-                  price:item.Subtotal
+                  price:item.Subtotal,
+                  tax:item.Tax
                 })
             }
         });
