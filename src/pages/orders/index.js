@@ -16,7 +16,7 @@ export default function Orders() {
  const [showForm, setShowForm] = useState(false);
 
 function newOrder() {
-  setFormOption(<NewWorkOrderForm />);
+  setFormOption(<NewWorkOrderForm truck={{id:null,name:null}} />);
   setShowForm(true);
 }
 

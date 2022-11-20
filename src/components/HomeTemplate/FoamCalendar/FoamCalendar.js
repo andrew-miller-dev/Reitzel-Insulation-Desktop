@@ -150,6 +150,7 @@ class FoamCalendar extends React.Component {
     this.truckSource = this.truckSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
+    this.createTruckObj = this.createTruckObj.bind(this);
   }
   async InfoIsHere() {
     if(this.mounted === true){
@@ -185,11 +186,22 @@ createOrder () {
 async onAppointmentForm (e) {
   e.cancel = true;
   if(!e.appointmentData.total) {
-   this.setState({formOption:<NewWorkOrderForm/>});
+    console.log(e.appointmentData.startDate)
+   this.setState({formOption:<NewWorkOrderForm truck={this.createTruckObj(e.appointmentData.TruckID)} start={e.appointmentData.startDate}/>});
    this.setState({showForm:true});
   }
-  
 } 
+
+createTruckObj = (id) => {
+  let obj = {id:null,name:null}
+  this.state.truckList.forEach(element => {
+    if(element.id == id) {
+      obj = {id:element.id,
+            name:`${element.TruckNumber} ${element.TruckInfo} ${element.TruckType}`}
+    }
+  });
+  return obj;
+}
   onGroupByDateChanged(args) {
     this.setState({
       groupByDate: args.value

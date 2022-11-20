@@ -213,7 +213,11 @@ export default function NewWorkOrderForm(props) {
     
     return (
         <div> 
-          <Form form={form} onFinish={createOrder}>
+          <Form form={form} onFinish={createOrder}
+          initialValues={{
+            ["SelectedDate"]:[props.start],
+            ["SelectedTruck"]:{value:props.truck.id, label:props.truck.name}
+            }}>
           
             <Row wrap={false}>
                 <Col flex={2}>
@@ -257,7 +261,7 @@ export default function NewWorkOrderForm(props) {
               <Col flex={1}>
               <Card title="Select Truck">
                 <Item name="SelectedTruck"> 
-                  <Select style={{width:'200px'}} options={optionsTruck}>
+                  <Select style={{width:'200px'}} options={optionsTruck} labelInValue={true}>
                     </Select> 
                   </Item> 
                     
@@ -268,6 +272,7 @@ export default function NewWorkOrderForm(props) {
                <Card title="Select Date">
                       <Item name="SelectedDate">
                         <DatePicker
+                        className="datepicker"
                         disabledTime={() => {
                           return {
                             disabledHours:()=> disabledHourArr,
