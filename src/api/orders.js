@@ -43,7 +43,7 @@ export async function getAvailableTrucks() {
 
 export async function addNewOrder(value, trucktype, quoteID) {
     var tableName = 'workorders';
-    var values = `${null},'${quoteID}','${value.allInfo.CustomerID}','${value.allInfo.AddressID}','${value.selectedTruck}','${value.allInfo.UserID}','${trucktype}','${value.total}','${value.startDate}','${value.endDate}','${utcDate}'`;
+    var values = `${null},'${quoteID}','${value.allInfo.CustomerID}','${value.allInfo.AddressID}','${value.selectedTruck.value}','${value.allInfo.UserID}','${trucktype}','${value.total}','${value.startDate}','${value.endDate}','${utcDate}'`;
     var newOrder = await ajax(
         `${baseURL}/insertValues`,
         {tableName, values},
@@ -55,7 +55,7 @@ export async function addNewOrder(value, trucktype, quoteID) {
 
 export async function addNewOrderDetail(value, order) {
     var tableName = 'workorderdetail';
-    var values = `${null},'${order}','${value.id}','${value.details}','${value.total}'`;
+    var values = `${null},'${order}','${value.id}','${value.subtotalLines}','${value.total}'`;
     var newDetail = await ajax(
         `${baseURL}/insertValues`,
         {tableName, values},
@@ -67,7 +67,7 @@ export async function addNewOrderDetail(value, order) {
 
 export async function addNewOrderProduct(value, order, detail) {
     var tableName = 'workorderprod';
-    var values = `${null},'${order}','${detail}','${value.id}','${value.product}','${value.price}'`;
+    var values = `${null},'${order}','${detail}','${value.prodID}','${value.product}','${value.price}'`;
     var newProd = await ajax(
         `${baseURL}/insertValues`,
         {tableName, values},

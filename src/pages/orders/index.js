@@ -16,7 +16,7 @@ export default function Orders() {
  const [showForm, setShowForm] = useState(false);
 
 function newOrder() {
-  setFormOption(<NewWorkOrderForm truck={{id:null,name:null}} />);
+  setFormOption(<NewWorkOrderForm truck={{id:null,name:null}} start={new Date()} />);
   setShowForm(true);
 }
 
@@ -60,6 +60,7 @@ function closeForm(){
         onCancel={closeForm}
         width="75%"
         destroyOnClose={true}
+        footer={false}
       >
         {formOption}
       </Modal>

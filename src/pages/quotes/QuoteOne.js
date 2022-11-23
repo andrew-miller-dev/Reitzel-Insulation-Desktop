@@ -343,8 +343,9 @@ function QuoteOne(props) {
     const getQuoteTotal = (detail) => {
         let total = 0.00;
         detail.map((item) => {
-            total = total + parseFloat(item.total) + parseFloat(getTaxes(quotedetails));
+            total = total + parseFloat(item.total);
         });
+        total = total + parseFloat(getTaxes(quotedetails));
         total = total.toFixed(2);
         return total;
     }

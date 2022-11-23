@@ -186,7 +186,6 @@ createOrder () {
 async onAppointmentForm (e) {
   e.cancel = true;
   if(!e.appointmentData.total) {
-    console.log(e.appointmentData.startDate)
    this.setState({formOption:<NewWorkOrderForm truck={this.createTruckObj(e.appointmentData.TruckID)} start={e.appointmentData.startDate}/>});
    this.setState({showForm:true});
   }

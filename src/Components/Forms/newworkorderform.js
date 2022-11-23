@@ -1,5 +1,5 @@
 import FindCustomer from "../Form_Buttons/findCustomerButton";
-import {Card, Row, Col, Select, Checkbox, Button, Form, message} from 'antd';
+import {Card, Row, Col, Select, Checkbox, Button, Form, message,} from 'antd';
 import { getCustomerQuotes } from "../../api/calendar";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,6 +32,8 @@ export default function NewWorkOrderForm(props) {
           total = total + item.total;
         }
       })
+      let taxTotal = getTaxesTotal(findSelectedDetails());
+      total = total + parseFloat(taxTotal);
       return total;
     }
 
@@ -70,6 +72,17 @@ export default function NewWorkOrderForm(props) {
       return taxesTotal;
     }
 
+    function getTaxesTotal(arr){
+      let taxesTotal = 0.00;
+      arr.map((item) => {
+        item.arr.map((item2) => {
+          taxesTotal = taxesTotal + parseFloat(item2.tax);
+        })
+      })
+      taxesTotal = taxesTotal.toFixed(2);
+      return taxesTotal;
+    }
+
     const setDisplay = async(customer) => {
         setSelectCustomer(customer);
         setAddress([]);
@@ -87,7 +100,6 @@ export default function NewWorkOrderForm(props) {
         setTrucks(truckList.data);
       }
       func();
-
     },[])
 
     const getAddressName =(quote) => {
@@ -169,6 +181,7 @@ export default function NewWorkOrderForm(props) {
       }
 
       const createOrder = async(values) => {
+        console.log(values);
         const validResult = await form.validateFields();
         if (validResult.errorFields && validResult.errorFields.length > 0) return;
           const endDate = new Date(values.SelectedDate);
@@ -187,7 +200,7 @@ export default function NewWorkOrderForm(props) {
             ),
             selectedTruck:values.SelectedTruck,
           };
-          let selectedTruckType = getTruckType(workOrderInfo.selectedTruck);
+          let selectedTruckType = getTruckType(workOrderInfo.selectedTruck.value);
           let order = await addNewOrder(workOrderInfo, selectedTruckType, workOrderInfo.allInfo.QuoteID);
           try {
           let orderID = order.data.insertId;
@@ -215,7 +228,6 @@ export default function NewWorkOrderForm(props) {
         <div> 
           <Form form={form} onFinish={createOrder}
           initialValues={{
-            ["SelectedDate"]:[props.start],
             ["SelectedTruck"]:{value:props.truck.id, label:props.truck.name}
             }}>
           
@@ -251,7 +263,8 @@ export default function NewWorkOrderForm(props) {
                 <Card title="Select Details" >
                       {renderList(quoteDetails.detailArray)}
                       <br/>
-                      Total for order: <b>{getSelectedTotal()}</b>
+                      Taxes for order: <span>$ {getTaxesTotal(findSelectedDetails())}</span><br/>
+                      Total for order: <b>$ {getSelectedTotal()}</b>
                 </Card>
                 </Col>
             </Row>
@@ -266,12 +279,18 @@ export default function NewWorkOrderForm(props) {
                   </Item> 
                     
               </Card>
-             
+              <Button 
+            type="primary"
+            htmlType="submit"
+            shape="round"
+            size="large"
+            block>Create Work Order</Button>
               </Col>
               <Col flex={1}>
                <Card title="Select Date">
                       <Item name="SelectedDate">
                         <DatePicker
+                        defaultValue={new Date(props.start)}
                         className="datepicker"
                         disabledTime={() => {
                           return {
@@ -279,13 +298,15 @@ export default function NewWorkOrderForm(props) {
                             disabledMinutes:()=> disabledMinuteArr
                           }
                         }} 
-                        showTime={{ hideDisabledOptions:true, format: 'HH:mm' }} />
+                        showTime={{ hideDisabledOptions:true,
+                                    format: 'HH:mm'}} />
                       </Item>
               </Card>
+             
               </Col>
             </Row>
 
-            <Button htmlType="submit">Boop</Button>
+            
           </Form>
         </div>
     )
