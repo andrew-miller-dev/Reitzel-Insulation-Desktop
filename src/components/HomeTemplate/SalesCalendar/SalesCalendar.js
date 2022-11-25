@@ -42,39 +42,7 @@ class SalesCalendar extends React.Component {
       userList:"",
       regionList:"",
       info:false,
-      findCustomerList:[],
-      customerAddresses:[],
       showForm:false,
-      clickedSalesman:"",
-      siteID:"",
-      custID:"",
-      apptDates:{
-        start:"",
-        end:""
-      },
-      basicInfo:{
-        firstName:"",
-        lastName:"",
-        phone:"",
-        email:"",
-        billingAddress:"",
-        billingCity:"",
-        billingPostal:"",
-        billingRegion:""
-      },
-      siteInfo:{
-        siteAddress:"",
-        siteCity:"",
-        siteProv:"",
-        sitePostal:"",
-        siteRegion:"",
-        },
-      appointmentInfo:{
-        startDate:"",
-        endDate:"",
-       },
-      description:"",
-      jobType:"",
       formOption:{}
     };
     

@@ -56,7 +56,6 @@ export const dataSource = new CustomStore({
       return data
     },
     insert: async (values) => {
-        console.log(values);
       try{
         let customer = values.customerInfo;
         let addressInfo = values.addressInfo;

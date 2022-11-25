@@ -10,28 +10,22 @@ import {getWorkOrderType,
   sendEmail,
   getCustomers,
   updateWorkOrder,
-  getCustomerQuotes,
-  getQuoteDetails,
-  getQuoteProducts,
   deleteWorkOrder,
   addNewOrder,
   markQuoteComplete} from '../../../api/calendar';
 import { getCustomer } from "../../../api/customer.js";
 import CustomStore from 'devextreme/data/custom_store';
-import { message, Modal, Space } from 'antd';
+import { message, Modal } from 'antd';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import ConfirmWorkOrder from "../../Email_Templates/confirm_work.js";
 import UpdateWork from "../../Email_Templates/update_work.js";
-import { Form, Popup, Button, List } from "devextreme-react";
-import { Item } from "devextreme-react/form";
 import { getTrucksByType } from "../../../api/trucks.js";
-import { createDetails, getSelectedDetails, getSelectedTotal, getTruckType, renderList } from "../FillCalendar/FillFunctions";
 import { addNewOrderDetail, addNewOrderProduct } from "../../../api/orders.js";
 import NewWorkOrderForm from "../../Forms/newworkorderform";
 const { confirm } = Modal;
-const { format } = require("date-fns-tz");
+const {format, utcToZonedTime, zonedTimeToUtc} = require("date-fns-tz");
 
 const dataSource = new CustomStore({
   key: "WorkOrderID",
@@ -46,16 +40,16 @@ const dataSource = new CustomStore({
       RegionID:5,
       type:item.WorkType,
       total:item.TotalAmount,
-      startDate:item.startDate,
-      endDate:item.endDate,
+      startDate:utcToZonedTime(item.startDate),
+      endDate:utcToZonedTime(item.endDate),
      }));
     return formatData;
   },
   update: async (key, values) => {
     let formatData = {
       TruckID: values.TruckID,
-      startDate : values.startDate,
-      endDate : values.endDate
+      startDate : format(zonedTimeToUtc(values.startDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+      endDate : format(zonedTimeToUtc(values.endDate),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
   }
     const check = await updateWorkOrder(key, formatData);
     return check;
@@ -128,29 +122,19 @@ class FoamCalendar extends React.Component {
       regionList:"",
       truckList:"",
       info:false,
-      findCustomerList:[],
       showForm:false,
-      showQuote:false,
-      clickedTruck:"",
-      dates:{
-        start:"",
-        end:""
-      },
-      custInfo:[],
-      custQuotes:[],
-      selectQuote:[],
-      selectQuoteDetails:[],
       mounted:false,
-      formOption:{}
+      formOption:{},
+      count:1
     };
     
-    this.createOrder = this.createOrder.bind(this);
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
     this.onAppointmentForm = this.onAppointmentForm.bind(this);
     this.truckSource = this.truckSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
     this.createTruckObj = this.createTruckObj.bind(this);
+    //this.raiseCount = this.raiseCount.bind(this);
   }
   async InfoIsHere() {
     if(this.mounted === true){
@@ -164,33 +148,19 @@ class FoamCalendar extends React.Component {
     }
 }
 
-createOrder () {
-    let values = {
-        startDate:this.state.dates.start,
-        endDate:this.state.dates.end,
-        TruckID:this.state.clickedTruck,
-        CustomerID:this.state.custInfo.CustomerID,
-        AddressID:this.state.selectQuote.AddressID,
-        UserID:this.state.selectQuote.UserID,
-        QuoteID:this.state.selectQuote.id,
-        WorkType:getTruckType(this.state.clickedTruck, this.state.truckList),
-        total:getSelectedTotal(this.state.selectQuoteDetails),
-        details:getSelectedDetails(this.state.selectQuoteDetails),
-    }
-    dataSource.insert(values);
-    this.setState({showQuote:false}); 
-    this.setState({selectQuote:[]});
-    this.setState({showForm:false});
-}
-
 async onAppointmentForm (e) {
   e.cancel = true;
   if(!e.appointmentData.total) {
-   this.setState({formOption:<NewWorkOrderForm truck={this.createTruckObj(e.appointmentData.TruckID)} start={e.appointmentData.startDate}/>});
+   this.setState({formOption:<NewWorkOrderForm truck={this.createTruckObj(e.appointmentData.TruckID)} start={new Date(e.appointmentData.startDate)}/>});
    this.setState({showForm:true});
   }
-} 
-
+}
+/*
+raiseCount = () => {
+  this.setState({count:count+1});
+  console.log(this.state.count);
+}
+*/
 createTruckObj = (id) => {
   let obj = {id:null,name:null}
   this.state.truckList.forEach(element => {

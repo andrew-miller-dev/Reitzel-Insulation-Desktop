@@ -9,9 +9,10 @@ import { getTrucks } from "../../api/trucks";
 import DatePicker from "../DatePicker";
 import { disabledMinuteArr, disabledHourArr } from '../../util/storedArrays';
 import { addNewOrder, addNewOrderDetail, addNewOrderProduct, updateQuoteOnComplete } from '../../api/orders';
+import { parseISO } from "date-fns";
 
 const {Item} = Form;
-const { format } = require("date-fns-tz");
+const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 
 export default function NewWorkOrderForm(props) {
     const dispatch = useDispatch();
@@ -50,7 +51,6 @@ export default function NewWorkOrderForm(props) {
     function getTruckType(id) {
       let workType = "";
       trucks.forEach((truck) => {
-        console.log(truck);
         if(truck.TruckID == id){
           workType = truck.TruckType;
         }         
@@ -98,6 +98,7 @@ export default function NewWorkOrderForm(props) {
       let func = async() => {
         let truckList = await getTrucks();
         setTrucks(truckList.data);
+        console.log(props.start);
       }
       func();
     },[])
@@ -190,8 +191,8 @@ export default function NewWorkOrderForm(props) {
             allInfo:select.quoteReducer.quoteChosen.quote,
             selectedDetails:findSelectedDetails(),
             total:getSelectedTotal(),
-            startDate: format(
-              values.SelectedDate,
+            startDate: format(values.SelectedDate
+              ,
               "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
             ),
             endDate:format(
@@ -221,6 +222,7 @@ export default function NewWorkOrderForm(props) {
             message.success("Order created");
           }
           updateAndCompleteQuote(workOrderInfo);
+          props.count();
         }
         }
     
@@ -228,7 +230,8 @@ export default function NewWorkOrderForm(props) {
         <div> 
           <Form form={form} onFinish={createOrder}
           initialValues={{
-            ["SelectedTruck"]:{value:props.truck.id, label:props.truck.name}
+            ["SelectedTruck"]:{value:props.truck.id, label:props.truck.name},
+            ["SelectedDate"]:new Date(props.start)
             }}>
           
             <Row wrap={false}>
@@ -273,7 +276,8 @@ export default function NewWorkOrderForm(props) {
               </Col>
               <Col flex={1}>
               <Card title="Select Truck">
-                <Item name="SelectedTruck"> 
+                <Item name="SelectedTruck"
+                rules={[{required:true}]}> 
                   <Select style={{width:'200px'}} options={optionsTruck} labelInValue={true}>
                     </Select> 
                   </Item> 
@@ -290,7 +294,7 @@ export default function NewWorkOrderForm(props) {
                <Card title="Select Date">
                       <Item name="SelectedDate">
                         <DatePicker
-                        defaultValue={new Date(props.start)}
+                        //defaultValue={props.start}
                         className="datepicker"
                         disabledTime={() => {
                           return {
