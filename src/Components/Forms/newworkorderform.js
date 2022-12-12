@@ -180,7 +180,6 @@ export default function NewWorkOrderForm(props) {
       }
 
       const createOrder = async(values) => {
-        console.log(values);
         const validResult = await form.validateFields();
         if (validResult.errorFields && validResult.errorFields.length > 0) return;
           const endDate = new Date(values.SelectedDate);

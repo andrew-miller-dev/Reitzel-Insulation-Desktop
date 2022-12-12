@@ -2,7 +2,7 @@ import { Card, Modal, Button, Select } from "antd";
 import { useState } from "react";
 import { getAddressList} from "../../api/calendar";
 import NewCustomerForm from "../Forms/newcustomerform";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import FindCustomer from "./findCustomerButton";
 
 export default function NewCustomerButton(props) {
@@ -10,7 +10,6 @@ export default function NewCustomerButton(props) {
     const [addressList, setAddressList] = useState([]);
     const [selectCustomer, setSelectCustomer] = useState([]);
     const dispatch = useDispatch();
-    const select = useSelector((state) => state);
 
     const optionsAddress = addressList.map((item) => (
       {
@@ -25,7 +24,6 @@ export default function NewCustomerButton(props) {
       const setDisplay = async(customer) => {
         setSelectCustomer(customer);
         dispatch({type:"customerUpdate", payload:customer});
-        console.log(select);
         const list = await getAddressList(customer.CustomerID);
         setAddressList(list.data);
         document.getElementById("CustomerInfo").style.display = "block";

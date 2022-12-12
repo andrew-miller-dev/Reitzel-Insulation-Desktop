@@ -13,12 +13,12 @@ function Confirmation(props){
                 <img src={header}></img>
             </Item>
             <Item>
-                <p>Hi {props.customerInfo.FirstName} {props.customerInfo.LastName},</p>
+                <p>Hi {props.customerInfo.CustFirstName} {props.customerInfo.CustLastName},</p>
             <br/>
             <p>Thank you for choosing Reitzel Insulation! Here are the details for your booking:</p>
             <p>Job Type: {props.estimateInfo.JobType}</p>
             <p>Date: {format(new Date(props.estimateInfo.startDate),"MMMM do',' yyyy")}</p>
-            <p> Approximate Arrival Time:  {format(new Date(props.estimateInfo.startDate),"K:mm b")}</p>
+            <p> Approximate Arrival Time:  {format(utcToZonedTime(props.estimateInfo.startDate,"America/Toronto"),"K:mm b")}</p>
             <br />
             </Item>
             <Item>

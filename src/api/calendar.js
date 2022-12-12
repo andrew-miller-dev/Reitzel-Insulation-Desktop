@@ -184,7 +184,7 @@ export async function addNewAddress(id, value){
 
 export async function addEstimate(id, address, value) {
   const tableName = "estimates";
-  const values = `${null},'${id}','${address}','${value.UserID}','${value.JobType}','${utcDate}','${value.estimateInfo}','${value.siteRegion}','${value.startDate}','${value.endDate}'`;
+  const values = `${null},'${id}','${address}','${value.UserID}','${value.JobType}','${utcDate}','${value.estimateInfo}','${value.Region}','${value.startDate}','${value.endDate}'`;
 
   const estimate = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (estimate !== []) return estimate;

@@ -45,7 +45,6 @@ export default function EstimateForm(props) {
     setSalesmen(salesData);
   }
   const onFinish = async (values) => {
-    console.log(selectAddress);
     if(selectAddress.addressID === ""){
       message.error("Select an address first");
     }
