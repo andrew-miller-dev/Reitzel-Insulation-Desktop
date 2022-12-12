@@ -125,16 +125,15 @@ class FoamCalendar extends React.Component {
       showForm:false,
       mounted:false,
       formOption:{},
-      count:1
     };
-    
+    this.schedulerRef = React.createRef();
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
     this.onAppointmentForm = this.onAppointmentForm.bind(this);
     this.truckSource = this.truckSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
     this.createTruckObj = this.createTruckObj.bind(this);
-    //this.raiseCount = this.raiseCount.bind(this);
+    this.closeForm = this.closeForm.bind(this);
   }
   async InfoIsHere() {
     if(this.mounted === true){
@@ -151,16 +150,16 @@ class FoamCalendar extends React.Component {
 async onAppointmentForm (e) {
   e.cancel = true;
   if(!e.appointmentData.total) {
-   this.setState({formOption:<NewWorkOrderForm truck={this.createTruckObj(e.appointmentData.TruckID)} start={new Date(e.appointmentData.startDate)}/>});
+   this.setState({formOption:<NewWorkOrderForm close={this.closeForm} truck={this.createTruckObj(e.appointmentData.TruckID)} start={new Date(e.appointmentData.startDate)}/>});
    this.setState({showForm:true});
   }
 }
-/*
-raiseCount = () => {
-  this.setState({count:count+1});
-  console.log(this.state.count);
+
+closeForm = () => {
+  this.setState({showForm:false});
+  this.schedulerRef.current.instance.getDataSource().reload();
 }
-*/
+
 createTruckObj = (id) => {
   let obj = {id:null,name:null}
   this.state.truckList.forEach(element => {
@@ -220,6 +219,7 @@ createTruckObj = (id) => {
       
       <div>
       <Scheduler
+      ref={this.schedulerRef}
         cellDuration={60}
         timeZone="America/Edmonton"
         groups = {groups}

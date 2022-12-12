@@ -9,10 +9,9 @@ import { getTrucks } from "../../api/trucks";
 import DatePicker from "../DatePicker";
 import { disabledMinuteArr, disabledHourArr } from '../../util/storedArrays';
 import { addNewOrder, addNewOrderDetail, addNewOrderProduct, updateQuoteOnComplete } from '../../api/orders';
-import { parseISO } from "date-fns";
 
 const {Item} = Form;
-const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
+const { format } = require("date-fns-tz");
 
 export default function NewWorkOrderForm(props) {
     const dispatch = useDispatch();
@@ -98,7 +97,6 @@ export default function NewWorkOrderForm(props) {
       let func = async() => {
         let truckList = await getTrucks();
         setTrucks(truckList.data);
-        console.log(props.start);
       }
       func();
     },[])
@@ -222,7 +220,8 @@ export default function NewWorkOrderForm(props) {
             message.success("Order created");
           }
           updateAndCompleteQuote(workOrderInfo);
-          props.count();
+          props.close();
+
         }
         }
     

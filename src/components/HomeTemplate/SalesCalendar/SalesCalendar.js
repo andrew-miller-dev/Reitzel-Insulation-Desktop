@@ -45,7 +45,7 @@ class SalesCalendar extends React.Component {
       showForm:false,
       formOption:{}
     };
-    
+    this.schedulerRef = React.createRef();
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
     this.onAppointmentForm = this.onAppointmentForm.bind(this);
     this.salesmanSource = this.salesmanSource.bind(this);
@@ -54,6 +54,7 @@ class SalesCalendar extends React.Component {
     this.createUserObj = this.createUserObj.bind(this);
     this.closeForm = this.closeForm.bind(this);
   }
+
   async InfoIsHere() {
   if(this.mounted){
     let customerData = await getCustomers();
@@ -86,7 +87,7 @@ createUserObj = (id) => {
 
 closeForm = () => {
   this.setState({showForm:false});
-  window.location.reload();
+  this.schedulerRef.current.instance.getDataSource().reload();
 }
 
 onGroupByDateChanged(args) {
@@ -135,6 +136,7 @@ onGroupByDateChanged(args) {
       
       <div>
       <Scheduler
+      ref={this.schedulerRef}
         timeZone="America/Toronto"
         groups = {groups}
         groupByDate={this.state.groupByDate}

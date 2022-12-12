@@ -66,9 +66,8 @@ export default function EstimateForm(props) {
       customerInfo:customer,
       addressInfo:addressInfo
     };
-    dataSource.insert(estimate);
+    dataSource.insert(estimate).then(() => {props.close()});
     history.push("/home");
-    props.close();
   }
   };
 

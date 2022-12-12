@@ -81,6 +81,9 @@ export const dataSource = new CustomStore({
     onUpdating: (key, values) => {
       
       confirm({title:"Send email update to customer?", onOk() {sendEmailUpdate(values)}, cancelText:"No"})
+    },
+    onInserted:(values) => {
+      
     }
   });
 
