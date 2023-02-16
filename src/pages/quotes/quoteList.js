@@ -174,7 +174,6 @@ var parseISO = require('date-fns/parseISO')
               onClick={async() => {
                 if(data.completed !== null){
                 const order = await GetOrderByQID(data.QuoteID);
-                console.log(order);
                 Modal.info({
                   title:"Appointment Information",
                   content:`Work order already created. Appointment time is ${format(parseISO(order.data[0].startDate),"MMMM do',' yyyy h':'mm aa")}`
@@ -183,9 +182,10 @@ var parseISO = require('date-fns/parseISO')
                 }
                 else{
                   history.push(`/orders/${data.QuoteID}/new`)
-                }
+               }
                 
-              }}>
+              }
+            }>
                 Create Work Order
               </Button>
               <br />

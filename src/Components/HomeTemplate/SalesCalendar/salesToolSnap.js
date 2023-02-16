@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getAddress } from '../../../api/addresses';
 
-
 const {format} = require('date-fns-tz');
 
 

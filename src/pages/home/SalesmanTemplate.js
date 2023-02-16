@@ -2,13 +2,16 @@ import React from "react";
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
-import {getUsers,  getRegionAPI, getEstimateByIDToday, getEstimateByIDTomorrow} from '../../api/calendar';
+import {getUsers,  getRegionAPI, getEstimateByIDToday, getEstimateByIDTomorrow, getEstimateTodayOnly} from '../../api/calendar';
 import CustomStore from 'devextreme/data/custom_store';
 import { getUser } from "../../util/storage";
 import Legend from "../../Components/Legend";
 import SalesToolSnap from "../../Components/HomeTemplate/SalesCalendar/salesToolSnap";
+import { Button, Modal, Row, Space } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
+import ScheduleDLTemplate from "../../Components/Word_Templates/scheduleDL";
 
-const { zonedTimeToUtc, format } = require('date-fns-tz');
+const {utcToZonedTime } = require('date-fns-tz');
 
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
@@ -28,8 +31,8 @@ const dataSource = new CustomStore({
       CreationDate : item.CreationDate,
       text : item.EstimateInfo,
       RegionID : item.RegionID,
-      startDate : timeFormat(item.startDate),
-      endDate : timeFormat(item.endDate)
+      startDate : utcToZonedTime(item.startDate),
+      endDate : utcToZonedTime(item.endDate)
     }));
     return formatData
     }
@@ -43,18 +46,22 @@ const dataSource = new CustomStore({
       CreationDate : item.CreationDate,
       text : item.EstimateInfo,
       RegionID : item.RegionID,
-      startDate : timeFormat(item.startDate),
-      endDate : timeFormat(item.endDate)
+      startDate : utcToZonedTime(item.startDate),
+      endDate : utcToZonedTime(item.endDate)
     }));
     return formatData
     }
   }
 });
 
-const timeFormat = (date) => {
-   let newdate = zonedTimeToUtc(new Date(date), 'America/Edmonton');
-   var formatteddate = format(newdate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-   return formatteddate;
+const getApptList = async() => {
+  let user = getUser();
+  const data = await getEstimateTodayOnly(user.UserID);
+    let formatData = data.data;
+    Modal.info({
+      title:'Download Schedule',
+      content:<ScheduleDLTemplate list={formatData} />
+    });
 }
 
 
@@ -139,9 +146,9 @@ class SalesmanTemplate extends React.Component {
         <Legend />
         </div>
           <div style={{padding:"15px", width:"100%"}}>
-            <h1>Your work day</h1>
+           <Row><Space> <h1>Your work day</h1> <Button onClick={() => {getApptList()}} type="primary"shape="round" icon={<DownloadOutlined/>} >Download</Button></Space></Row>
              <Scheduler
-              timeZone="America/Edmonton"
+              timeZone="America/Toronto"
               resourceCellRender={renderResourceCell}
               dataSource={dataSource}
               views={views}
@@ -164,7 +171,11 @@ class SalesmanTemplate extends React.Component {
         ></Resource>
         </Scheduler>
         </div>
-        
+        <div id="testPdf">
+          <p>
+            pdf tester
+            </p>
+        </div>
      
     </div>
     );

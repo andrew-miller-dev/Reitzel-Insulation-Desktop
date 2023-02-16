@@ -146,6 +146,20 @@ export async function getEstimateByIDToday(id) {
     }
 }
 
+export async function getEstimateTodayOnly(id) {
+  const tableName = "estimates LEFT JOIN address ON estimates.AddressID = address.AddressID LEFT JOIN customers ON estimates.CustomerID = customers.CustomerID";
+  const condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 1 DAY AND startDate >= CURDATE()`;
+    const estimatelist = await ajax(
+      `${baseURL}/fetchValues`,
+      { tableName, condition},
+      "post"
+    );
+    if (estimatelist !== []) return estimatelist;
+    else {
+      return 0;
+    }
+}
+
 export async function getEstimateByIDTomorrow(id) {
   const tableName = "estimates";
   const condition = `UserID = '${id}' AND startDate <= CURDATE() + INTERVAL 2 DAY`;

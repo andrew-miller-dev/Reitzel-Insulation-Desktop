@@ -26,11 +26,7 @@ const renderResourceCell = (model) => {
       <b>{model.data.FirstName} {model.data.LastName[0]}</b>
   );
 }
-const onAppointmentDeleting = (e) => {
-  var cancel = true;
-  e.cancel = cancel;
-  confirm({title:"Do you want to delete this appointment?", onOk(){dataSource.remove(e.appointmentData.EstimateID) }, onCancel(){cancel = true}});
-}
+
 
 class SalesCalendar extends React.Component {
   constructor(props) {
@@ -48,6 +44,7 @@ class SalesCalendar extends React.Component {
     this.schedulerRef = React.createRef();
     this.onGroupByDateChanged = this.onGroupByDateChanged.bind(this);
     this.onAppointmentForm = this.onAppointmentForm.bind(this);
+    this.onAppointmentDeleting = this.onAppointmentDeleting.bind(this);
     this.salesmanSource = this.salesmanSource.bind(this);
     this.regionSource = this.regionSource.bind(this);
     this.InfoIsHere = this.InfoIsHere.bind(this);
@@ -72,6 +69,11 @@ async onAppointmentForm (e) {
     this.setState({formOption:<NewEstimateForm close = {this.closeForm} start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
     this.setState({showForm:true});
   }
+}
+onAppointmentDeleting = (e) => {
+  var cancel = true;
+  e.cancel = cancel;
+  confirm({title:"Do you want to delete this appointment?", onOk(){dataSource.remove(e.appointmentData.EstimateID).then(()=>{this.schedulerRef.current.instance.getDataSource().reload();}) }, onCancel(){cancel = true}});
 }
 
 createUserObj = (id) => {
@@ -150,7 +152,7 @@ onGroupByDateChanged(args) {
         endDayHour={19}
         appointmentComponent={SalesTemplate}
         appointmentTooltipComponent={SalesTooltip}
-        onAppointmentDeleting={onAppointmentDeleting}
+        onAppointmentDeleting={this.onAppointmentDeleting}
         onAppointmentFormOpening={this.onAppointmentForm}
         >
         <Resource
