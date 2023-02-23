@@ -58,12 +58,17 @@ const getApptList = async() => {
   let user = getUser();
   const data = await getEstimateTodayOnly(user.UserID);
     let formatData = data.data;
-    Modal.info({
+    const modal = Modal.info({
+      okText:"Please wait",
+      onOk:{},
+      closable:false,
       title:'Download Schedule',
-      content:<ScheduleDLTemplate list={formatData} />
+      content:<ScheduleDLTemplate list={formatData}/>
     });
+    setTimeout(() => {
+      modal.destroy()
+    },2000)
 }
-
 
 const views = ['day'];
 
