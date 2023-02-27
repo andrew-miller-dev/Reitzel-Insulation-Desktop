@@ -63,7 +63,8 @@ export default function EstimateForm(props) {
       customerID: customer.CustomerID,
       addressID:selectAddress,
       customerInfo:customer,
-      addressInfo:addressInfo
+      addressInfo:addressInfo,
+      salesEmail:props.salesman.email
     };
     dataSource.insert(estimate).then(() => {props.close()});
     history.push("/home");

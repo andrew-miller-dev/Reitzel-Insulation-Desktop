@@ -70,7 +70,7 @@ export const dataSource = new CustomStore({
           else message.warn("Something went wrong");
   
     if(validator.isEmail(customer.Email)){
-      console.log(customer);
+      console.log(values);
       sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />), customer_info_sheet)
     }
     return estimateResult;

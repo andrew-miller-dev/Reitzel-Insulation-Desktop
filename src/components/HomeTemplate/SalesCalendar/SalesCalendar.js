@@ -80,8 +80,10 @@ createUserObj = (id) => {
   let obj = {id:null,name:null}
   this.state.userList.forEach(element => {
     if(element.id == id) {
+      console.log(element);
       obj = {id:element.id,
-              name:element.FirstName}
+              name:element.FirstName,
+              email:element.Email}
     }
   });
   return obj;
@@ -112,7 +114,8 @@ onGroupByDateChanged(args) {
     let salesData = data.data.map((item) => ({
       id: item.UserID,
       FirstName : item.FirstName,
-      LastName: item.LastName
+      LastName: item.LastName,
+      Email:item.Email
     }))
     return salesData;
   }
