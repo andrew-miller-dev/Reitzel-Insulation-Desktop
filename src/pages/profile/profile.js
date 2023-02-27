@@ -1,14 +1,16 @@
-import { Button, Card, Input, Row, Col, Modal } from "antd";
+import { Button, Card, Input, Row, Col, Modal, Form, message } from "antd";
 import { useEffect, useState } from "react";
 import { GetUserByID } from "../../api";
 import ChangeEmailForm from "../../Components/Forms/changeemailform";
 import ChangePasswordForm from "../../Components/Forms/changepassword";
 import { getUser } from "../../util/storage";
 
+const {Item} = Form;
 export default function Profile(props) {
     const [user, setUser] = useState([]);
     const [showForm,setShowForm] = useState(false);
     const [content, setContent] = useState({});
+    const [form] = Form.useForm();
 
     useEffect(() =>{
         const func = async() => {
@@ -21,18 +23,79 @@ export default function Profile(props) {
     },[])
 
     const closeForm = () => {
+        form.resetFields();
         setShowForm(false);
         setContent({});
         
     }
+    const confirmOldPass = async(values) => {
+        const validResult = await form.validateFields();
+        if (validResult.errorFields && validResult.errorFields.length > 0) return;
+        const value = form.getFieldsValue();
+        if(value.oldConfirm === user.Password) {
+            setContent(<ChangePasswordForm user = {user} close={closeForm} />)
+        }
+        else {
+            message.error("Password not correct");
+        }
+    }
+    const confirmPassEmail= async(values) => {
+        const validResult = await form.validateFields();
+        if (validResult.errorFields && validResult.errorFields.length > 0) return;
+        const value = form.getFieldsValue();
+        if(value.oldConfirm === user.Password) {
+            setContent(<ChangeEmailForm user = {user} close={closeForm} />)
+        }
+        else {
+            message.error("Password not correct");
+        }
+    }
     const changePassword = () => {
        setShowForm(true);
-       setContent(<ChangePasswordForm user = {user} close={closeForm} />)
+       setContent(
+       <>
+       <h3>Change Password</h3>
+       <Form form={form} onFinish={confirmOldPass}>
+        <Item 
+        label="Confirm old password"
+        name="oldConfirm"
+        rules={[
+            {
+                required:true,
+                message:"Required"
+            }
+        ]}>
+            <Input.Password />
+        </Item>
+        <Item>
+        <Button htmlType="submit" style={{float:"right"}} type="primary">Submit</Button>
+        </Item>
+       </Form>
+       </>)
     }
 
     const changeEmail = () => {
         setShowForm(true);
-        setContent(<ChangeEmailForm user = {user} close ={closeForm} />)
+        setContent(
+            <>
+            <h3>Change Password</h3>
+            <Form form={form} onFinish={confirmPassEmail}>
+             <Item 
+             label="Confirm password"
+             name="oldConfirm"
+             rules={[
+                 {
+                     required:true,
+                     message:"Required"
+                 }
+             ]}>
+                 <Input.Password />
+             </Item>
+             <Item>
+             <Button htmlType="submit" style={{float:"right"}} type="primary">Submit</Button>
+             </Item>
+            </Form>
+            </>)
     }
     return (
 
@@ -61,6 +124,7 @@ export default function Profile(props) {
                     <Col span={2}> <b>Password:</b>
                     </Col>
                     <Col span={4}><Input.Password
+                    disabled
                      style={{minWidth:"200px",maxWidth:"300px"}} 
                      value={user.Password}
                      ></Input.Password>
@@ -78,7 +142,8 @@ export default function Profile(props) {
             </Card>
             <Modal visible={showForm}
             onCancel={closeForm}
-            footer={null}>
+            footer={null}
+            destroyOnClose={true}>
             {content}
             </Modal>
         </div>

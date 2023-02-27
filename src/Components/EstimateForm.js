@@ -101,6 +101,7 @@ export default function EstimateForm(props) {
               ]}
             >
               <RangePicker
+                style={{width:"350px"}}
                 showTime={{ format: "HH:mm" }}
                 className="datepicker"
               />
