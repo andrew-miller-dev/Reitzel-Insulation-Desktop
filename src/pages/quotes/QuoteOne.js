@@ -7,7 +7,7 @@ import qData from './quoteData.js';
 import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
-import { Card, Row, Col, Checkbox, Select, InputNumber, } from "antd";
+import { Card, Row, Col, Checkbox, Select, InputNumber, Space } from "antd";
 const { Option } = Select;
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(),"MMMM do',' yyyy");
@@ -611,7 +611,11 @@ function QuoteOne(props) {
                     <br/>
                     <br/>
                     <br/>
+                    <Space>
                     <Button size="md" variant="primary" type="submit" className="ant-btn ant-btn-primary">Submit</Button>
+                    <Button size="md">Save as Draft</Button>
+                    </Space>
+                   
                 </div>
             </div>
         </form>

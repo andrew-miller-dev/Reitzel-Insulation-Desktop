@@ -135,10 +135,7 @@ onGroupByDateChanged(args) {
         )
       }
       else{
-
-      
     return (
-      
       <div>
       <Scheduler
       ref={this.schedulerRef}

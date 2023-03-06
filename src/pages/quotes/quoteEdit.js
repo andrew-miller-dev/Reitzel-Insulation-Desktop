@@ -10,8 +10,6 @@ function QuoteEdit (props) {
     let quoteID = useRouteMatch('/quotes/:qid/edit').params.qid;
     let history = useHistory();
     const [isLoading, setLoading] = useState(true);
-
-    const [setAllData] = useState([]);
     const [quoteData, setQuoteData] = useState([]);
     const [quoteDetail, setQuoteDetail] = useState([]);
     const [productList, setProductList] = useState([]);
@@ -22,9 +20,6 @@ function QuoteEdit (props) {
     useEffect( () => {
         let func = async() => {
             let allInfo = await getAllInfoID(quoteID);
-            console.log(allInfo.data[0]);
-            setAllData(allInfo.data[0]);
-            
             let detailList = await getQuoteDetails(quoteID);
             setQuoteDetail(detailList.data);
             let products = await getProductList(quoteID);
