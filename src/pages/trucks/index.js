@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {Button, Switch, Card, Table, Form, Modal, Input, message, Select} from 'antd';
+import {Button, Switch, Card, Table, Form, Modal, Input, message, Select, Space} from 'antd';
 import { getTrucks, addTruck, changeAvailable, deleteTruckID } from '../../api/trucks';
+import NewTruckForm from '../../Components/Forms/Truck_Forms/newtruckform';
+import EditTruckForm from '../../Components/Forms/Truck_Forms/edittruckform';
 const {Item} = Form;
 const {Option} = Select;
 
@@ -9,16 +11,13 @@ export default function Trucks(props) {
     const [addShow, setAddShow] = useState(false);
     const [truckList, setTruckList] = useState([]);
     const [count, setCount] = useState(0);
-    const [form] = Form.useForm();
-    const types = ["foam","loosefill"];
-    const options = types.map((item, index) => (
-      <Option key={item}>{item}</Option>
-    ));
+    const [modalContent, setModalContent]= useState({});
+
     const title = (
         <Button
           onClick={() => {
-            form.resetFields();
             setAddShow(true);
+            setModalContent(<NewTruckForm closeForm = {closeForm} />)
           }}
           type="primary"
         >
@@ -59,13 +58,21 @@ export default function Trucks(props) {
             )
         },
         {
-            title:"Delete Truck",
+            title:"Edit/Delete",
             render:(data) => (
               <div>
-                <Button 
+                <Space>
+                  <Button onClick={()=>{ setAddShow(true);
+                                          setModalContent(<EditTruckForm closeForm={closeForm}/>)}}>
+                    Edit
+                  </Button>
+                   <Button 
                 type="primary" danger
                 onClick={() => {deleteTruck(data).then(() => {setCount(count + 1)})}}
-                >Delete</Button>
+                >X</Button>
+                  
+                </Space>
+               
                 </div>
 
                 
@@ -91,16 +98,9 @@ export default function Trucks(props) {
         getData();
     }, [truckList.length, count]);
 
-    const finishSubmit = async () => {
-        const validResult = await form.validateFields();
-        if (validResult.errorFields && validResult.errorFields.length > 0) return;
-        const value = form.getFieldsValue();
-        const result = await addTruck(value);
-    if (result.data && result.data.affectedRows > 0) {
-      message.success("Added new truck");
-      setAddShow(false);
-    } 
-    setCount(count + 1);
+    const closeForm =() => {
+      setAddShow(false); 
+      setCount(count + 1);
     }
 
     const changeAvail = async(data) => {
@@ -144,61 +144,12 @@ export default function Trucks(props) {
         ></Table>
         </Card>
         <Modal
-        title="Add new truck"
+        title="Add/Edit Truck"
         visible={addShow}
-        onOk={finishSubmit}
-        onCancel={() => {setAddShow(false)}}>
-            <Form
-            form={form}
-            >
-                <Item
-                label="Truck Number"
-              name="truckNumber"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-                </Item>
-                <Item
-                label="Truck Info"
-              name="truckInfo"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-                </Item>
-                <Item
-                label="License Plate"
-              name="truckPlate"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-                </Item>
-                <Item
-                label="Truck Type"
-                name="truckType"
-                rules={[{
-                  required:true,
-                  message:"Required"
-                }]}>
-                  <Select>
-                  {options}
-                  </Select>
-                </Item>
-        </Form>
+        onCancel={closeForm}
+        footer={false}
+        destroyOnClose={true}>
+          {modalContent}
         </Modal>
         
         </div>

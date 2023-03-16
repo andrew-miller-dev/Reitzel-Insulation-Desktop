@@ -39,6 +39,7 @@ export default function ajax(url, body = {}, method = "GET") {
     promise
       .then((data) => resolve(data))
       .catch((err) => {
+        console.log(err);
         message.warn("err:" + err);
       });
   });

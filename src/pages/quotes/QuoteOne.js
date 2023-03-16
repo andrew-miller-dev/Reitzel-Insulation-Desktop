@@ -7,7 +7,8 @@ import qData from './quoteData.js';
 import {getCustomerAddresses} from '../../api/customer';
 import { getCustomers } from "../../api/calendar";
 import {getUser} from '../../util/storage';
-import { Card, Row, Col, Checkbox, Select, InputNumber, Space } from "antd";
+import { Card, Row, Col, Checkbox, Select, InputNumber, Space, message } from "antd";
+var fs = require('fs');
 const { Option } = Select;
 const {format } = require('date-fns-tz');
 let formatDate = format(new Date(),"MMMM do',' yyyy");
@@ -38,25 +39,34 @@ function QuoteOne(props) {
     const [addresses, setAddresses] = useState([]);
     
     useEffect(async () => {
-        let result = await getCustomers();
+        try{
+            let result = await getCustomers();
             let cust = result.data.map((c) => (
-                    {
-                    value : c.CustFirstName + " " + c.CustLastName,
-                    id : c.CustomerID,
-                    name : c.CustFirstName + " " + c.CustLastName,
-                    first_name : c.CustFirstName,
-                    last_name : c.CustLastName,
-                    phone : c.Phone,
-                    email : c.Email,
-                    address : c.BillingAddress,
-                    city : c.CustCity,
-                    postal_code : c.CustPostalCode,
-                    region : c.CustRegion,
-                }
-            ));
-            setCustomers(cust);
-            setLoading(false);
-            setUser(getUser());    
+                {
+                value : c.CustFirstName + " " + c.CustLastName,
+                id : c.CustomerID,
+                name : c.CustFirstName + " " + c.CustLastName,
+                first_name : c.CustFirstName,
+                last_name : c.CustLastName,
+                phone : c.Phone,
+                email : c.Email,
+                address : c.BillingAddress,
+                city : c.CustCity,
+                postal_code : c.CustPostalCode,
+                region : c.CustRegion,
+            }
+        ));
+        setCustomers(cust);
+        setLoading(false);
+        setUser(getUser());    
+        }
+        catch(e){
+            //let result = JSON.parse(localStorage.getItem('customerList'));
+            console.log(e);
+        }
+        finally{
+           
+        }
         },[selectedQuote]);
 
     const {value: custID, assignValue: assignCustID} = useInput();
@@ -169,7 +179,35 @@ function QuoteOne(props) {
         evt.preventDefault();
 
     }
-
+    const submitDraft= (evt) => {
+        evt.preventDefault();
+        var payload = 
+        {
+            quoteDate:formatDate,
+            userInfo:user,
+            id:custID,
+            addressID: addressID,
+            first_name: firstName,
+            last_name: lastName,
+            billing_address: billingAddress,
+            city: city,
+            post_code: postCode,
+            phone_number: phoneNumber,
+            email: email,
+            site_address: siteAddress,
+            site_city: siteCity,
+            site_postal:siteCode,
+            customer_notes: customerNotes,
+            installer_notes: installerNotes,
+            details: quotedetails,
+            total: getQuoteTotal(quotedetails),
+            tax: taxRate
+        }
+        fs.appendFile('drafts.txt',"test",function (err) {
+            if(err) throw err;
+            message.success("Draft saved");
+        });
+    }
     const changeTax = () => {
         setTax(!tax);
         if(tax === true){
@@ -613,7 +651,7 @@ function QuoteOne(props) {
                     <br/>
                     <Space>
                     <Button size="md" variant="primary" type="submit" className="ant-btn ant-btn-primary">Submit</Button>
-                    <Button size="md">Save as Draft</Button>
+                    <Button size="md" onClick={submitDraft}>Save as Draft</Button>
                     </Space>
                    
                 </div>
