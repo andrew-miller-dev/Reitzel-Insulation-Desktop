@@ -33,7 +33,7 @@ class SalesCalendar extends React.Component {
     super(props);
     this.state={
       mounted:false,
-      groupByDate:false,
+      groupByDate:true,
       useExisting:false,
       userList:"",
       regionList:"",
