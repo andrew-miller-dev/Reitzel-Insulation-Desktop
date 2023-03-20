@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {Button, Switch, Card, Table, Form, Modal, Input, message, Select, Space} from 'antd';
-import { getTrucks, addTruck, changeAvailable, deleteTruckID } from '../../api/trucks';
+import {Button, Switch, Card, Table, Modal, message, Space} from 'antd';
+import { getTrucks, changeAvailable, deleteTruckID } from '../../api/trucks';
 import NewTruckForm from '../../Components/Forms/Truck_Forms/newtruckform';
 import EditTruckForm from '../../Components/Forms/Truck_Forms/edittruckform';
-const {Item} = Form;
-const {Option} = Select;
 
 export default function Trucks(props) {
 
@@ -63,7 +61,7 @@ export default function Trucks(props) {
               <div>
                 <Space>
                   <Button onClick={()=>{ setAddShow(true);
-                                          setModalContent(<EditTruckForm closeForm={closeForm}/>)}}>
+                                          setModalContent(<EditTruckForm info={data} closeForm={closeForm}/>)}}>
                     Edit
                   </Button>
                    <Button 

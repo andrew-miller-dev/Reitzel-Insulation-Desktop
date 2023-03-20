@@ -64,3 +64,16 @@ export async function getTrucksByType(term){
     return 0;
   }
 }
+
+export async function editTruck(data,id) {
+  const tableName = 'trucks';
+  const columnsAndValues = `TruckInfo='${data.truckInfo}',LicensePlate='${data.truckPlate}',TruckType='${data.truckType}'`;
+  const condition = `TruckID = '${id}'`
+  const truck = await ajax(
+      `${baseURL}/updateValues`,
+      {tableName,columnsAndValues,condition},
+      "post"
+  );
+  if (truck !==[]) return truck;
+  else return 0;
+}

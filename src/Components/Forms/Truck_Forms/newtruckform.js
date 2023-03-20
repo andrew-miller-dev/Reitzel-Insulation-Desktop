@@ -75,7 +75,7 @@ export default function NewTruckForm(props) {
                   </Select>
                 </Item>
                 <Item>
-                    <Button htmlType='submit'></Button>
+                    <Button type="primary" htmlType='submit'>Submit</Button>
                 </Item>
         </Form>)
 }
