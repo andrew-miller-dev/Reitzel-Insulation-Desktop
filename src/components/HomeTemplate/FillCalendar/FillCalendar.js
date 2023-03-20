@@ -10,24 +10,18 @@ import {getWorkOrderType,
         sendEmail,
         getCustomers,
         updateWorkOrder,
-        getCustomerQuotes,
-        getQuoteDetails,
-        getQuoteProducts,
         deleteWorkOrder,
         addNewOrder,
         markQuoteComplete} from '../../../api/calendar';
 import { getCustomer } from "../../../api/customer.js";
 import CustomStore from 'devextreme/data/custom_store';
-import { message, Modal, Space } from 'antd';
+import { message, Modal } from 'antd';
 import {renderEmail} from 'react-html-email';
 import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import ConfirmWorkOrder from "../../Email_Templates/confirm_work.js";
 import UpdateWork from "../../Email_Templates/update_work.js";
-import { Form, Popup, Button, List } from "devextreme-react";
-import { Item } from "devextreme-react/form";
 import { getTrucksByType } from "../../../api/trucks.js";
-import { createDetails, getSelectedDetails, getSelectedTotal, getTruckType, renderList } from "./FillFunctions.js";
 import { addNewOrderDetail, addNewOrderProduct } from "../../../api/orders.js";
 import NewWorkOrderForm from "../../Forms/newworkorderform.js";
 const { confirm } = Modal;
