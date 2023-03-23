@@ -57,6 +57,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
               id:item.WODetailID,
               details:item.Details,
               total:item.DetailTotal,
+              tax:item.DetailTax,
               arr:getProductArr(item.WODetailID)
             });
           }
@@ -88,7 +89,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
               {renderProducts(item.arr)}
             </tbody>
           </table>
-          
+          <p style={{marginTop:"5px",marginBottom:"-3px"}}>Tax: {item.tax}</p>
           <p><strong>Total: </strong>{item.total}</p>
         </Card>)
 

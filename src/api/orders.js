@@ -55,7 +55,7 @@ export async function addNewOrder(value, trucktype, quoteID) {
 
 export async function addNewOrderDetail(value, order) {
     var tableName = 'workorderdetail';
-    var values = `${null},'${order}','${value.id}','${value.subtotalLines}','${value.total}'`;
+    var values = `${null},'${order}','${value.id}','${value.subtotalLines}','${value.total}','${value.tax}'`;
     var newDetail = await ajax(
         `${baseURL}/insertValues`,
         {tableName, values},

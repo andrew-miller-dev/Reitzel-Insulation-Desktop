@@ -63,6 +63,7 @@ export default function NewWorkOrderForm(props) {
     }
 
     function getTaxes(detail){
+      console.log(detail)
       let taxesTotal = 0.00;
           detail.arr.map((item) => {
           taxesTotal = taxesTotal + parseFloat(item.tax);

@@ -76,7 +76,6 @@ export default function Trucks(props) {
                 
             )
         }
-
     ];
     useEffect(() => {
         const getData = async() => {
@@ -91,7 +90,10 @@ export default function Trucks(props) {
                     available:item.Available
                 }
             ));
-            setTruckList(table);
+            let newList = table.sort((a,b) => {
+              return a.number - b.number;
+            })  
+            setTruckList(newList);
         } 
         getData();
     }, [truckList.length, count]);
