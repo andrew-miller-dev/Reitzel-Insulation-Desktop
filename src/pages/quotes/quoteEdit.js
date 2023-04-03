@@ -29,7 +29,6 @@ function QuoteEdit (props) {
         }
         try {
             func();
-
         } catch (error) {
             console.log(error);
         }

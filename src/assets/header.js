@@ -1,3 +1,4 @@
+import logo from "../../src/assets/logo.png";
 const header = "https://i.ibb.co/wYqDcXp/logo.png";
 
 export default function LogoHeader(){

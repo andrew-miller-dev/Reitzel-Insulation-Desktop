@@ -50,21 +50,7 @@ var parseISO = require('date-fns/parseISO')
         });
         return newList;
       }
-    const getDetailsByID = (id) => {
-        let array = [];
-        detailData.forEach((item) => {
-          if(item.quoteID === id){
-            array.push({
-              quoteID:item.quoteID,
-              id:item.subtotalID,
-              subtotalLines:item.subtotalLines,
-              total:item.subtotalAmount,
-              arr:getProductArr(item.SubtotalID)
-            });
-          }
-        });
-        return array;
-    }
+    
     const checkDate = (date) => {
       let returnDate = "";
       if(date === "December 31st, 1969"){
@@ -73,49 +59,6 @@ var parseISO = require('date-fns/parseISO')
         returnDate = date;
     }
     return returnDate;
-    }
-    const getProductArr = (id) => {
-      let array = [];
-      prodData.forEach((item) => {
-             if(item.subtotalID === id){
-                  array.push({
-                    prodID:item.QuoteLineID,
-                    product:item.Product,
-                    price:item.Subtotal
-                  })
-              }
-          });
-          return array;
-    }
-    const renderDetails = () => {
-      let rows = [];
-      formData.forEach((item) => {
-        rows.push(<Card title="Details" bordered={true} type="inner">
-          <p>{item.subtotalLines}</p>
-          <strong>Products</strong>
-          <table style={{width:'100%'}}>
-            <tbody>
-              {renderProducts(item.arr)}
-            </tbody>
-          </table>
-          
-          <p><strong>Total: </strong>{item.total}</p>
-        </Card>)
-
-      });
-      return rows;
-    }
-    const renderProducts = (array) => {
-      let rows = [];
-      array.forEach((item) => {
-        rows.push(
-          <tr width="100px">
-            <td>{item.product}</td>
-            <td>{item.price}</td>
-          </tr>
-      )})
-      return rows
-
     }
     const findQuote = async (value) => {
       let result = await SearchAllInfo(value);
@@ -239,6 +182,7 @@ var parseISO = require('date-fns/parseISO')
         <Modal
         visible={showForm}
         title="View Quote"
+        destroyOnClose={true}
         onCancel={() => {setShowForm(false)}}
         onOk={() => {history.push(`/quotes/${formData}/edit`)}}
         okText="Edit Quote"

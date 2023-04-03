@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import {getRegion, updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote} from '../../api/customer';
+import { updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote, getCustomerQuotes} from '../../api/customer';
 import { addAddress } from '../../api/neworder';
 import { useRouteMatch } from "react-router-dom";
 import { withRouter } from "react-router-dom";
@@ -24,6 +24,7 @@ export function CustomerInfo() {
   const [regions, setRegions] = useState([]);
   const [customerInfo, setcustomerinfo] = useState([]);
   const [addressList, setAddressList] = useState([]);
+  const [QandOlist,setQandOlist] = useState([]);
   const [user, setUser] = useState("");
   const [notes, setNotes] = useState([]);
   const [count, setCount] = useState(0);
@@ -52,7 +53,8 @@ export function CustomerInfo() {
           setUser(initial);
            await getNotes(match).then((notes) => {
             setNotes(notes.data);
-          })
+          });
+          let quotes = getCustomerQuotes(match)
         };
         func();
         getAddressList();
@@ -195,28 +197,47 @@ export function CustomerInfo() {
         });
         return rows;
       }
+    const columns2 = [
+      {title:"Address",
+      dataIndex:"",
+      key:""},
+      {title:"Salesman",
+      dataIndex:"",
+      key:""},
+      {title:"Creation Date",
+      dataIndex:"",
+      key:""},
+      {title:"Modified On",
+      dataIndex:"",
+      key:""},
+      {title:"Status",
+      dataIndex:"",
+      key:""},
+    ]
+
     const columns =[
-      {
-        title:"Address",
+      {title:"Address",
         dataIndex:"address",
-        key:"address"
-      },
-      {
-        title:"Postal Code",
+        key:"address"},
+      {title:"Postal Code",
         dataIndex:"postalcode",
-        key:"postal"
-      },
-      {
-        title:"City",
+        key:"postal"},
+      {title:"City",
         dataIndex:"city",
-        key:"city"
-      },
-      {
-        title:"Region",
+        key:"city"},
+      {title:"Region",
         dataIndex:"region",
-        key:"region"
+        key:"region",
+        render:(data) => {
+          let regionName = regions.filter(region => region.id == data);
+          return(
+            <div>
+              {regionName[0].name}
+            </div>
+       
+          )
+        }
       }
-      
     ]
       return(
         <div>
@@ -347,10 +368,8 @@ export function CustomerInfo() {
               
             </div>
             </div>
-            
-        
-            
         <Table
+        title={()=>"Addresses"}
         style={{ width: "80%", margin: "0 auto" }}
         rowKey="id"
         bordered
@@ -367,6 +386,17 @@ export function CustomerInfo() {
             formAddress.resetFields();
           }}
           >New Address</Button>
+          <Table
+          title={()=> "Quotes"}
+        style={{ width: "80%", margin: "0 auto" }}
+        rowKey="id"
+        bordered
+        dataSource={QandOlist}
+        columns={columns2}
+        tableLayout="auto"
+        pagination={{ pageSize: 10 }}>
+
+          </Table>
 
           <Modal
           visible={showForm}

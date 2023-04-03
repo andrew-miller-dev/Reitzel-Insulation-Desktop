@@ -80,7 +80,7 @@ export default function NewCustomerForm(props) {
     return (
         <Form form={form} layout="vertical" onFinish={sendInfo} preserve={false}>
             <Card title="Add new customer">
-              <Row>
+              <Row justify="space-between">
                 <Col>
                 <Card title="Contact Info">
                     <Row>

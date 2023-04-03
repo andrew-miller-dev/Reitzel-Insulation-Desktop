@@ -43,6 +43,7 @@ async function emailQuote (customer){
   try {
     const pdf = document.getElementById("printContents");
     const opt = {
+      html2canvas: {useCORS:true},
       filename: `${customer.first_name}_${customer.last_name}_Quote_${customer.quote_date}.pdf`
     };
     const worker = await html2pdf().set(opt).from(pdf).output("datauristring");
@@ -122,20 +123,18 @@ function QuotePrint(props) {
         <Card>
           <strong>Attention:</strong> {quoteFormData.first_name}{" "}
           {quoteFormData.last_name}
-          <br /> Address: {quoteFormData.billing_address}
-          <br /> City: {quoteFormData.city}
-          <br /> Postal Code: {quoteFormData.post_code}
-          <br /> Phone: {quoteFormData.phone_number}
-          <br /> Email: {quoteFormData.email}
+          <br /> {quoteFormData.billing_address}, {quoteFormData.city}
+          <br /> {quoteFormData.post_code}
+          <br /> {quoteFormData.phone_number}
+          <br /> {quoteFormData.email}
           <br />
         </Card>
         </Col>
         <Col>
         <Card>
-          <strong>Site Address</strong>
-          <br /> Site Address: {quoteFormData.site_address}
-          <br /> Site City: {quoteFormData.site_city}
-          <br /> Site Postal Code: {quoteFormData.site_postal}
+          <strong>Jobsite Address</strong>
+          <br />{quoteFormData.site_address}, {quoteFormData.site_city}
+          <br />{quoteFormData.site_postal}
         </Card>
          </Col>
         </Row>
@@ -145,8 +144,7 @@ function QuotePrint(props) {
         <div>
           {quoteFormData.details.length > 0 && (
             <div>
-             <p>Quote Details</p>
-              <table width="100%" border="1" cellPadding="10px">
+              <table width="100%" border="0" cellPadding="10px">
               <tbody>
                 {quoteFormData.details.map((item) => {
 
@@ -165,7 +163,7 @@ function QuotePrint(props) {
                                 {prod.product}
                               </td>
                                 <td width="20%">
-                                  {prod.price}
+                                  $ {prod.price}
                                 </td>
                               </tr>
                           );
@@ -179,7 +177,7 @@ function QuotePrint(props) {
                     );
                 })}
                 <tr>
-                  <td>
+                  <td colSpan={"3"} style={{textAlign:"right"}}>
                     Taxes: ${getTaxes(quoteFormData)}<br/>
                     Grand Total: ${Number(getTotal(quoteFormData)) + Number(getTaxes(quoteFormData))}
                   </td>

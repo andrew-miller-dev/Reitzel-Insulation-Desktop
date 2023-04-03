@@ -27,7 +27,6 @@ const closeForm = () =>{
   setShowForm(false);
   window.location.reload();
 }
-
 const renderCustomer = (data) => {
     const newArr = []
     if(data.length > 0) { 
@@ -58,9 +57,7 @@ const renderOrders = (data) => {
   })}
   return newArr
 }
-const renderItem = (data) => {
 
-}
 const renderItemQ = (data) => {
   return {
     value:"quote"+ " "+data.QuoteID,
@@ -160,7 +157,6 @@ const buttons = () => {
          onClick={() => {
           setFormOption(<NewCustomerForm close = {() => {setShowForm(false)}} />);
           setShowForm(true);
-         // history.push('/newcustomer');
          }}>
         New Customer
       </Button>
@@ -168,7 +164,6 @@ const buttons = () => {
       onClick={() => {
         setFormOption(<NewEstimateForm close={closeForm} salesman={{id:null,name:null}} />);
         setShowForm(true);
-        //history.push('/newestimate');
       }}>
         New Estimate
       </Button>

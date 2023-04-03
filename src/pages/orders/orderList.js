@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Input, Popover} from "antd";
 import { useHistory } from "react-router-dom";
-import { SearchAllInfo} from "../../api/quoteEditAPI";
-import { getAllInfoWO, getDetailsWO, getProductsWO } from '../../api/orders';
+import { SearchAllInfoWO, getAllInfoWO, getDetailsWO, getProductsWO } from '../../api/orders';
 import { getUser } from '../../util/storage';
 import WorkToPDFConvert from './workToPDFconvert';
 const {Search} = Input;
@@ -109,8 +108,8 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
       return rows
 
     }
-    const findQuote = async (value) => {
-      let result = await SearchAllInfo(value);
+    const findWO = async (value) => {
+      let result = await SearchAllInfoWO(value);
       setTestData(result.data)
     }
     const columns =[
@@ -191,7 +190,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
                   className="searchbar"
                   size = "medium"
                   enterButton="Find Order"
-                  onChange={(e) => {findQuote(e.target.value)}} />
+                  onChange={(e) => {findWO(e.target.value)}} />
           </div>
 
         <h2>Active Work Orders</h2>
@@ -227,7 +226,7 @@ const {format, zonedTimeToUtc } = require('date-fns-tz')
                   className="searchbar"
                   size = "medium"
                   enterButton="Find Quote"
-                  onChange={(e) => {findQuote(e.target.value)}} />
+                  onChange={(e) => {findWO(e.target.value)}} />
           </div>
           
 
