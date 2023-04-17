@@ -154,6 +154,7 @@ onGroupByDateChanged(args) {
         appointmentTooltipComponent={SalesTooltip}
         onAppointmentDeleting={this.onAppointmentDeleting}
         onAppointmentFormOpening={this.onAppointmentForm}
+        maxAppointmentsPerCell={1}
         >
         <Resource
           dataSource={this.state.userList}

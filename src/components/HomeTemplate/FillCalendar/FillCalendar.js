@@ -106,7 +106,7 @@ const groups = ['TruckID'];
 
 const renderResourceCell = (model) => {
   return (
-      <b>Truck {model.data.TruckNumber} {model.data.TruckInfo}</b>
+      <b>Truck {model.data.TruckNumber}</b>
   );
 }
 const onAppointmentDeleting = (e) => {

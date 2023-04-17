@@ -54,7 +54,8 @@ export function CustomerInfo() {
            await getNotes(match).then((notes) => {
             setNotes(notes.data);
           });
-          let quotes = getCustomerQuotes(match)
+          let quotes = await getCustomerQuotes(match)
+          console.log(quotes);
         };
         func();
         getAddressList();
@@ -229,13 +230,19 @@ export function CustomerInfo() {
         dataIndex:"region",
         key:"region",
         render:(data) => {
-          let regionName = regions.filter(region => region.id == data);
+          if(regions !== []){
+            let regionName = regions.filter(region => region.id == data);
           return(
             <div>
-              {regionName[0].name}
+               {regionName[0].name}
             </div>
-       
           )
+          }
+          else {
+            return(
+              <div>Loading...</div>
+            )
+          }
         }
       }
     ]

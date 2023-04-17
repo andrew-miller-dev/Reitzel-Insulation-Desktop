@@ -142,8 +142,8 @@ export async function checkExisting(info){
 }
 
 export async function getCustomerQuotes(id) {
-  const tableName = "quotes LEFT JOIN subtotallines ON quotes.QuoteID = subtotallines.quoteID LEFT JOIN quotelines ON quotes.QuoteID = ";
-  const condition = `CustomerID = ${id}`;
+  const tableName = "quotes LEFT JOIN subtotallines ON quotes.QuoteID = subtotallines.quoteID LEFT JOIN quotelines ON quotes.QuoteID = quotelines.QuoteID";
+  const condition = `CustomerID = '${id}'`;
   const quotes = await ajax(
     `${baseURL}/fetchValues`,
     {tableName, condition},

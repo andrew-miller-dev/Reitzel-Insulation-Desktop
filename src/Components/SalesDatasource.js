@@ -9,10 +9,9 @@ import CustomStore from 'devextreme/data/custom_store';
 import { message, Modal} from 'antd';
 import { renderEmail } from "react-html-email";
 import Confirmation from "./Email_Templates/confirmation";
-import { customer_info_sheet } from "../assets/paths";
 import UpdateConfirm from '../Components/Email_Templates/updateConfirm'
 import validator from "validator";
-
+import {file} from "../assets/estimatePDF";
 
 const { confirm } = Modal;
 const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
@@ -70,8 +69,8 @@ export const dataSource = new CustomStore({
           else message.warn("Something went wrong");
   
     if(validator.isEmail(customer.Email)){
-      console.log(values);
-      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />), customer_info_sheet)
+      
+      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />),file)
     }
     return estimateResult;
       }
@@ -91,6 +90,6 @@ export const dataSource = new CustomStore({
   const sendEmailUpdate = async (values) => {
     let findCustomerEmail = await getCustomer(values.CustomerID);
     let customerEmail = findCustomerEmail.data[0];
-    sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>), customer_info_sheet);
+    sendUpdate(customerEmail.Email, renderEmail(<UpdateConfirm estimateInfo = {values}/>));
     message.success("Email sent to customer");
   }
