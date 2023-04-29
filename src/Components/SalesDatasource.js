@@ -11,7 +11,7 @@ import { renderEmail } from "react-html-email";
 import Confirmation from "./Email_Templates/confirmation";
 import UpdateConfirm from '../Components/Email_Templates/updateConfirm'
 import validator from "validator";
-import {file} from "../assets/estimatePDF";
+//import file from "/How_to_Prepare_for_Your_Free_Insulation_Estimation.pdf";
 
 const { confirm } = Modal;
 const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
@@ -69,8 +69,8 @@ export const dataSource = new CustomStore({
           else message.warn("Something went wrong");
   
     if(validator.isEmail(customer.Email)){
-      
-      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />),file)
+      var pdf = "/insulation.pdf";
+      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />),pdf)
     }
     return estimateResult;
       }
@@ -79,11 +79,9 @@ export const dataSource = new CustomStore({
       }
     },
     onUpdating: (key, values) => {
-      
       confirm({title:"Send email update to customer?", onOk() {sendEmailUpdate(values)}, cancelText:"No"})
     },
     onInserted:(values) => {
-      
     }
   });
 

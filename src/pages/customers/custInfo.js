@@ -55,7 +55,6 @@ export function CustomerInfo() {
             setNotes(notes.data);
           });
           let quotes = await getCustomerQuotes(match)
-          console.log(quotes);
         };
         func();
         getAddressList();
@@ -85,8 +84,6 @@ export function CustomerInfo() {
       const title = (
         <div>
           <Space>
-
-          
           <Button
             type="primary"
           onClick={() => {
@@ -230,22 +227,16 @@ export function CustomerInfo() {
         dataIndex:"region",
         key:"region",
         render:(data) => {
-          if(regions !== []){
             let regionName = regions.filter(region => region.id == data);
           return(
             <div>
-               {regionName[0].name}
+               {data}
             </div>
           )
-          }
-          else {
-            return(
-              <div>Loading...</div>
-            )
-          }
         }
       }
     ]
+    if(customerInfo !== [] && addressList !== [] && regions !== [])
       return(
         <div>
           <Card
@@ -570,6 +561,11 @@ export function CustomerInfo() {
         </Card>
         </div>
       )
+      else {
+        return (
+          <div>Loading...</div>
+        )
+      }
     }
 
     export default withRouter(CustomerInfo)

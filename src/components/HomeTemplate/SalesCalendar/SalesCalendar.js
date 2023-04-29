@@ -2,7 +2,7 @@ import React from "react";
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 import Switch from 'devextreme-react/switch';
-import Legend from '../../Legend'
+import Legend from '../../Legend';
 import Scheduler, {Resource} from 'devextreme-react/scheduler';
 import SalesTemplate from './SalesTemplate.js'
 import SalesTooltip from './salesTooltip.js';
@@ -80,7 +80,6 @@ createUserObj = (id) => {
   let obj = {id:null,name:null}
   this.state.userList.forEach(element => {
     if(element.id == id) {
-      console.log(element);
       obj = {id:element.id,
               name:element.FirstName,
               email:element.Email}
@@ -139,6 +138,7 @@ onGroupByDateChanged(args) {
       <div>
       <Scheduler
       ref={this.schedulerRef}
+      showAllDayPanel={false}
         timeZone="America/Toronto"
         groups = {groups}
         groupByDate={this.state.groupByDate}
