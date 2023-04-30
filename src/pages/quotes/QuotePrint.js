@@ -51,7 +51,6 @@ async function emailQuote (customer){
       if(customer.billing_address === customer.site_address){
           sendQuote(customer.email, renderEmail(<QuoteEmail siteCard="none" info={customer}/>),worker)
       }
-      
       else{
         sendQuote(customer.email, renderEmail(<QuoteEmail siteCard = "block" info={customer}/>),worker)
       }

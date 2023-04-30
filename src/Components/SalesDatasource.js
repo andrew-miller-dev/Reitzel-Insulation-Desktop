@@ -11,11 +11,12 @@ import { renderEmail } from "react-html-email";
 import Confirmation from "./Email_Templates/confirmation";
 import UpdateConfirm from '../Components/Email_Templates/updateConfirm'
 import validator from "validator";
+
 //import file from "/How_to_Prepare_for_Your_Free_Insulation_Estimation.pdf";
 
 const { confirm } = Modal;
 const { format, zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
-
+const path = require("path");
 
 export const dataSource = new CustomStore({
     key: "EstimateID",
@@ -69,8 +70,12 @@ export const dataSource = new CustomStore({
           else message.warn("Something went wrong");
   
     if(validator.isEmail(customer.Email)){
-      var pdf = "/insulation.pdf";
-      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />),pdf)
+      //var link = "/public/insulation.pdf"
+      //var pdf = "C:\Users\amill\Reitzel Desktop GitHub\Reitzel-Insulation-Desktop\public\insulation.pdf";
+      //var blob = new Blob([link], {type:'application/pdf'});
+      //var reader = new FileReader();
+      //var pdf = URL.createObjectURL(blob);
+      sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />))
     }
     return estimateResult;
       }
