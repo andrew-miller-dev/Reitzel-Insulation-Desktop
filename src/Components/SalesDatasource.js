@@ -70,11 +70,6 @@ export const dataSource = new CustomStore({
           else message.warn("Something went wrong");
   
     if(validator.isEmail(customer.Email)){
-      //var link = "/public/insulation.pdf"
-      //var pdf = "C:\Users\amill\Reitzel Desktop GitHub\Reitzel-Insulation-Desktop\public\insulation.pdf";
-      //var blob = new Blob([link], {type:'application/pdf'});
-      //var reader = new FileReader();
-      //var pdf = URL.createObjectURL(blob);
       sendConfirm(customer.Email, renderEmail(<Confirmation customerInfo = {customer} siteInfo = {addressInfo.data[0]} estimateInfo = {values}  />))
     }
     return estimateResult;

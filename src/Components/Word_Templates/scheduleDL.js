@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import html2pdf from "html2pdf.js";
 import { message } from 'antd';
+import LogoHeader from '../../assets/header';
 
 const { format} = require('date-fns-tz');
 var add = require('date-fns/add')
@@ -17,7 +18,7 @@ export default function ScheduleDLTemplate(props) {
     })
 
     const timeFormat = (date) => {
-        let newdate =add(new Date(date), {hours:-3});
+        let newdate = new Date(date);
         var formatteddate = format(newdate, "hh:mm");
         return formatteddate;
      }
@@ -47,7 +48,7 @@ export default function ScheduleDLTemplate(props) {
                         <p style={{justifyContent:""}}>Schedule for {format(new Date(),"MMMM do',' yyyy" )}</p>
                     </div>
                     
-                    <div>
+                    <div> 
                     {list.map((element) => {
             return(
                 <> 
