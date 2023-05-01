@@ -176,12 +176,6 @@ class SalesmanTemplate extends React.Component {
         ></Resource>
         </Scheduler>
         </div>
-        <div id="testPdf">
-          <p>
-            pdf tester
-            </p>
-        </div>
-     
     </div>
     );
   }

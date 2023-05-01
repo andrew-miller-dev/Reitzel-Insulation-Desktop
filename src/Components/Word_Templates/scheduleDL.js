@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import html2pdf from "html2pdf.js";
 import { message } from 'antd';
-import LogoHeader from '../../assets/header';
 
-const { format} = require('date-fns-tz');
+const { format, zonedTimeToUtc} = require('date-fns-tz');
 var add = require('date-fns/add')
 
 export default function ScheduleDLTemplate(props) {
@@ -18,8 +17,8 @@ export default function ScheduleDLTemplate(props) {
     })
 
     const timeFormat = (date) => {
-        let newdate = new Date(date);
-        var formatteddate = format(newdate, "hh:mm");
+        //let newdate = new Date(date);
+        var formatteddate = format(zonedTimeToUtc(date), "hh:mm");
         return formatteddate;
      }
      const download = async() => {
