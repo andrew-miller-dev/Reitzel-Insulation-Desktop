@@ -145,7 +145,7 @@ function QuoteCreate(props){
                                 </td>
                                 <td>
                                     Price:
-                                    <input type="number" key={prod.prodKey} defaultValue={prod.price}
+                                    <input type="number" key={prod.prodKey}
                                         onChange={(e) => {
                                             handleProductPrice(prod, e);
                                          }}

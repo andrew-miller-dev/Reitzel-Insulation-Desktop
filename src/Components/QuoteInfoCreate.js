@@ -49,6 +49,5 @@ let quoteCreate = {
         quote:quoteData,
         detailArray: detailData
         }
-
     return quoteCreate;
 }

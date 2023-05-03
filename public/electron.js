@@ -45,6 +45,13 @@ function createWindow() {
   mainWindow.on('page-title-updated', function (e) {
     e.preventDefault()
   });
+  mainWindow.on('did-fail-load', () => {
+    mainWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'dist/index.html'),
+      protocol: 'file:',
+      slashes: true
+    }))
+  })
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
   });

@@ -1,8 +1,9 @@
-import { Card, Col, Form, Input, Row, Button, Select, Checkbox, Switch, message } from "antd";
+import { Card, Col, Form, Input, Row, Button, Select, Checkbox, message } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { regions } from "../../util/storedArrays";
 import { CheckForExisting, checkForMultipleBilling } from "../../config/checks";
 import { addCustomer, addAddress } from "../../api/neworder";
+import { useState } from "react";
 const {Option} = Select;
 const { Item } = Form;
 
@@ -10,6 +11,9 @@ export default function NewCustomerForm(props) {
   const [form] = Form.useForm();
 
     const sendInfo = async(values) => {
+        if(form.getFieldValue('addresses') === undefined){
+          message.warn("Need at least one address")
+        }
       let billing = "";
         form.validateFields();
         if(values.addresses !== undefined){
@@ -36,6 +40,9 @@ export default function NewCustomerForm(props) {
         let customerInfo = await addCustomer(newInfo);
         var latestCustomer = customerInfo.data.insertId;
         if(values.addresses !== undefined){
+          if(values.addresses.Length === 0){
+            console.log('oops');
+          }
           values.addresses.forEach(async(item) => {
             let addressInfo = {
               City:item.city,
@@ -72,7 +79,7 @@ export default function NewCustomerForm(props) {
     const checkBilling = () => {
       let array = form.getFieldValue('addresses');
       if(checkForMultipleBilling(array)){
-        return Promise.reject(new Error('Only one billing address'))
+        return Promise.reject(new Error('One billing address please'))
       }
       else return Promise.resolve();
     }
@@ -152,12 +159,12 @@ export default function NewCustomerForm(props) {
           <>
             {fields.map(({ key, name, ...restField }) => (
               <div>
-
-              
               <Row>
                 <Col span={14}> <Form.Item
                   {...restField}
                   name={[name, 'address']}
+                  rules={[{required:true,
+                       message: "Required"}]}
                 >
                   <Input placeholder="Address"/>
                 </Form.Item>
@@ -177,12 +184,16 @@ export default function NewCustomerForm(props) {
                 <Form.Item
                   {...restField}
                   name={[name, 'city']}
+                  rules={[{required:true,
+                    message: "Required"}]}
                 >
                   <Input placeholder="City"/>
                 </Form.Item>
                 <Form.Item
                   {...restField}
                   name={[name, 'postal']}
+                  rules={[{required:true,
+                    message: "Required"}]}
                 >
                   <Input placeholder="Postal Code"/>
                 </Form.Item>
@@ -191,14 +202,14 @@ export default function NewCustomerForm(props) {
                <Col span={18}>
                <Form.Item
                {...restField}
-               name={[name, 'region']}>
+               name={[name, 'region']}
+               rules={[{required:true,
+                message: "Required"}]}>
                  <Select placeholder="Select a region">{options}</Select>
                </Form.Item>
                </Col>
-               
                <MinusCircleOutlined onClick={() => remove(name)} />
-             </Row>
-             
+             </Row>             
               </div>
             ))}
             <Form.Item>
