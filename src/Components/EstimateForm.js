@@ -5,7 +5,7 @@ import DatePicker from './DatePicker.js';
 import SalesSnapshot from './HomeTemplate/SalesCalendar/SalesSnapshot';
 import {getUsers } from "../api/calendar"
 import TextArea from "antd/lib/input/TextArea";
-import { jobs } from "../util/storedArrays";
+import { disabledHourArrEstimate, disabledMinuteArrEstimate, jobs } from "../util/storedArrays";
 import { useHistory } from "react-router-dom";
 import { getAddress } from "../api/addresses";
 import { dataSource } from "./SalesDatasource.js";
@@ -103,8 +103,15 @@ export default function EstimateForm(props) {
             >
               <RangePicker
                 style={{width:"350px"}}
-                showTime={{ format: "HH:mm" }}
+                showTime={{ hideDisabledOptions:true,
+                            format: "HH:mm" }}
                 className="datepicker"
+                disabledTime={()=>{
+                  return{
+                    disabledHours:()=> disabledHourArrEstimate,
+                    disabledMinutes:()=> disabledMinuteArrEstimate
+                  }
+                }}
               />
             </Item>
             <Item

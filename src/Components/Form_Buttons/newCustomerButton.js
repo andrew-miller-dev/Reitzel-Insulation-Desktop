@@ -16,7 +16,7 @@ export default function NewCustomerButton(props) {
         label:`${item.Address}`,
         value:item.AddressID
       }
-    ))
+    ));
     const closeForm = () => {
       setShowForm(false);
     }
@@ -46,6 +46,7 @@ export default function NewCustomerButton(props) {
                     <Card title="Address">
                       <Select style={{width:'150px'}} 
                       options={optionsAddress}
+                      //defaultValue={()=>{}}
                       onSelect={(value) => {dispatch({type:"addressUpdate",payload:value})}}>
                       </Select>
                     </Card>

@@ -3,6 +3,7 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { regions } from "../../util/storedArrays";
 import { CheckForExisting, checkForMultipleBilling } from "../../config/checks";
 import { addCustomer, addAddress } from "../../api/neworder";
+import React, {useEffect, useState} from 'react'
 const {Option} = Select;
 const { Item } = Form;
 
@@ -68,6 +69,10 @@ export default function NewCustomerForm(props) {
     const options = regions.map((item, index) => (
       <Option key={index + 1}>{item}</Option>
     ));
+    const addressTemplate = () => {
+      return 
+    }
+
 
     const checkBilling = () => {
       let array = form.getFieldValue('addresses');
@@ -147,13 +152,21 @@ export default function NewCustomerForm(props) {
                 <Col>
                 <Card title="Addresses">
               <Form.Item >              
-            <Form.List name="addresses" >
+            <Form.List 
+              name="addresses"
+              initialValue={[
+                {address:"",
+                billing:true,
+                city:"",
+                postal:"",
+                region:""}
+              ]} 
+            >
+            
         {(fields, { add, remove }) => (
           <>
             {fields.map(({ key, name, ...restField }) => (
               <div>
-
-              
               <Row>
                 <Col span={14}> <Form.Item
                   {...restField}
@@ -197,8 +210,7 @@ export default function NewCustomerForm(props) {
                </Col>
                
                <MinusCircleOutlined onClick={() => remove(name)} />
-             </Row>
-             
+             </Row>             
               </div>
             ))}
             <Form.Item>
