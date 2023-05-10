@@ -1,6 +1,5 @@
 import React from "react";
 import {Checkbox} from 'antd';
-import { getElementInfo } from "devextreme-react/core/configuration/react/element";
  
 export function createDetails (detlist, prodlist) {
     let temp = [];

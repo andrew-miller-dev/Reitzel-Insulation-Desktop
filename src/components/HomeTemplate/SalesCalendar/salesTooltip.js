@@ -4,6 +4,7 @@ import { ButtonItem, SimpleItem } from 'devextreme-react/form';
 import React, { useEffect, useState } from 'react';
 import { getAddress } from '../../../api/addresses';
 import { deleteEstimate, updateEstimateInfo } from '../../../api/calendar';
+import { getCustomer } from '../../../api/customer';
 
 const {format} = require('date-fns-tz');
 
@@ -11,11 +12,14 @@ const {format} = require('date-fns-tz');
 export default function SalesTooltip (model) {
   const data = model.data.appointmentData;
   const [address, setAddress] = useState([]);
+  const [customer, setCustomer] = useState([]);
   const [showPop, setShowPop] = useState(false);
   const [info, setInfo] = useState(data.text);
   useEffect(() => {
     const func = async() => {
-      let result = await getAddress(data.AddressID)
+      let resultC = await getCustomer(data.CustomerID);
+      let result = await getAddress(data.AddressID);
+      setCustomer(resultC.data[0]);
       setAddress(result.data[0]);
     }
     func();
@@ -51,17 +55,21 @@ export default function SalesTooltip (model) {
       <div style={{float:'right'}}>
         <Button hint='Edit appointment' icon='clearformat' onClick={editClicked}></Button><Button icon='clearsquare' hint="Delete appointment" title='DeleteButton' onClick={deleteClicked}></Button>
       </div>
-      <b style={{fontSize:15}}>
-         {data.text}
-      </b>
-      <p>
-       {address.Address}, {address.City}
+      <div style={{display:'flex',flexDirection:'column'}}>
+      <b>{customer.CustFirstName} {customer.CustLastName}</b>
+      <br/>
+      <b>
+      {address.Address}, {address.City}
        <br/>
        {address.PostalCode}
+      </b>
+      <p>
+      {data.text}
       </p>
       
       <p style={{color:'grey'}}>{`${format(new Date(data.startDate),"h':'mm aa")} - ${format(new Date(data.endDate),"h':'mm aa")}`}</p>
       {displayJobType()}
+       </div>
     <Popup
     visible={showPop}
     showTitle={true}
