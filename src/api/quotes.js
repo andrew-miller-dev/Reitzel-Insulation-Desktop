@@ -58,3 +58,14 @@ export async function sendQuote(customer, email, attach){
       return 0;
     }
   }
+
+  export async function deleteQuote(id){
+    var sql =`DELETE quotes, quotelines, subtotallines FROM quotes LEFT JOIN quotelines ON quotes.QuoteID= quotelines.QuoteID LEFT JOIN subtotallines ON quotes.QuoteID = subtotallines.QuoteID WHERE quotes.QuoteID = '${id}'`
+    const result = await ajax(
+      `${baseURL}/processCustomQuery`,
+      {sql},
+      'post'
+    );
+    return result;
+  
+  }

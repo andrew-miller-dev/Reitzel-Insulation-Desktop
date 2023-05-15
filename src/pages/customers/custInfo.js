@@ -4,7 +4,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote, getCustomerQuotes} from '../../api/customer';
 import { addAddress } from '../../api/neworder';
 import { useRouteMatch } from "react-router-dom";
-import { withRouter } from "react-router-dom";
+import { withRouter, useHistory } from "react-router-dom";
 import {getUser} from '../../util/storage';
 import { getRegionAPI } from '../../api/calendar';
 
@@ -15,7 +15,7 @@ const { format } = require('date-fns-tz')
 
 
 export function CustomerInfo() {
-
+  let history = useHistory();
   let match = useRouteMatch('/customers/:customer').params.customer;
   const [showForm, setShowForm] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
@@ -139,7 +139,7 @@ export function CustomerInfo() {
               const result = deleteCustomer(id);
               message.success("Customer has been successfully deleted");
               resolve();
-              
+              history.push("/customers");
             });
           },
           onCancel() {

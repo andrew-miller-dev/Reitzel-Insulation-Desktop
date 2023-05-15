@@ -62,7 +62,7 @@ export default function ViewQuoteForm (props) {
               </tbody>
             </table>
             
-            <p><strong>Total: </strong>{item.total}</p>
+            <p><strong>Total: </strong>$ {item.total}</p>
           </Card>)
   
         });
@@ -74,7 +74,7 @@ export default function ViewQuoteForm (props) {
           rows.push(
             <tr width="100px">
               <td>{item.product}</td>
-              <td>{item.price}</td>
+              <td>$ {item.price}</td>
             </tr>
         )})
         return rows;

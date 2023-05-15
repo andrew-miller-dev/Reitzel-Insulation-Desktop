@@ -6,6 +6,7 @@ import { getUser } from '../../util/storage';
 import getWordDoc from './quoteToWordBypass';
 import { GetOrderByQID } from '../../api/orders';
 import ViewQuoteForm from '../../Components/Forms/viewquoteform';
+import { deleteQuote } from '../../api/quotes';
 const {Search} = Input;
 const {format} = require('date-fns-tz')
 var parseISO = require('date-fns/parseISO')
@@ -19,6 +20,7 @@ var parseISO = require('date-fns/parseISO')
   const [testData, setTestData] = useState([]);
   const [detailData, setDetailData] = useState([]);
   const [prodData, setProdData] = useState([]);
+  const [count, setCount] = useState(0);
   
     useEffect(() => {
           const func = async () => {
@@ -39,7 +41,7 @@ var parseISO = require('date-fns/parseISO')
           setLoaded(true);
         }
         
-      },[]);
+      },[count]);
 
       const getUserQuotes = (list) => {
         let newList = [];
@@ -63,6 +65,20 @@ var parseISO = require('date-fns/parseISO')
     const findQuote = async (value) => {
       let result = await SearchAllInfo(value);
       setTestData(result.data)
+    }
+
+    const deleteQuoteFunc = (id) => {
+      try {
+        deleteQuote(id);
+        message.success("Quote deleted");
+      }
+      catch (e) {
+        console.log(e);
+        message.error("Something went wrong, please try again")
+      }
+      finally {
+        setCount(count + 1);
+      }
     }
     const columns =[
       {
@@ -147,6 +163,9 @@ var parseISO = require('date-fns/parseISO')
                 setShowForm(true);     
                             }}>
             View Quote</Button>
+            <br/>
+            <br/>
+            <Button onClick={() => {deleteQuoteFunc(data.QuoteID)}}>Delete Quote</Button>
             </div>}
             trigger='clicked'>
             <Button>. . .</Button>
