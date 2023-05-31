@@ -1,5 +1,6 @@
 export const jobs = ["Spray Foam Insulation","Attic Blown-in Cellulose Insulation","Fireproofing","Removal of Insulation","Drill & Fill Insulation"];
 export const regions = [
+    "Kitchener - Waterloo",
     "Elmira & area",
     "Guelph & area",
     "Cambridge & area",
@@ -7,8 +8,7 @@ export const regions = [
     "Stratford & area",
     "Listowel area",
     "Greater Toronto Area",
-    "Kitchener - Waterloo",
-    "Brantford, Paris, Burford, Waterford, Brant County, Haldmald, Caledonia",
+    "Brantford & area",
     "Other"
   ];
 

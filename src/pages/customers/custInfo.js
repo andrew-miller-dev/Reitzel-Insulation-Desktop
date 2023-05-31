@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote, getCustomerQuotes} from '../../api/customer';
-import { addAddress } from '../../api/neworder';
+import { addAddress, addContractAddress } from '../../api/neworder';
 import { useRouteMatch } from "react-router-dom";
 import { withRouter, useHistory } from "react-router-dom";
 import {getUser} from '../../util/storage';
@@ -28,6 +28,7 @@ export function CustomerInfo() {
   const [user, setUser] = useState("");
   const [notes, setNotes] = useState([]);
   const [count, setCount] = useState(0);
+  const [contractor, setContractor] = useState("none");
 
   const options = regions.map((item) => (
     <Option key={item.id}>{item.name}</Option>
@@ -35,7 +36,7 @@ export function CustomerInfo() {
     useEffect(() => {
         const func = async () => {
            await getCustomer(match).then((info) => {
-            var customerInfo = info.data.map((item) =>({
+            var customerinfo = info.data.map((item) =>({
             id: item.CustomerID,
             firstName: item.CustFirstName,
             lastName: item.CustLastName,
@@ -44,9 +45,14 @@ export function CustomerInfo() {
             billing: item.BillingAddress,
             city: item.CustCity,
             postal: item.CustPostalCode,
-            region: item.CustRegion
+            region: item.CustRegion,
+            contractor: item.IsContractor
           }));
-          setcustomerinfo(customerInfo[0]);
+          if(customerinfo[0].contractor === 1) {
+            setContractor('block');
+          }
+          setcustomerinfo(customerinfo[0]);
+          console.log(customerInfo);
           });
           let userInfo = getUser();
           let initial = userInfo.FirstName.charAt(0) + userInfo.LastName.charAt(0);
@@ -68,7 +74,9 @@ export function CustomerInfo() {
           address: item.Address,
           postalcode: item.PostalCode,
           city: item.City,
-          region: item.Region
+          region: item.Region,
+          contractName: item.ContractorName,
+          contractPhone:item.ContractorPhone
         }));
         setAddressList(addresses);
         })
@@ -156,14 +164,23 @@ export function CustomerInfo() {
           BillingAddress: value.address,
           PostalCode: value.postalCode,
           City: value.city,
-          Region: value.region
+          Region: value.region,
+          ContractorName :value.contractorName,
+          ContractorNumber:value.contractorPhone
         }
         let id = customerInfo.id;
-        var result = await addAddress(id, info);
+        if(customerInfo.contractor == 1){
+          var result = await addContractAddress(id, info);
+        }
+        else{
+          var result = await addAddress(id, info);
+        }
+        
         if (result.status == 200){
           message.success("added new address");
         }
         setShowAddress(false);
+        setCount(count + 1);
       }
       const getNoteTable = () => {
         let rows = [];
@@ -213,7 +230,9 @@ export function CustomerInfo() {
       key:""},
     ]
 
-    const columns =[
+    const columns = () => {
+      if(customerInfo.contractor == 0) {
+        return [
       {title:"Address",
         dataIndex:"address",
         key:"address"},
@@ -236,6 +255,38 @@ export function CustomerInfo() {
         }
       }
     ]
+      }
+      else return [
+        {title:'Contractor Contact',
+          dataIndex:'contractName',
+          key:"contractName"},
+        {title:"Contrator Phone",
+        dataIndex:'contractPhone',
+        key:'contractPhone'},
+        {title:"Address",
+        dataIndex:"address",
+        key:"address"},
+      {title:"Postal Code",
+        dataIndex:"postalcode",
+        key:"postal"},
+      {title:"City",
+        dataIndex:"city",
+        key:"city"},
+      {title:"Region",
+        dataIndex:"region",
+        key:"region",
+        render:(data) => {
+            let regionName = regions.filter(region => region.id == data);
+          return(
+            <div>
+               {data}
+            </div>
+          )
+        }
+      }
+      ]
+      }
+
     if(customerInfo !== [] && addressList !== [] && regions !== [])
       return(
         <div>
@@ -372,7 +423,7 @@ export function CustomerInfo() {
         rowKey="id"
         bordered
         dataSource={addressList}
-        columns={columns}
+        columns={columns()}
         tableLayout="auto"
         pagination={{ pageSize: 10 }}>
 
@@ -507,6 +558,18 @@ export function CustomerInfo() {
               form={formAddress}
               labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}
               >
+                <div style={{display:contractor}}>
+                <Item
+                label="Contractor Name"
+                name="contractorName">
+                  <Input />
+                </Item>
+                <Item
+                label="Contractor Phone"
+                name="contractorPhone">
+                  <Input />
+                </Item>
+                </div>
               <Item 
               label="Address"
               name="address"

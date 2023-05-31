@@ -104,7 +104,8 @@ const renderItemO = (data) => {
     let quoteResults = await SearchAllInfo(value);
     setQuoteList(quoteResults.data);
     let orderResults = await SearchAllInfoWO(value);
-    setOrderList(orderResults.data); 
+    setOrderList(orderResults.data);
+
   }
   else {
     setCustomerList([]);
@@ -175,6 +176,7 @@ if(getUser() && getMenu()) {
   return (
     <div className="content-searchbar">
       <Select
+      allowClear
       defaultValue={{label:"",value:""}}
       placeholder="Search"
       filterOption={false}
@@ -185,7 +187,7 @@ if(getUser() && getMenu()) {
       dropdownMatchSelectWidth={500}
       labelInValue={true}
       style={{width:300}}
-      onSearch={onSearch}
+      onSearch={(data) => {onSearch(data)}}
       options={[
         {
           label:"Customers",

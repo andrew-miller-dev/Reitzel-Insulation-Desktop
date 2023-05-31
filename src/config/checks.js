@@ -38,3 +38,8 @@ export function checkForMultipleBilling(array) {
     if(count > 1 || count <= 0) return true;
     else return false;
 }
+
+export function checkForWeekend (date) {
+    const day = date.getDay();
+    return day === 0 || day === 6
+}

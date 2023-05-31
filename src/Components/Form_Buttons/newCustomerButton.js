@@ -45,6 +45,10 @@ export default function NewCustomerButton(props) {
                     </Card>
                     <Card title="Address">
                       <Select style={{width:'150px'}} 
+                      showSearch={true}
+                      filterOption={(inputValue, option) =>
+                        option.label.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                      }
                       options={optionsAddress}
                       //defaultValue={()=>{}}
                       onSelect={(value) => {dispatch({type:"addressUpdate",payload:value})}}>

@@ -5,8 +5,10 @@ import React, { useEffect, useState } from 'react';
 import { getAddress } from '../../../api/addresses';
 import { deleteEstimate, updateEstimateInfo } from '../../../api/calendar';
 import { getCustomer } from '../../../api/customer';
+import { getUser } from '../../../util/storage';
+import { GetUserByID } from '../../../api';
 
-const {format} = require('date-fns-tz');
+const {format, utcToZonedTime} = require('date-fns-tz');
 
 
 export default function SalesTooltip (model) {
@@ -15,12 +17,15 @@ export default function SalesTooltip (model) {
   const [customer, setCustomer] = useState([]);
   const [showPop, setShowPop] = useState(false);
   const [info, setInfo] = useState(data.text);
+ const [user, setUser] = useState([]);
   useEffect(() => {
     const func = async() => {
       let resultC = await getCustomer(data.CustomerID);
       let result = await getAddress(data.AddressID);
+      let resultU = await GetUserByID(data.UserID);
       setCustomer(resultC.data[0]);
       setAddress(result.data[0]);
+      setUser(resultU.data[0]);
     }
     func();
   },[address.length]);
@@ -69,6 +74,11 @@ export default function SalesTooltip (model) {
       
       <p style={{color:'grey'}}>{`${format(new Date(data.startDate),"h':'mm aa")} - ${format(new Date(data.endDate),"h':'mm aa")}`}</p>
       {displayJobType()}
+      <div style={{display:'flex', justifyContent:'space-between', color:'cornflowerblue'}}>
+        <span>Created By: {`${user.FirstName} ${user.LastName[0]}`} </span>
+        <span>{format(utcToZonedTime(data.CreationDate,"America/Toronto"),"MMMM do',' yyyy")}</span>
+      </div>
+      
        </div>
     <Popup
     visible={showPop}

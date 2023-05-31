@@ -1,16 +1,18 @@
-import { Card, Col, Form, Input, Row, Button, Select, Checkbox, Switch, message } from "antd";
+import { Card, Col, Form, Input, Row, Button, Select, Checkbox, message, Space, Switch } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { regions } from "../../util/storedArrays";
 import { CheckForExisting, checkForMultipleBilling } from "../../config/checks";
 import { addCustomer, addAddress } from "../../api/neworder";
-import React, {useEffect, useState} from 'react'
+import React, { useState } from 'react'
 const {Option} = Select;
 const { Item } = Form;
 
 export default function NewCustomerForm(props) {
   const [form] = Form.useForm();
+  const [contractor,setContractor] = useState("none");
 
     const sendInfo = async(values) => {
+      console.log(values);
       let billing = "";
         form.validateFields();
         if(values.addresses !== undefined){
@@ -18,6 +20,7 @@ export default function NewCustomerForm(props) {
           if(item.billing) billing = item;
         })
         }
+        let num = values.isContractor ? 1 : 0;
        let newInfo = {
         CustFirstName : values.firstName,
         CustLastName:values.lastName,
@@ -26,10 +29,10 @@ export default function NewCustomerForm(props) {
         CustCity:billing.city,
         CustPostalCode:billing.postal,
         CustRegion:billing.region,
-        BillingAddress:billing.address
+        BillingAddress:billing.address,
+        IsContractor:num,
        }
         const check = await CheckForExisting(newInfo);
-        console.log(check);
         if(check.length > 0){
           message.warn("Customer already on file");
         }
@@ -42,7 +45,9 @@ export default function NewCustomerForm(props) {
               City:item.city,
               PostalCode:item.postal,
               Region:item.region,
-              BillingAddress:item.address
+              BillingAddress:item.address,
+              ContractName:item.contractName,
+              ContractPhone:item.contractPhone
             }
             var newAddress = await addAddress(latestCustomer, addressInfo);
           })
@@ -69,10 +74,6 @@ export default function NewCustomerForm(props) {
     const options = regions.map((item, index) => (
       <Option key={index + 1}>{item}</Option>
     ));
-    const addressTemplate = () => {
-      return 
-    }
-
 
     const checkBilling = () => {
       let array = form.getFieldValue('addresses');
@@ -80,6 +81,12 @@ export default function NewCustomerForm(props) {
         return Promise.reject(new Error('Only one billing address'))
       }
       else return Promise.resolve();
+    }
+    const contractorTrue = () => {
+      if(contractor === "block"){
+        setContractor("none");
+      }
+      else setContractor("block");
     }
 
     return (
@@ -147,6 +154,20 @@ export default function NewCustomerForm(props) {
                      </Item>
                      </Col>
                  </Row>
+                 <Row>
+                  <Col>
+                  <Item name="isContractor"
+                        defaultValue={false}
+                        valuePropName="checked">
+                      <Checkbox onClick={()=> {contractorTrue()}}
+                      //onChange={}
+                      >
+                      Contractor
+                    </Checkbox>
+                  </Item>
+                  
+                  </Col>
+                 </Row>
             </Card>
                 </Col>
                 <Col>
@@ -167,10 +188,30 @@ export default function NewCustomerForm(props) {
           <>
             {fields.map(({ key, name, ...restField }) => (
               <div>
+                <div style={{display:contractor}}>
+                <Row>
+                  <Col>
+                  <Form.Item {...restField} 
+                  name={[name,"contractName"]}
+                  >
+                    <Input placeholder="Contractor Name" />
+                  </Form.Item>
+                  </Col>
+                  <Col>
+                  <Form.Item {...restField} 
+                  name={[name,"contractPhone"]}
+                  >
+                    <Input placeholder="Contractor Number" />
+                  </Form.Item>
+                  </Col>
+                </Row>
+                </div>
               <Row>
                 <Col span={14}> <Form.Item
                   {...restField}
                   name={[name, 'address']}
+                  rules={[{required:true,
+                    message:"Required"}]}
                 >
                   <Input placeholder="Address"/>
                 </Form.Item>
@@ -190,12 +231,16 @@ export default function NewCustomerForm(props) {
                 <Form.Item
                   {...restField}
                   name={[name, 'city']}
+                  rules={[{required:true,
+                    message:"Required"}]}
                 >
                   <Input placeholder="City"/>
                 </Form.Item>
                 <Form.Item
                   {...restField}
                   name={[name, 'postal']}
+                  rules={[{required:true,
+                    message:"Required"}]}
                 >
                   <Input placeholder="Postal Code"/>
                 </Form.Item>
@@ -204,7 +249,10 @@ export default function NewCustomerForm(props) {
                <Col span={18}>
                <Form.Item
                {...restField}
-               name={[name, 'region']}>
+               name={[name, 'region']}
+               rules={[{required:true,
+                message:"Required"}]}
+               >
                  <Select placeholder="Select a region">{options}</Select>
                </Form.Item>
                </Col>
