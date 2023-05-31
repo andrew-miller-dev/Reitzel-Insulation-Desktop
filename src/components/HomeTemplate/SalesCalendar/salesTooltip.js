@@ -75,7 +75,7 @@ export default function SalesTooltip (model) {
       <p style={{color:'grey'}}>{`${format(new Date(data.startDate),"h':'mm aa")} - ${format(new Date(data.endDate),"h':'mm aa")}`}</p>
       {displayJobType()}
       <div style={{display:'flex', justifyContent:'space-between', color:'cornflowerblue'}}>
-        <span>Created By: {`${user.FirstName} ${user.LastName[0]}`} </span>
+        <span>Created By: {`${user.FirstName} ${user.LastName}`} </span>
         <span>{format(utcToZonedTime(data.CreationDate,"America/Toronto"),"MMMM do',' yyyy")}</span>
       </div>
       
