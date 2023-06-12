@@ -7,6 +7,7 @@ import { useRouteMatch } from "react-router-dom";
 import { withRouter, useHistory } from "react-router-dom";
 import {getUser} from '../../util/storage';
 import { getRegionAPI } from '../../api/calendar';
+import { CheckBox } from 'devextreme-react';
 
 const { Item } = Form;
 const { confirm } = Modal;
@@ -52,7 +53,6 @@ export function CustomerInfo() {
             setContractor('block');
           }
           setcustomerinfo(customerinfo[0]);
-          console.log(customerInfo);
           });
           let userInfo = getUser();
           let initial = userInfo.FirstName.charAt(0) + userInfo.LastName.charAt(0);
@@ -104,7 +104,8 @@ export function CustomerInfo() {
               billing: customerInfo.billing,
              city: customerInfo.city,
               postal: customerInfo.postal,
-              region: customerInfo.region
+              region: customerInfo.region,
+              contractor:customerInfo.contractor
              });
             }}
           >
@@ -545,6 +546,12 @@ export function CustomerInfo() {
               ]}
             >
               <Select>{options}</Select>
+            </Item>
+            <Item
+            label="Contractor"
+            name="contractor"
+            >
+              <CheckBox />
             </Item>
           </Form>
         </Modal>
