@@ -76,7 +76,7 @@ export async function deleteEstimate(id) {
 
   export async function updateEstimateInfo(id, value) {
     const tableName = "estimates";
-    const columnsAndValues = `EstimateInfo = '${value}'`;
+    const columnsAndValues = `CustomerID = '${value.customer}', AddressID='${value.address}', JobType='${value.jobTypes}', EstimateInfo = '${value.info}', RegionID = '${value.region}'`;
     const condition = `EstimateID='${id}'`;
     const result = await ajax(
       `${baseURL}/updateValues`,

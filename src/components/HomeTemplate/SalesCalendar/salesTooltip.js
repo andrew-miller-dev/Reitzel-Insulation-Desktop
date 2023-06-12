@@ -1,22 +1,22 @@
-import {message, Modal} from 'antd';
-import { Button, Form, Popup, TextArea } from 'devextreme-react';
-import { ButtonItem, SimpleItem } from 'devextreme-react/form';
+import {Modal, Button, Input, Tooltip} from 'antd';
 import React, { useEffect, useState } from 'react';
 import { getAddress } from '../../../api/addresses';
-import { deleteEstimate, updateEstimateInfo } from '../../../api/calendar';
+import { deleteEstimate} from '../../../api/calendar';
 import { getCustomer } from '../../../api/customer';
-import { getUser } from '../../../util/storage';
 import { GetUserByID } from '../../../api';
+import { EditFilled, DeleteFilled } from '@ant-design/icons';
+import EditAppointmentForm from '../../Forms/editappointmentform';
 
 const {format, utcToZonedTime} = require('date-fns-tz');
-
+const {TextArea} = Input;
 
 export default function SalesTooltip (model) {
   const data = model.data.appointmentData;
+  const [info, setInfo] = useState(data.text);
   const [address, setAddress] = useState([]);
   const [customer, setCustomer] = useState([]);
   const [showPop, setShowPop] = useState(false);
-  const [info, setInfo] = useState(data.text);
+  
  const [user, setUser] = useState([]);
   useEffect(() => {
     const func = async() => {
@@ -36,6 +36,9 @@ export default function SalesTooltip (model) {
 
   const editClicked = async(data) => {
     setShowPop(true);
+  }
+  const close = () => {
+    setShowPop(false);
   }
   const displayJobType = () => {
     const jobArr = data.JobType.split(',');
@@ -58,7 +61,12 @@ export default function SalesTooltip (model) {
   return (
     <div>
       <div style={{float:'right'}}>
-        <Button hint='Edit appointment' icon='clearformat' onClick={editClicked}></Button><Button icon='clearsquare' hint="Delete appointment" title='DeleteButton' onClick={deleteClicked}></Button>
+        <Tooltip title="Edit">
+          <Button style={{border:0}} icon={<EditFilled />} onClick={editClicked}></Button>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <Button style={{border:0}} icon={<DeleteFilled />} onClick={deleteClicked}></Button>
+        </Tooltip>
       </div>
       <div style={{display:'flex',flexDirection:'column'}}>
       <b>{customer.CustFirstName} {customer.CustLastName}</b>
@@ -78,58 +86,18 @@ export default function SalesTooltip (model) {
         <span>Created By: {`${user.FirstName} ${user.LastName}`} </span>
         <span>{format(utcToZonedTime(data.CreationDate,"America/Toronto"),"MMMM do',' yyyy")}</span>
       </div>
-      
        </div>
-    <Popup
+    <Modal
     visible={showPop}
     showTitle={true}
+    onCancel={() => {setShowPop(false)}}
     title="Appointment editing"
     width='40%'
     height='30%'
+    footer={false}
     >
-    <>
-    <form 
-    onSubmit={async(e) => {
-      let result = await updateEstimateInfo(data.EstimateID, info);
-      if(result.status === 200) {
-        message.success("Appointment updated");
-      }
-      else message.error("Something went wrong");
-      e.preventDefault();
-      
-    }}>
-      <Form>
-        <SimpleItem
-        dataField="Info"
-        label={{text:"Change appointment information",location:"top"}}>
-          <TextArea
-          id="UpdatedInfo"
-          title="Change appointment information"
-          defaultValue={info}
-          onChange={(e) => {setInfo(e.component._changedValue)}}>
-          
-          </TextArea>
-        </SimpleItem>
-          <ButtonItem
-          horizontalAlignment="center"
-          buttonOptions={{text:'Update',type:'Success',useSubmitBehavior:false, onClick:() => {return new Promise(async(resolve, reject) => {
-            let result = await updateEstimateInfo(data.EstimateID, info);
-            if(result.status === 200) {
-              message.success("Appointment updated");
-            }
-            else message.error("Something went wrong");
-            setShowPop(false);
-            resolve();
-            
-          })}}}
-          />
-      </Form>
-    </form>
-    
-    </>
-      
-    </Popup>
+      <EditAppointmentForm closeForm = {close} data={data} cust = {customer} add = {address} />
+    </Modal>
     </div>
-
   )
 }
