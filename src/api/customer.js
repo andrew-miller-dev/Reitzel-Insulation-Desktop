@@ -1,5 +1,6 @@
 import ajax from "./base";
 import { baseURL } from "../config/values";
+import { addEscapeChar } from "../config/checks";
 
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
@@ -75,7 +76,7 @@ export async function deleteCustomer(id) {
 
 export async function addAddress(id, value){
   var tableName = "address";
-  var values = `${null},'${id}','${value.BillingAddress}','${value.PostalCode}','${value.City}','${value.Prov}','${value.Region}'`;
+  var values = `${null},'${id}','${addEscapeChar(value.BillingAddress)}','${value.PostalCode}','${value.City}','${value.Prov}','${value.Region}'`;
 
   var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("address", address);

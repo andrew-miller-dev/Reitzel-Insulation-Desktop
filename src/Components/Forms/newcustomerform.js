@@ -27,7 +27,7 @@ export default function NewCustomerForm(props) {
         Phone:values.phone,
         Email:values.email,
         CustCity:billing.city,
-        CustPostalCode:billing.postal,
+        CustPostalCode:billing.postal || " ",
         CustRegion:billing.region,
         BillingAddress:billing.address,
         IsContractor:num,
@@ -239,8 +239,6 @@ export default function NewCustomerForm(props) {
                 <Form.Item
                   {...restField}
                   name={[name, 'postal']}
-                  rules={[{required:true,
-                    message:"Required"}]}
                 >
                   <Input placeholder="Postal Code"/>
                 </Form.Item>

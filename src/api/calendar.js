@@ -174,28 +174,6 @@ export async function getEstimateByIDTomorrow(id) {
     }
 }
 
-
-export async function addNewCustomer(value) {
-  const tableName = "customers";
-  const values = `${null},'${value.firstName}','${value.lastName}','${value.phone}','${value.email}','${value.siteAddress}','${value.siteCity}','${value.sitePostal}','${value.Region}'`;
-  const orders = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  if (orders !== []) return orders;
-  else {
-    return 0;
-  }
-}
-
-export async function addNewAddress(id, value){
-  const tableName = "address";
-  const values = `${null},'${id}','${value.siteAddress}','${value.sitePostal}','${value.siteCity}','${value.siteRegion}'`;
-
-  const address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  if (address !== []) return address;
-  else {
-    return 0;
-  }
-}
-
 export async function addEstimate(id, address, value) {
   const tableName = "estimates";
   const values = `${null},'${id}','${address}','${value.UserID}','${value.JobType}','${utcDate}','${value.estimateInfo}','${value.Region}','${value.startDate}','${value.endDate}'`;

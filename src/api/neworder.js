@@ -1,5 +1,6 @@
 import ajax from "./base";
 import { baseURL } from "../config/values";
+import { addEscapeChar } from "../config/checks";
 const {format} = require('date-fns-tz');
 
 export async function addCustomer(order) {
@@ -15,7 +16,7 @@ export async function addCustomer(order) {
 
 export async function addEstimate(id, address, value) {
   var tableName = "estimates";
-  var values = `${null},'${id}','${address}','${value.UserID}','${value.JobType}','${format(new Date(),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}','${value.estimateInfo}','${value.Region}','${value.startDate}','${value.endDate}'`;
+  var values = `${null},'${id}','${address}','${value.UserID}','${value.JobType}','${format(new Date(),"yyyy-MM-dd'T'HH:mm:ss.SSSxxx")}','${ addEscapeChar(value.estimateInfo)}','${value.Region}','${value.startDate}','${value.endDate}'`;
 
   var estimate = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   if (estimate !== []) return estimate;
@@ -26,7 +27,7 @@ export async function addEstimate(id, address, value) {
 
 export async function addAddress(id, value){
   var tableName = "address";
-  var values = `${null},'${id}','${value.BillingAddress}','${value.PostalCode}','${value.City}','${value.Region}','${null}','${null}'`;
+  var values = `${null},'${id}','${addEscapeChar(value.BillingAddress)}','${value.PostalCode}','${value.City}','${value.Region}','${null}','${null}'`;
 
   var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("address", address);
@@ -38,7 +39,7 @@ export async function addAddress(id, value){
 
 export async function addContractAddress(id, value){
   var tableName = "address";
-  var values = `${null},'${id}','${value.BillingAddress}','${value.PostalCode}','${value.City}','${value.Region}','${value.ContractorName}','${value.ContractorNumber}'`;
+  var values = `${null},'${id}','${addEscapeChar(value.BillingAddress)}','${value.PostalCode}','${value.City}','${value.Region}','${value.ContractorName}','${value.ContractorNumber}'`;
 
   var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
   console.log("address", address);
