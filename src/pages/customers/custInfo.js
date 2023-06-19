@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, EditFilled } from "@ant-design/icons";
 import { updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote, getCustomerQuotes} from '../../api/customer';
 import { addAddress, addContractAddress } from '../../api/neworder';
 import { useRouteMatch } from "react-router-dom";
 import { withRouter, useHistory } from "react-router-dom";
 import {getUser} from '../../util/storage';
 import { getRegionAPI } from '../../api/calendar';
-import { CheckBox } from 'devextreme-react';
+import EditCustomerForm from '../../Components/Forms/Customer_Forms/editcustomerform';
 
 const { Item } = Form;
 const { confirm } = Modal;
@@ -30,6 +30,8 @@ export function CustomerInfo() {
   const [notes, setNotes] = useState([]);
   const [count, setCount] = useState(0);
   const [contractor, setContractor] = useState("none");
+  const [formData, setFormData] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
   const options = regions.map((item) => (
     <Option key={item.id}>{item.name}</Option>
@@ -47,7 +49,7 @@ export function CustomerInfo() {
             city: item.CustCity,
             postal: item.CustPostalCode,
             region: item.CustRegion,
-            contractor: item.IsContractor
+            contractor: contractorCheck(item.IsContractor)
           }));
           if(customerinfo[0].contractor === 1) {
             setContractor('block');
@@ -60,13 +62,21 @@ export function CustomerInfo() {
            await getNotes(match).then((notes) => {
             setNotes(notes.data);
           });
-          let quotes = await getCustomerQuotes(match)
+          let quotes = await getCustomerQuotes(match);
         };
         func();
         getAddressList();
         getRegions();
       }, [count]);
-
+    const contractorCheck = (num) => {
+      if(num === 1) return true;
+      else return false
+    }
+    const closeForm = () => {
+      setShowModal(false);
+      setCount(count + 1);
+    }
+  
     const getAddressList = async () => {
         await getCustomerAddresses(match).then((list) => {
           var addresses = list.data.map((item) =>({
@@ -95,7 +105,8 @@ export function CustomerInfo() {
           <Button
             type="primary"
           onClick={() => {
-              setShowForm(true);
+              setFormData(<EditCustomerForm data={customerInfo} close={closeForm} regionList={regions} />)
+              setShowModal(true);
               form1.setFieldsValue({
               firstName: customerInfo.firstName,
               lastName: customerInfo.lastName,
@@ -122,19 +133,7 @@ export function CustomerInfo() {
           </Space>
         </div>
       )
-      const handleUpdate = async () => {
-        const validResult = await form1.validateFields();
-        if (validResult.errorFields && validResult.errorFields.length > 0) return;
-        const value = form1.getFieldsValue();
-        const id = customerInfo.id;
-        //update data in the backend
-        const result = await updateCustomer(id, value.firstName, value.lastName, value.email, value.phone, value.billing, value.city, value.postal, value.region);
-        setShowForm(false);
 
-        if (result.status === 200) {
-          message.success("Successfully updated customer information");
-        }
-      };
       const handleDeleteCustomer = async (id) => {
         confirm({
           title: "Are you sure you want to delete this customer?",
@@ -155,7 +154,6 @@ export function CustomerInfo() {
             console.log("Cancel");
           },
         });
-
       }
       const handleNewAddress = async () =>{
         const validResult = await formAddress.validateFields();
@@ -253,8 +251,10 @@ export function CustomerInfo() {
                {data}
             </div>
           )
+        }},
+        {title:"Edit",
+          
         }
-      }
     ]
       }
       else return [
@@ -284,7 +284,14 @@ export function CustomerInfo() {
             </div>
           )
         }
-      }
+      },
+      {title:"Edit",
+       render:(data) => {
+        return(
+          <Button icon={<EditFilled />} />
+        )
+       }  
+        }
       ]
       }
 
@@ -447,114 +454,6 @@ export function CustomerInfo() {
         pagination={{ pageSize: 10 }}>
 
           </Table>
-
-          <Modal
-          visible={showForm}
-          title="Update Customer"
-          onOk={handleUpdate}
-          onCancel={() => setShowForm(false)}
-        >
-          <Form form={form1} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
-            <Item
-              label="First Name"
-              name="firstName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-                
-              ]}
-              
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Last Name"
-              name="lastName"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Email"
-              name="email"
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Phone"
-              name="phone"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Billing Address"
-              name="billing"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="City"
-              name="city"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-            </Item>
-            <Item
-              label="Postal Code"
-              name="postal"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Input />
-              </Item>
-              <Item
-              label="Region"
-              name="region"
-              rules={[
-                {
-                  required: true,
-                  message: "Required",
-                },
-              ]}
-            >
-              <Select>{options}</Select>
-            </Item>
-            <Item
-            label="Contractor"
-            name="contractor"
-            >
-              <CheckBox />
-            </Item>
-          </Form>
-        </Modal>
         <Modal
           visible={showAddress}
           title="New Address"
@@ -629,6 +528,13 @@ export function CustomerInfo() {
           </Form>
         </Modal>
         </Card>
+        <Modal
+        footer={false}
+        visible={showModal}
+        onCancel={closeForm}
+        destroyOnClose={true}>
+            {formData}
+        </Modal>
         </div>
       )
       else {

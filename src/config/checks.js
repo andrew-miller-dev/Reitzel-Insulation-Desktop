@@ -17,7 +17,7 @@ export function addEscapeChar(string) {
         newstring = string.replace("'","''");
     }
     else if (string.includes("\"")){
-        newstring = newstring.replace('"','"');
+        newstring = newstring.replace('"','""');
     }
     console.log(newstring);
     return newstring;
@@ -25,7 +25,6 @@ export function addEscapeChar(string) {
 
 
 export async function CheckForExisting(data) {
-    console.log(data);
     let obj = {
         firstName:data.CustFirstName,
         lastName:data.CustLastName,
