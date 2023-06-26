@@ -30,7 +30,6 @@ export async function addAddress(id, value){
   var values = `${null},'${id}','${addEscapeChar(value.BillingAddress)}','${value.PostalCode}','${value.City}','${value.Region}','${null}','${null}'`;
 
   var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  console.log("address", address);
   if (address !== []) return address;
   else {
     return 0;
@@ -42,7 +41,6 @@ export async function addContractAddress(id, value){
   var values = `${null},'${id}','${addEscapeChar(value.BillingAddress)}','${value.PostalCode}','${value.City}','${value.Region}','${value.ContractorName}','${value.ContractorNumber}'`;
 
   var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  console.log("address", address);
   if (address !== []) return address;
   else {
     return 0;

@@ -55,12 +55,24 @@ let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' 
     { tableName, columnsAndValues, condition },
     "post"
   );
-  console.log("result", result);
   if (result !== []) return result;
   else {
     return 0;
   }
 }
+
+export async function updateAddress(id, values) {
+  const tableName = 'address';
+  const columnsAndValues = `Address='${addEscapeChar(values.address)}',PostalCode='${values.postalCode}',City='${values.city}',Region='${values.region.value}',ContractorName='${values.contractorName}',ContractorPhone='${values.contractorPhone}'`;
+  const condition = `AddressID=${id}`;
+  const result = await ajax(
+    `${baseURL}/updateValues`,
+    {tableName,columnsAndValues,condition},
+    "post"
+  );
+return result;
+}
+
 
 export async function deleteCustomer(id) {
   var tableName = "customers";
@@ -69,18 +81,6 @@ export async function deleteCustomer(id) {
   const result = await ajax(`${baseURL}/deleteValues`, { tableName, columns, condition }, "post");
   console.log("result", result);
   if (result !== []) return result;
-  else {
-    return 0;
-  }
-}
-
-export async function addAddress(id, value){
-  var tableName = "address";
-  var values = `${null},'${id}','${addEscapeChar(value.BillingAddress)}','${value.PostalCode}','${value.City}','${value.Prov}','${value.Region}'`;
-
-  var address = await ajax(`${baseURL}/insertValues`, { tableName, values }, "post");
-  console.log("address", address);
-  if (address !== []) return address;
   else {
     return 0;
   }
@@ -151,6 +151,3 @@ export async function getCustomerQuotes(id) {
     "post");
     return quotes;
 }
-
-//const tableName = "estimates LEFT JOIN address ON estimates.AddressID = address.AddressID
-// LEFT JOIN customers ON estimates.CustomerID = customers.CustomerID";

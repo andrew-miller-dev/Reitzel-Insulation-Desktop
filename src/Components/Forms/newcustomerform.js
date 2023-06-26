@@ -12,7 +12,6 @@ export default function NewCustomerForm(props) {
   const [contractor,setContractor] = useState("none");
 
     const sendInfo = async(values) => {
-      console.log(values);
       let billing = "";
         form.validateFields();
         if(values.addresses !== undefined){

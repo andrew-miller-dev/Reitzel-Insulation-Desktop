@@ -18,7 +18,6 @@ export default function EditCustomerForm(props) {
         const validResult = await form1.validateFields();
         if (validResult.errorFields && validResult.errorFields.length > 0) return;
         const value = form1.getFieldsValue();
-        console.log(value);
         let num = value.contractor ? 1 : 0;
         const id = props.data.id;
         const postal = value.postal || " ";

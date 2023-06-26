@@ -14,12 +14,11 @@ export function checkForUndefined(object) {
 export function addEscapeChar(string) {
     let newstring = string;
     if(string.includes("'")) {
-        newstring = string.replace("'","''");
+        newstring = string.replaceAll("'","\\'");
     }
-    else if (string.includes("\"")){
-        newstring = newstring.replace('"','""');
+    else if (string.includes('"')){
+        newstring = newstring.replaceAll('"','\\"');
     }
-    console.log(newstring);
     return newstring;
 }
 

@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import { Card, Table, Button, Modal, Form, Input, message, Select, Space } from "antd";
 import { ExclamationCircleOutlined, EditFilled } from "@ant-design/icons";
-import { updateCustomer, getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote, getCustomerQuotes} from '../../api/customer';
+import { getCustomer, getCustomerAddresses, deleteCustomer, addNotes, getNotes, deleteNote, getCustomerQuotes} from '../../api/customer';
 import { addAddress, addContractAddress } from '../../api/neworder';
 import { useRouteMatch } from "react-router-dom";
 import { withRouter, useHistory } from "react-router-dom";
 import {getUser} from '../../util/storage';
 import { getRegionAPI } from '../../api/calendar';
 import EditCustomerForm from '../../Components/Forms/Customer_Forms/editcustomerform';
+import EditAddress from '../../Components/Forms/Customer_Forms/editaddressform';
 
 const { Item } = Form;
 const { confirm } = Modal;
@@ -18,10 +19,8 @@ const { format } = require('date-fns-tz')
 export function CustomerInfo() {
   let history = useHistory();
   let match = useRouteMatch('/customers/:customer').params.customer;
-  const [showForm, setShowForm] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
   const [formAddress] = Form.useForm();
-  const [form1] = Form.useForm();
   const [regions, setRegions] = useState([]);
   const [customerInfo, setcustomerinfo] = useState([]);
   const [addressList, setAddressList] = useState([]);
@@ -51,7 +50,7 @@ export function CustomerInfo() {
             region: item.CustRegion,
             contractor: contractorCheck(item.IsContractor)
           }));
-          if(customerinfo[0].contractor === 1) {
+          if(customerinfo[0].contractor === true) {
             setContractor('block');
           }
           setcustomerinfo(customerinfo[0]);
@@ -107,17 +106,6 @@ export function CustomerInfo() {
           onClick={() => {
               setFormData(<EditCustomerForm data={customerInfo} close={closeForm} regionList={regions} />)
               setShowModal(true);
-              form1.setFieldsValue({
-              firstName: customerInfo.firstName,
-              lastName: customerInfo.lastName,
-              email: customerInfo.email,
-              phone: customerInfo.phone,
-              billing: customerInfo.billing,
-             city: customerInfo.city,
-              postal: customerInfo.postal,
-              region: customerInfo.region,
-              contractor:customerInfo.contractor
-             });
             }}
           >
             Modify
@@ -168,15 +156,9 @@ export function CustomerInfo() {
           ContractorNumber:value.contractorPhone
         }
         let id = customerInfo.id;
-        if(customerInfo.contractor == 1){
           var result = await addContractAddress(id, info);
-        }
-        else{
-          var result = await addAddress(id, info);
-        }
-        
         if (result.status == 200){
-          message.success("added new address");
+          message.success("New address added");
         }
         setShowAddress(false);
         setCount(count + 1);
@@ -253,7 +235,11 @@ export function CustomerInfo() {
           )
         }},
         {title:"Edit",
-          
+       render:(data) => {
+        return(
+          <Button icon={<EditFilled />} onClick={() => {setFormData(<EditAddress regionList={regions} display={contractor} address={data} close={closeForm}/>);setShowModal(true)}}/>
+        )
+       }  
         }
     ]
       }
@@ -288,7 +274,7 @@ export function CustomerInfo() {
       {title:"Edit",
        render:(data) => {
         return(
-          <Button icon={<EditFilled />} />
+          <Button icon={<EditFilled />} onClick={() => {setFormData(<EditAddress regionList={regions} display={contractor} address={data} close={closeForm}/>);setShowModal(true)}}/>
         )
        }  
         }
