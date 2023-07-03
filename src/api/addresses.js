@@ -1,10 +1,11 @@
 import ajax from "./base";
 import { baseURL } from "../config/values";
+import { addEscapeChar } from "../config/checks";
 
 
 export async function getAddress(id) {
     var tableName = "address";
-    var condition = `AddressID = '${id}'`
+    var condition = `AddressID = '${id}'`;
     const address = await ajax(
       `${baseURL}/fetchValues`,
       { tableName, condition},
@@ -39,4 +40,15 @@ export async function getAddress(id) {
       );
       if(info !== []) return info;
       else return 0; 
+  }
+
+  export async function getAddressByName(name) {
+    var tableName = "address";
+    var condition = `Address = '${addEscapeChar(name)}'`;
+    const address = await ajax(
+      `${baseURL}/fetchValues`,
+      { tableName, condition},
+      "post"
+    );
+    return address;
   }

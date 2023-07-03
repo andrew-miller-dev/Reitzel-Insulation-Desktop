@@ -12,7 +12,6 @@ export default function EditAddress (props) {
     const options = props.regionList.map((item) => (
         <Option key={item.id}>{item.name}</Option>
       ));
-
     const getRegionName = (reg) => {
         console.log(props.regionList,reg)
         let selRegion = props.regionList.find(({id}) => id === reg);

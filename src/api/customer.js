@@ -48,7 +48,7 @@ let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' 
 
   export async function updateCustomer(id, firstName, lastName, email, phone, billing, city, postal, region, contractor){
     var tableName = "customers";
-    var columnsAndValues = `CustFirstName='${firstName}', CustLastName='${lastName}',Phone='${phone}',Email='${email}', BillingAddress='${billing}',CustCity='${city}',CustPostalCode='${postal}', CustRegion='${region}',IsContractor='${contractor}'`;
+    var columnsAndValues = `CustFirstName='${firstName}', CustLastName='${lastName}',Phone='${phone}',Email='${email}', BillingAddress='${addEscapeChar(billing)}',CustCity='${city}',CustPostalCode='${postal}', CustRegion='${region}',IsContractor='${contractor}'`;
   var condition = `CustomerID=${id}`;
   const result = await ajax(
     `${baseURL}/updateValues`,
@@ -72,7 +72,6 @@ export async function updateAddress(id, values) {
   );
 return result;
 }
-
 
 export async function deleteCustomer(id) {
   var tableName = "customers";

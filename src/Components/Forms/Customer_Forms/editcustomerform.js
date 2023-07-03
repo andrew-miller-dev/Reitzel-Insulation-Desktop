@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, message, Select, Switch } from "antd";
-import { updateCustomer } from '../../../api/customer';
+import { updateAddress, updateCustomer } from '../../../api/customer';
+import { getAddressByName } from '../../../api/addresses';
 
 
 
@@ -15,16 +16,26 @@ export default function EditCustomerForm(props) {
       ));
 
     const handleUpdate = async () => {
+        const billingUpdate = await getAddressByName(props.data.billing);
+        console.log(billingUpdate);
         const validResult = await form1.validateFields();
         if (validResult.errorFields && validResult.errorFields.length > 0) return;
         const value = form1.getFieldsValue();
         let num = value.contractor ? 1 : 0;
         const id = props.data.id;
         const postal = value.postal || " ";
+        const address = {
+          address:value.billing,
+          postalCode:postal,
+          city:value.city,
+          region:value.region,
+          contractorName: value.firstName + ' ' + value.lastName,
+          contractorPhone: value.phone
+        }
         //update data in the backend
         const result = await updateCustomer(id, value.firstName, value.lastName, value.email, value.phone, value.billing, value.city, postal, value.region.value, num);
-        
-        if (result.status === 200) {
+        const resultA = await updateAddress(billingUpdate.data[0].AddressID, address);
+        if (result.status === 200 && resultA.status === 200) {
           message.success("Successfully updated customer information");
         }
         props.close();
