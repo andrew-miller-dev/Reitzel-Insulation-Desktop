@@ -121,13 +121,12 @@ export async function deleteEstimate(id) {
     else return 0;
  }
 
- export async function sendUpdate(customer, email, attach){
+ export async function sendUpdate(customer, email){
   const to = customer;
   const subject = "Booking Update - Reitzel Insulation";
   const html = email;
-  const file = attach;
-
-  const completed = await ajax(`${baseURL}/sendEmailHtml`, {to, subject, html, file}, "post");
+ 
+  const completed = await ajax(`${baseURL}/sendEmailPdf`, {to, subject, html}, "post");
   if (completed !== []) return completed;
   else return 0;
 }

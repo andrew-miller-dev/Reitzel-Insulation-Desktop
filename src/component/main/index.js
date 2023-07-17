@@ -13,6 +13,7 @@ import NewCusomter from "../../pages/newcustomer";
 import NewEstimate from "../../pages/newestimate";
 import Profile from "../../pages/profile/profile";
 import "./index.css";
+import TVDisplay from "../../pages/TV/TVdisplay";
 
 export default function Main() {
   return (
@@ -30,6 +31,7 @@ export default function Main() {
         <Route path="/newcustomer" component={NewCusomter} />
         <Route path="/newestimate" component={NewEstimate} />
         <Route path='/profile' component={Profile} />
+        <Route path="/TV" component={TVDisplay} />
         <Redirect to="/home"></Redirect>
       </Switch>
     </div>

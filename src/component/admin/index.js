@@ -1,6 +1,6 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import { Layout, Modal, message } from "antd";
+import { Layout } from "antd";
 import Main from "../main";
 import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
 import "./index.css";
@@ -9,6 +9,7 @@ import Head from "../head";
 import { getUser } from "../../util/storage";
 import Searchbar from "../searchbar";
 import { datas } from "../../api/index";
+import TVDisplay from "../../pages/TV/TVdisplay";
 const { Header, Content, Footer, Sider } = Layout;
 
 export default class Homepage extends React.Component {
@@ -24,9 +25,12 @@ export default class Homepage extends React.Component {
       (this.state.user && this.state.user.SecurityLevel) || "";
     const FirstName = (this.state.user && this.state.user.FirstName) || "";
     if (!getUser()) return <Redirect to="/login" />;
-    return (
+    if (this.state.user.SecurityLevel == "TV") return (
+      <TVDisplay />
+    )
+     return (
       <Layout className="layout">
-        <Sider>
+        <Sider collapsible>
           <Leftnav role={SecurityLevel} imgUrl={datas.user[0].imgUrl}></Leftnav>
         </Sider>
         <Layout className="main-layout">

@@ -47,7 +47,7 @@ class Leftnav extends Component {
           mode="inline"
           defaultSelectedKeys="/home"
           selectedKeys={pathname}
-        >
+          >
           {this.getNodes(menu)}
         </Menu>
       </div>

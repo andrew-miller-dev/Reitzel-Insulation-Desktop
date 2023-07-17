@@ -43,7 +43,7 @@ class SalesCalendar extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      groupByDate:false,
+      groupByDate:true,
       userList:"",
       regionList:"",
       info:false
