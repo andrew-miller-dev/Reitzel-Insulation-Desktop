@@ -23,7 +23,6 @@ const dataSource = new CustomStore({
       startDate : item.startDate,
       endDate : item.endDate
     }));
-    console.log(formatData);
     return formatData
   }
 });
@@ -78,7 +77,6 @@ class SalesCalendar extends React.Component {
       region: item.Region,
       color: item.color
     }))
-    console.log(regionData);
     return regionData;
   }
 
@@ -89,7 +87,6 @@ class SalesCalendar extends React.Component {
       FirstName : item.FirstName,
       LastName: item.LastName
     }))
-    console.log(salesData);
     return salesData;
   }
   componentDidMount(){

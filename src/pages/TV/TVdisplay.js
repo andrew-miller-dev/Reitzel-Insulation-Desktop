@@ -2,31 +2,44 @@ import { Tabs, Card } from "antd";
 import FillCalendar from "../../Components/HomeTemplate/FillCalendar/FillCalendar";
 import FoamCalendar from "../../Components/HomeTemplate/FoamCalendar/FoamCalendar";
 import SalesCalendar from "../../Components/HomeTemplate/SalesCalendar/SalesSnapshot";
-import Head from "../../component/head";
-import { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import FoamSnapshot from "../../Components/HomeTemplate/FoamCalendar/FoamSnapshot";
 import FillSnapshot from "../../Components/HomeTemplate/FillCalendar/FillSnapshot";
+import Head from "../../component/head";
+import HeadSmall from "../../component/head/headSmall";
 
 
 export default function TVDisplay(props) {
 const [activeTab, setActiveTab] = useState(1);
 
-  useEffect(() => {
-    setInterval(() => {
-      timer();
-    }, 5000);
-  },[])
+useInterval(() => {
+  if(activeTab === 3) {
+    setActiveTab(1);
+  }
+  else {
+    setActiveTab(a => a + 1);
+  }
+}, 5000);
 
+
+  function useInterval(callback, delay) {
+    const savedCallback = useRef();
   
-  const timer = () => {
-    console.log("went off");
-    console.log(activeTab)
-    if(activeTab == 3) {
-      setActiveTab(0);
-    }
-    else {
-      setActiveTab(parseInt(activeTab + 1));
-    }
+    // Remember the latest callback.
+    useEffect(() => {
+      savedCallback.current = callback;
+    }, [callback]);
+  
+    // Set up the interval.
+    useEffect(() => {
+      function tick() {
+        savedCallback.current();
+      }
+      if (delay !== null) {
+        let id = setInterval(tick, delay);
+        return () => clearInterval(id);
+      }
+    }, [delay]);
   }
 
   const items2 = [
@@ -43,19 +56,14 @@ const [activeTab, setActiveTab] = useState(1);
     3: <FillSnapshot />
   }
 
-  const handleTabChange = key => {
-    setActiveTab(key);
-  };
-
     return (
       <>  
+      <HeadSmall />
        <Card 
        tabList={items2}
        defaultActiveTabKey="1"
        activeTabKey={activeTab}
-       onTabChange={key => {
-        handleTabChange(key)
-       }}>
+       >
       {contentList[activeTab]}
        </Card>
       </>
