@@ -9,12 +9,15 @@ import SalesTooltip from './salesTooltip.js';
 import {getUsersWithDisplay, 
         getRegionAPI, 
         getCustomers,} from '../../../api/calendar';
-import { Modal, Space } from 'antd';
+import { Modal, Space, message } from 'antd';
 import 'devextreme-react/tag-box';
 import 'devextreme-react/autocomplete';
 import { Button } from "devextreme-react";
 import NewEstimateForm from "../../Forms/newestimateform";
 import {dataSource} from '../../../Components/SalesDatasource'
+import { holidays, isValidDate } from "../../../config/checks";
+import { DateCell } from "./dateCell";
+import DataCell from "./dataCell";
 const { confirm } = Modal;
 const currentDate = new Date();
 let date = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
@@ -26,6 +29,10 @@ const renderResourceCell = (model) => {
       <b>{model.data.FirstName} {model.data.LastName[0]}</b>
   );
 }
+
+const renderDateCell = (model) => <DateCell itemData={model} />
+
+const renderDataCell = (model) => <DataCell itemData={model} />
 
 
 class SalesCalendar extends React.Component {
@@ -65,10 +72,18 @@ class SalesCalendar extends React.Component {
 } 
 async onAppointmentForm (e) {
   e.cancel = true;
+  if(isValidDate(e.appointmentData.startDate)){
+
+  
   if(!e.appointmentData.CreationDate){
+    if(e.appointmentData.startDate)
     this.setState({formOption:<NewEstimateForm close = {this.closeForm} start={e.appointmentData.startDate} end = {e.appointmentData.endDate} salesman = {this.createUserObj(e.appointmentData.UserID)} />});
     this.setState({showForm:true});
   }
+}
+else {
+  message.error("Date is unavailable for booking");
+}
 }
 onAppointmentDeleting = (e) => {
   var cancel = true;
@@ -145,6 +160,8 @@ onGroupByDateChanged(args) {
         resourceCellRender={renderResourceCell}
         dataSource={dataSource}
         views={views}
+        dataCellRender={renderDataCell}
+        dateCellRender={renderDateCell}
         defaultCurrentView="workWeek"
         defaultCurrentDate={date}
         height={600}

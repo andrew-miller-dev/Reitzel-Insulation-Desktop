@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
-import { Card, Table, Button, Modal, message, Switch } from "antd";
+import { Card, Table, Button, Modal, message, Switch, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { getUsers, deleteUser, getRoles, changeDisplay } from "../../api/index";
 import NewUserForm from "../../Components/Forms/newuserform";
@@ -16,6 +16,9 @@ export default function Users() {
   const [currentForm, setCurrentForm] = useState([]);
 
   const title = (
+    <Space>
+      
+    
     <Button
       onClick={() => {
         setCurrentForm(<NewUserForm count = {changeCount} roleList = {roles} closeForm = {closeModal} />);
@@ -25,6 +28,10 @@ export default function Users() {
     >
       New User
     </Button>
+    <Button>
+      User Time off
+    </Button>
+    </Space>
   );
 
   //for table coloumns

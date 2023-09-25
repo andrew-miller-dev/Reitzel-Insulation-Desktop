@@ -138,7 +138,6 @@ export default function Profile(props) {
                     <Col>  {user.SecurityLevel}
                     </Col>
                 </Row>
-               
             </Card>
             <Modal visible={showForm}
             onCancel={closeForm}

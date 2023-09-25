@@ -1,15 +1,6 @@
 import { checkExisting } from "../api/customer";
+import { holidays } from "../util/storedArrays";
 
-export function checkForUndefined(object) {
-    for (let[key, value] of Object.entries(object)){
-        if (value === undefined) {
-            value  = '_______';
-        }
-        console.log(`${key}, ${value}`)
-    }
-    console.log(object);
-    return object;
-}
 
 export function addEscapeChar(string) {
     let newstring = string;
@@ -45,4 +36,19 @@ export function checkForMultipleBilling(array) {
 export function checkForWeekend (date) {
     const day = date.getDay();
     return day === 0 || day === 6
+}
+
+export function isValidDate(date) {
+    let stringDate = date.toLocaleDateString();
+    let filteredHolidays = holidays.filter((holiday) => new Date(holiday).toLocaleDateString() === stringDate).length > 0;
+    if(filteredHolidays === false) 
+    {
+        
+        if(checkForWeekend(date)) {
+            return false
+        }
+        else return true;
+
+    }
+    else return false;
 }
